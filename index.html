@@ -3,19 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lane Racer</title>
+    <title>Lane Racer Pro</title>
     <style>
-        body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; background: #2c3e50; touch-action: manipulation; overflow: hidden; }
-        #gameCanvas { background: #34495e; border-radius: 10px; margin: 10px; touch-action: none; }
-        .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; width: 100%; max-width: 400px; }
-        button { padding: 15px; font-size: 18px; border: none; border-radius: 8px; background: #3498db; color: white; touch-action: manipulation; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: #2c3e50; 
+            touch-action: manipulation; 
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        #gameCanvas { 
+            background: #34495e; 
+            border-radius: 10px; 
+            margin: 10px; 
+            touch-action: none; 
+        }
+        .controls { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            padding: 10px; 
+            width: 100%; 
+            max-width: 400px; 
+        }
+        button { 
+            padding: 15px; 
+            font-size: 18px; 
+            border: none; 
+            border-radius: 8px; 
+            background: #3498db; 
+            color: white; 
+            touch-action: manipulation; 
+            -webkit-tap-highlight-color: transparent;
+        }
         button:active { background: #2980b9; }
-        #score { color: white; font-size: 24px; margin: 10px; font-family: Arial; }
-        .game-over { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 20px; border-radius: 10px; text-align: center; display: none; }
+        .score-board {
+            color: white;
+            font-size: 24px;
+            margin: 10px;
+            font-family: Arial;
+            display: flex;
+            gap: 20px;
+        }
+        .game-over { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0, 0, 0, 0.8); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+            display: none; 
+        }
     </style>
 </head>
 <body>
-    <div id="score">Score: 0</div>
+    <div class="score-board">
+        <div>Score: <span id="currentScore">0</span></div>
+        <div>Best: <span id="bestScore">0</span></div>
+    </div>
     <canvas id="gameCanvas"></canvas>
     <div class="controls">
         <button id="leftBtn">←</button>
@@ -28,10 +83,14 @@
     </div>
 
     <script>
+        // Инициализация localStorage для рекордов
+        let bestScore = localStorage.getItem('bestScore') || 0;
+        document.getElementById('bestScore').textContent = bestScore;
+
         const CONFIG = {
             ROAD: {
                 widthRatio: 0.8,
-                lanes: 4, // 4 полосы
+                lanes: 4,
                 colors: {
                     road: '#7f8c8d',
                     marker: '#ffffff',
@@ -43,7 +102,7 @@
                 height: 50,
                 speed: 7,
                 color: '#e74c3c',
-                lane: 1 // начальная позиция (0-3)
+                lane: 1
             },
             ENEMIES: {
                 types: [
@@ -85,6 +144,9 @@
             }
         };
 
+        // Запрет контекстного меню
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
         function resizeCanvas() {
             canvas.width = Math.min(window.innerWidth - 20, 400);
             canvas.height = canvas.width * 0.8;
@@ -98,10 +160,24 @@
             const rightBtn = document.getElementById('rightBtn');
             const soundBtn = document.getElementById('soundBtn');
             
-            leftBtn.addEventListener('touchstart', () => movePlayer(-1));
-            rightBtn.addEventListener('touchstart', () => movePlayer(1));
+            // Обработчики для мобильных устройств
+            const handleTouch = e => {
+                e.preventDefault();
+                if(e.cancelable) e.preventDefault();
+            };
+
+            leftBtn.addEventListener('touchstart', e => {
+                handleTouch(e);
+                movePlayer(-1);
+            });
             
-            document.addEventListener('keydown', (e) => {
+            rightBtn.addEventListener('touchstart', e => {
+                handleTouch(e);
+                movePlayer(1);
+            });
+
+            // Обработчики клавиатуры
+            document.addEventListener('keydown', e => {
                 if(e.key === 'ArrowLeft') movePlayer(-1);
                 if(e.key === 'ArrowRight') movePlayer(1);
             });
@@ -112,6 +188,14 @@
         function movePlayer(direction) {
             player.lane = Math.max(0, Math.min(CONFIG.ROAD.lanes - 1, player.lane + direction));
             player.updatePosition();
+        }
+
+        function updateBestScore() {
+            if(score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('bestScore', bestScore);
+                document.getElementById('bestScore').textContent = bestScore;
+            }
         }
 
         function createEnemy() {
@@ -133,34 +217,29 @@
         function updateGame() {
             if(isGameOver) return;
 
-            // Движение врагов
             enemies.forEach(enemy => {
                 enemy.y += enemy.speed;
                 if(checkCollision(player, enemy)) gameOver();
             });
 
-            // Удаление вышедших за экран врагов
             enemies = enemies.filter(enemy => {
                 if(enemy.y > canvas.height) {
                     score += 10;
-                    document.getElementById('score').textContent = `Score: ${score}`;
+                    document.getElementById('currentScore').textContent = score;
                     return false;
                 }
                 return true;
             });
 
-            // Спавн новых врагов
             if(Math.random() * CONFIG.ENEMIES.spawnRate < 1) {
                 createEnemy();
             }
         }
 
         function drawRoad() {
-            // Отрисовка дороги
             ctx.fillStyle = CONFIG.ROAD.colors.road;
             ctx.fillRect(ROAD.left(), 0, ROAD.right() - ROAD.left(), canvas.height);
 
-            // Разметка полос
             ctx.strokeStyle = CONFIG.ROAD.colors.marker;
             ctx.setLineDash([20, 15]);
             for(let i = 1; i < CONFIG.ROAD.lanes; i++) {
@@ -175,11 +254,9 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawRoad();
             
-            // Игрок
             ctx.fillStyle = player.color;
             ctx.fillRect(player.x, player.y, player.width, player.height);
             
-            // Враги
             enemies.forEach(enemy => {
                 ctx.fillStyle = enemy.color;
                 ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
@@ -188,6 +265,7 @@
 
         function gameOver() {
             isGameOver = true;
+            updateBestScore();
             document.getElementById('gameOver').style.display = 'block';
             cancelAnimationFrame(gameLoop);
         }
@@ -197,9 +275,9 @@
             player.updatePosition();
             enemies = [];
             score = 0;
+            document.getElementById('currentScore').textContent = '0';
             isGameOver = false;
             document.getElementById('gameOver').style.display = 'none';
-            document.getElementById('score').textContent = `Score: 0`;
             gameLoop = requestAnimationFrame(game);
         }
 
