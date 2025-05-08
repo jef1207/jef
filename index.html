@@ -3,76 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Прямой Доступ</title>
+    <title>YouTube Mini App</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background: #f1f1f1;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .player-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            background: #000;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        #player {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 10px;
-        }
-        .video-item {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .video-item:hover {
-            transform: translateY(-5px);
-        }
-        .video-thumbnail {
-            width: 100%;
-            height: 140px;
-            object-fit: cover;
-        }
-        .video-title {
-            padding: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        button {
-            padding: 10px 20px;
-            background: #ff0000;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-        }
+        /* Стили остаются прежними из предыдущего примера */
+        body { margin: 0; padding: 20px; font-family: Arial; background: #f0f0f0; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .player-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; border-radius: 10px; }
+        #player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 10px; }
+        .video-item { background: white; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .video-item:hover { transform: translateY(-5px); }
+        .video-thumbnail { width: 100%; height: 140px; object-fit: cover; }
+        .video-title { padding: 10px; font-size: 14px; color: #333; }
+        .controls { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+        button { padding: 10px 20px; background: #ff0000; color: white; border: none; border-radius: 25px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -90,36 +34,45 @@
     </div>
 
     <script>
-        // Список популярных видео (можно менять ID)
+        // Список видео без ограничений
         const videos = [
-            {id: 'dQw4w9WgXcQ', title: 'Классический трек'},
-            {id: 'yPYZpwSpKmA', title: 'Природа в 4K'},
-            {id: '3bhkYoMWTFE', title: 'Космические путешествия'},
-            {id: 'LXb3EKWsInQ', title: 'Горные пейзажи'},
-            {id: '4PDJcw9oJt0', title: 'Учебник по программированию'},
-            {id: '6stlCkUDG_s', title: 'Животные Африки'}
+            {id: 'LXb3EKWsInQ', title: '4K Природа'},     // Проверенные ролики
+            {id: 'yPYZpwSpKmA', title: 'Расслабляющие волны'},
+            {id: '3bhkYoMWTFE', title: 'Космос'},
+            {id: '6stlCkUDG_s', title: 'Дикая природа'},
+            {id: 'c6HqRlFFuOA', title: 'Кофеварка'},
+            {id: 'VYOjWnS4cMY', title: 'HD Фон'}
         ];
 
         let player;
 
-        // Инициализация плеера
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '100%',
                 width: '100%',
                 videoId: videos[0].id,
+                playerVars: {
+                    'origin': window.location.origin,  // Важно для CORS
+                    'rel': 0,          // Отключаем похожие видео
+                    'modestbranding': 1,// Меньше логотипов
+                    'controls': 1       // Показываем элементы управления
+                },
                 events: {
-                    'onReady': onPlayerReady
+                    'onReady': onPlayerReady,
+                    'onError': onPlayerError
                 }
             });
             
-            // Генерация списка видео
+            initVideoGrid();
+        }
+
+        function initVideoGrid() {
             const grid = document.getElementById('videoList');
             videos.forEach(video => {
                 const item = document.createElement('div');
                 item.className = 'video-item';
                 item.innerHTML = `
-                    <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" 
+                    <img src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg" 
                          class="video-thumbnail" 
                          alt="${video.title}">
                     <div class="video-title">${video.title}</div>
@@ -133,8 +86,16 @@
             event.target.playVideo();
         }
 
+        function onPlayerError(event) {
+            console.error('Ошибка плеера:', event.data);
+            alert('Это видео недоступно. Попробуйте другое.');
+        }
+
         function loadVideo(videoId) {
-            player.loadVideoById(videoId);
+            player.loadVideoById({
+                videoId: videoId,
+                suggestedQuality: 'hd720'
+            });
         }
 
         function playVideo() {
@@ -148,8 +109,7 @@
         // Загрузка YouTube API
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        document.head.appendChild(tag);
     </script>
 </body>
 </html>
