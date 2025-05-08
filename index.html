@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Mini Player</title>
+    <title>YouTube Прямой Доступ</title>
     <style>
         body {
             margin: 0;
             padding: 20px;
             font-family: Arial, sans-serif;
-            background: #f0f0f0;
+            background: #f1f1f1;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         .player-container {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
             background: #000;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         #player {
             position: absolute;
@@ -32,121 +32,120 @@
             height: 100%;
             border: 0;
         }
-        .search-box {
-            margin-bottom: 20px;
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+        .video-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .video-item:hover {
+            transform: translateY(-5px);
+        }
+        .video-thumbnail {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+        .video-title {
+            padding: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+        .controls {
             display: flex;
             gap: 10px;
-        }
-        input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            font-size: 16px;
+            justify-content: center;
+            margin: 20px 0;
         }
         button {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background: #ff0000;
             color: white;
             border: none;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #cc0000;
-        }
-        .controls {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="search-box">
-            <input type="text" id="videoUrl" placeholder="Введите URL YouTube видео...">
-            <button onclick="loadVideo()">Загрузить</button>
-        </div>
         <div class="player-container">
             <div id="player"></div>
         </div>
+        
         <div class="controls">
-            <button onclick="playVideo()">▶️ Воспроизвести</button>
-            <button onclick="pauseVideo()">⏸️ Пауза</button>
-            <button onclick="toggleFullscreen()">⛶ Полный экран</button>
+            <button onclick="playVideo()">▶ Воспроизвести</button>
+            <button onclick="pauseVideo()">⏸ Пауза</button>
         </div>
+
+        <div class="video-grid" id="videoList"></div>
     </div>
 
     <script>
-        let player;
-        const videoIdRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+        // Список популярных видео (можно менять ID)
+        const videos = [
+            {id: 'dQw4w9WgXcQ', title: 'Классический трек'},
+            {id: 'yPYZpwSpKmA', title: 'Природа в 4K'},
+            {id: '3bhkYoMWTFE', title: 'Космические путешествия'},
+            {id: 'LXb3EKWsInQ', title: 'Горные пейзажи'},
+            {id: '4PDJcw9oJt0', title: 'Учебник по программированию'},
+            {id: '6stlCkUDG_s', title: 'Животные Африки'}
+        ];
 
-        // Инициализация YouTube IFrame API
+        let player;
+
+        // Инициализация плеера
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '100%',
                 width: '100%',
+                videoId: videos[0].id,
                 events: {
                     'onReady': onPlayerReady
                 }
             });
+            
+            // Генерация списка видео
+            const grid = document.getElementById('videoList');
+            videos.forEach(video => {
+                const item = document.createElement('div');
+                item.className = 'video-item';
+                item.innerHTML = `
+                    <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" 
+                         class="video-thumbnail" 
+                         alt="${video.title}">
+                    <div class="video-title">${video.title}</div>
+                `;
+                item.onclick = () => loadVideo(video.id);
+                grid.appendChild(item);
+            });
         }
 
         function onPlayerReady(event) {
-            // Действия при готовности плеера
+            event.target.playVideo();
         }
 
-        function loadVideo() {
-            const url = document.getElementById('videoUrl').value;
-            const videoId = extractVideoId(url);
-            
-            if(videoId) {
-                if(player && player.loadVideoById) {
-                    player.loadVideoById(videoId);
-                } else {
-                    player = new YT.Player('player', {
-                        height: '100%',
-                        width: '100%',
-                        videoId: videoId,
-                        events: {
-                            'onReady': onPlayerReady
-                        }
-                    });
-                }
-            } else {
-                alert('Пожалуйста, введите корректный URL YouTube видео');
-            }
-        }
-
-        function extractVideoId(url) {
-            const match = url.match(videoIdRegex);
-            return match ? match[1] : null;
+        function loadVideo(videoId) {
+            player.loadVideoById(videoId);
         }
 
         function playVideo() {
-            if(player) player.playVideo();
+            player.playVideo();
         }
 
         function pauseVideo() {
-            if(player) player.pauseVideo();
+            player.pauseVideo();
         }
 
-        function toggleFullscreen() {
-            const container = document.querySelector('.player-container');
-            if (!document.fullscreenElement) {
-                container.requestFullscreen().catch(err => {
-                    alert(`Ошибка при переходе в полноэкранный режим: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        }
-
-        // Динамическая загрузка YouTube IFrame API
+        // Загрузка YouTube API
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
