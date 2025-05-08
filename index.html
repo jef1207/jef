@@ -1,137 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>🔥 Dragon's Crypt Lite</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Mini Player</title>
     <style>
-        /* Стили остаются без изменений */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .player-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 24px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #cc0000;
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Интерфейс игры без упоминаний NFT -->
-        <div id="inventory">
-            <h3>🎒 Инвентарь</h3>
-            <div id="inventory-items"></div>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="videoUrl" placeholder="Введите URL YouTube видео...">
+            <button onclick="loadVideo()">Загрузить</button>
+        </div>
+        <div class="player-container">
+            <div id="player"></div>
+        </div>
+        <div class="controls">
+            <button onclick="playVideo()">▶️ Воспроизвести</button>
+            <button onclick="pauseVideo()">⏸️ Пауза</button>
+            <button onclick="toggleFullscreen()">⛶ Полный экран</button>
         </div>
     </div>
 
     <script>
-        // Упрощенная система предметов
-        class GameItem {
-            constructor(name, type, stats) {
-                this.id = Math.random().toString(36).substr(2,9);
-                this.name = name;
-                this.type = type;
-                this.stats = stats;
-            }
-        }
+        let player;
+        const videoIdRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
 
-        // База данных внутриигровых предметов
-        const itemsDB = {
-            dragonSword: new GameItem('🗡️ Меч дракона', 'weapon', { attack: 15 }),
-            healthPotion: new GameItem('🧪 Зелье здоровья', 'consumable', { hp: 50 })
-        };
-
-        // Обновленная система крафта
-        const craftingRecipes = [
-            {
-                result: itemsDB.dragonSword,
-                requirements: [
-                    { item: 'dragonScale', quantity: 3 },
-                    { item: 'ironOre', quantity: 5 }
-                ]
-            }
-        ];
-
-        // Система гильдий
-        class Guild {
-            constructor(name) {
-                this.name = name;
-                this.members = [];
-                this.level = 1;
-            }
-
-            addMember(player) {
-                if (this.members.length < 30) {
-                    this.members.push(player);
+        // Инициализация YouTube IFrame API
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                events: {
+                    'onReady': onPlayerReady
                 }
-            }
-        }
-
-        // Торговая система
-        class Marketplace {
-            constructor() {
-                this.listings = [];
-            }
-
-            addListing(item, price) {
-                this.listings.push({
-                    item: item.id,
-                    price: price,
-                    seller: gameState.playerId
-                });
-            }
-        }
-
-        // Ежедневные задания
-        const dailyQuests = [
-            {
-                title: "Сбор ресурсов",
-                objective: { target: 'wood', amount: 10 },
-                reward: { gold: 100, items: ['healthPotion'] }
-            }
-        ];
-
-        // Инициализация игрового состояния
-        const gameState = {
-            inventory: [],
-            guild: null,
-            completedQuests: [],
-            currency: {
-                gold: 0,
-                gems: 0
-            }
-        };
-
-        // Обновленная система крафта
-        function craftItem(recipe) {
-            if (checkRequirements(recipe.requirements)) {
-                gameState.inventory.push(recipe.result);
-                updateInventoryUI();
-            }
-        }
-
-        function checkRequirements(requirements) {
-            return requirements.every(req => {
-                const itemCount = gameState.inventory.filter(
-                    i => i.id === req.item
-                ).length;
-                return itemCount >= req.quantity;
             });
         }
 
-        // Инициализация интерфейса
-        function initGame() {
-            renderCraftingRecipes();
-            loadDailyQuests();
-            updateInventoryUI();
+        function onPlayerReady(event) {
+            // Действия при готовности плеера
         }
 
-        // Загрузка ежедневных заданий
-        function loadDailyQuests() {
-            const now = new Date();
-            if (!localStorage.getItem('questsRefresh') || 
-                now > new Date(localStorage.getItem('questsRefresh'))) {
-                gameState.availableQuests = [...dailyQuests];
-                localStorage.setItem('questsRefresh', 
-                    new Date(now.setDate(now.getDate() + 1)));
+        function loadVideo() {
+            const url = document.getElementById('videoUrl').value;
+            const videoId = extractVideoId(url);
+            
+            if(videoId) {
+                if(player && player.loadVideoById) {
+                    player.loadVideoById(videoId);
+                } else {
+                    player = new YT.Player('player', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: videoId,
+                        events: {
+                            'onReady': onPlayerReady
+                        }
+                    });
+                }
+            } else {
+                alert('Пожалуйста, введите корректный URL YouTube видео');
             }
         }
 
-        // Пример использования
-        initGame();
+        function extractVideoId(url) {
+            const match = url.match(videoIdRegex);
+            return match ? match[1] : null;
+        }
+
+        function playVideo() {
+            if(player) player.playVideo();
+        }
+
+        function pauseVideo() {
+            if(player) player.pauseVideo();
+        }
+
+        function toggleFullscreen() {
+            const container = document.querySelector('.player-container');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => {
+                    alert(`Ошибка при переходе в полноэкранный режим: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Динамическая загрузка YouTube IFrame API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     </script>
 </body>
 </html>
