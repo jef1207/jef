@@ -2,206 +2,177 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Угадай число!</title>
+    <title>Jetton Spin</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         
+        :root {
+            --primary: #2A2F4F;
+            --accent: #917FB3;
+            --gold: #FFD700;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2.5rem 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            width: 90%;
-            max-width: 500px;
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-        }
-
-        .container:hover {
-            transform: translateY(-5px);
-        }
-
-        h1 {
-            color: #2d3748;
-            margin: 0 0 2rem 0;
-            font-weight: 700;
-            font-size: 1.8rem;
-            position: relative;
-        }
-
-        h1::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 3px;
-            background: #4a5568;
-            margin: 10px auto;
-            border-radius: 2px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 2rem 0;
-        }
-
-        input {
-            padding: 0.8rem 1.2rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            width: 150px;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-
-        button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--primary), #1A1C30);
             color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 500;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .close-btn {
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .balance {
+            text-align: center;
         }
 
-        #message {
-            min-height: 60px;
-            padding: 1rem;
-            margin: 1.5rem 0;
-            border-radius: 10px;
-            font-weight: 500;
+        .balance h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--gold);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: scale(1.05);
+        }
+
+        .prize-pool {
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.2rem;
+        }
+
+        .spin-section {
+            text-align: center;
+            margin-top: auto;
+            padding: 2rem;
+        }
+
+        .spin-btn {
+            background: linear-gradient(45deg, var(--accent), #E5BEEC);
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 30px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .spin-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .timer {
+            color: #FF6B6B;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+
+        .add-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            gap: 0.5rem;
+            margin: 1rem auto;
+            padding: 0.8rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
         }
 
-        #attempts {
+        footer {
             text-align: center;
-            color: #4a5568;
+            padding: 1rem;
+            opacity: 0.8;
             font-size: 0.9rem;
-            margin: 1.5rem 0;
-        }
-
-        .new-game-btn {
-            display: block;
-            width: 100%;
-            background: #48bb78;
-            margin-top: 1.5rem;
-        }
-
-        /* Анимации */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .success {
-            background: #f0fff4;
-            color: #38a169;
-            animation: pulse 0.5s ease;
-        }
-
-        .error {
-            background: #fff5f5;
-            color: #e53e3e;
-        }
-
-        .hint {
-            background: #ebf8ff;
-            color: #4299e1;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Угадай число от 1 до 100!</h1>
-        
-        <div class="input-group">
-            <input type="number" id="guessInput" placeholder="Ваше число">
-            <button onclick="checkGuess()">Проверить</button>
+    <div class="header">
+        <div class="close-btn">×</div>
+        <div class="balance">
+            <h2>$0.60</h2>
+            <div>355</div>
         </div>
-
-        <div id="message" class="hint">Игра началась! Угадайте число ✨</div>
-        
-        <div id="attempts">Попыток: 0</div>
-        
-        <button class="new-game-btn" onclick="newGame()">Новая игра</button>
     </div>
 
+    <div class="main-grid">
+        <div class="game-card">САЗН</div>
+        <div class="game-card">МАСНИРЫ</div>
+        <div class="game-card">ПОДАРОК</div>
+        <div class="game-card">ТАБЛИЦА ЛИ</div>
+    </div>
+
+    <div class="prize-pool">
+        Призовой фонд: $89,580
+    </div>
+
+    <div class="add-button">
+        <span>+</span>
+        <span>0</span>
+    </div>
+
+    <div class="timer">17d 17h</div>
+
+    <div class="spin-section">
+        <button class="spin-btn">SPIN FOR AD</button>
+    </div>
+
+    <footer>
+        При поддержке<br>
+        Jetton Games WEB
+    </footer>
+
     <script>
-        // Оставить оригинальный JavaScript код без изменений
-        let targetNumber;
-        let attempts = 0;
-        
-        function initGame() {
-            targetNumber = Math.floor(Math.random() * 100) + 1;
-            attempts = 0;
-            updateAttempts();
-            document.getElementById('message').textContent = 'Игра началась! Угадайте число ✨';
-            document.getElementById('message').className = 'hint';
-            document.getElementById('guessInput').value = '';
+        // Таймер обратного отсчета
+        function updateTimer() {
+            const timerElement = document.querySelector('.timer');
+            // Здесь можно добавить логику отсчета времени
+            timerElement.textContent = '17d 17h'; 
         }
 
-        function checkGuess() {
-            const userGuess = parseInt(document.getElementById('guessInput').value);
-            const messageElement = document.getElementById('message');
-            
-            if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
-                messageElement.textContent = '❌ Введите число от 1 до 100!';
-                messageElement.className = 'error';
-                return;
-            }
+        // Анимация спина
+        document.querySelector('.spin-btn').addEventListener('click', function() {
+            this.style.animation = 'spin 0.5s ease';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 500);
+        });
 
-            attempts++;
-            updateAttempts();
-
-            if (userGuess === targetNumber) {
-                messageElement.textContent = `🎉 Поздравляем! Вы угадали за ${attempts} попыток!`;
-                messageElement.className = 'success';
-            } else if (userGuess < targetNumber) {
-                messageElement.textContent = '📈 Попробуйте число побольше!';
-                messageElement.className = 'hint';
-            } else {
-                messageElement.textContent = '📉 Попробуйте число поменьше!';
-                messageElement.className = 'hint';
-            }
-        }
-
-        function updateAttempts() {
-            document.getElementById('attempts').textContent = `Попыток: ${attempts}`;
-        }
-
-        function newGame() {
-            initGame();
-        }
-
-        window.onload = initGame;
+        setInterval(updateTimer, 1000);
     </script>
 </body>
 </html>
