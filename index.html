@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Racer</title>
+    <title>Lane Racer</title>
     <style>
         body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; background: #2c3e50; touch-action: manipulation; overflow: hidden; }
         #gameCanvas { background: #34495e; border-radius: 10px; margin: 10px; touch-action: none; }
@@ -12,18 +12,14 @@
         button:active { background: #2980b9; }
         #score { color: white; font-size: 24px; margin: 10px; font-family: Arial; }
         .game-over { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 20px; border-radius: 10px; text-align: center; display: none; }
-        .settings-panel { position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; color: white; }
     </style>
 </head>
 <body>
-    <div class="settings-panel">
-        <button onclick="toggleSound()">🔊 Sound: ON</button>
-    </div>
     <div id="score">Score: 0</div>
     <canvas id="gameCanvas"></canvas>
     <div class="controls">
         <button id="leftBtn">←</button>
-        <button id="brakeBtn">⧖ Тормоз</button>
+        <button id="soundBtn">🔊 Sound</button>
         <button id="rightBtn">→</button>
     </div>
     <div class="game-over" id="gameOver">
@@ -34,8 +30,8 @@
     <script>
         const CONFIG = {
             ROAD: {
-                widthRatio: 0.7,
-                lanes: 3,
+                widthRatio: 0.8,
+                lanes: 4, // 4 полосы
                 colors: {
                     road: '#7f8c8d',
                     marker: '#ffffff',
@@ -45,27 +41,20 @@
             PLAYER: {
                 width: 30,
                 height: 50,
-                speed: 5,
+                speed: 7,
                 color: '#e74c3c',
-                startPosition: 'center'
+                lane: 1 // начальная позиция (0-3)
             },
             ENEMIES: {
                 types: [
                     {
-                        name: 'car',
                         width: 30,
                         height: 50,
-                        minSpeed: 3,
-                        maxSpeed: 5,
-                        color: '#2ecc71',
-                        spawnChance: 0.7
+                        speed: 4,
+                        color: '#2ecc71'
                     }
-                ]
-            },
-            DIFFICULTY: {
-                levels: [
-                    { score: 0, spawnRate: 100, speedMultiplier: 1.0 }
-                ]
+                ],
+                spawnRate: 100
             }
         };
 
@@ -75,68 +64,62 @@
         let score = 0;
         let gameLoop;
         let isGameOver = false;
-        let currentLevel = 0;
-        let soundEnabled = false;
+        let soundEnabled = true;
 
         const ROAD = {
             left: () => canvas.width * (1 - CONFIG.ROAD.widthRatio) / 2,
             right: () => ROAD.left() + canvas.width * CONFIG.ROAD.widthRatio,
-            laneWidth: () => (ROAD.right() - ROAD.left()) / CONFIG.ROAD.lanes
+            laneWidth: () => (ROAD.right() - ROAD.left()) / CONFIG.ROAD.lanes,
+            getLaneCenter: lane => ROAD.left() + (lane + 0.5) * ROAD.laneWidth()
         };
 
         const player = {
             x: 0,
-            y: 0,
-            ...CONFIG.PLAYER,
-            resetPosition() {
-                switch(CONFIG.PLAYER.startPosition) {
-                    case 'left': 
-                        this.x = ROAD.left() + 10;
-                        break;
-                    case 'right':
-                        this.x = ROAD.right() - this.width - 10;
-                        break;
-                    default:
-                        this.x = ROAD.left() + (ROAD.right() - ROAD.left() - this.width) / 2;
-                }
-                this.y = canvas.height - 80;
+            y: canvas.height - 80,
+            lane: CONFIG.PLAYER.lane,
+            width: CONFIG.PLAYER.width,
+            height: CONFIG.PLAYER.height,
+            color: CONFIG.PLAYER.color,
+            updatePosition() {
+                this.x = ROAD.getLaneCenter(this.lane) - this.width/2;
             }
         };
 
         function resizeCanvas() {
             canvas.width = Math.min(window.innerWidth - 20, 400);
             canvas.height = canvas.width * 0.8;
-            player.resetPosition();
+            player.y = canvas.height - 80;
+            player.updatePosition();
             enemies = [];
         }
 
         function addEventListeners() {
             const leftBtn = document.getElementById('leftBtn');
             const rightBtn = document.getElementById('rightBtn');
+            const soundBtn = document.getElementById('soundBtn');
             
-            leftBtn.addEventListener('touchstart', () => player.moveLeft = true);
-            leftBtn.addEventListener('touchend', () => player.moveLeft = false);
-            rightBtn.addEventListener('touchstart', () => player.moveRight = true);
-            rightBtn.addEventListener('touchend', () => player.moveRight = false);
+            leftBtn.addEventListener('touchstart', () => movePlayer(-1));
+            rightBtn.addEventListener('touchstart', () => movePlayer(1));
             
             document.addEventListener('keydown', (e) => {
-                if(e.key === 'ArrowLeft') player.moveLeft = true;
-                if(e.key === 'ArrowRight') player.moveRight = true;
+                if(e.key === 'ArrowLeft') movePlayer(-1);
+                if(e.key === 'ArrowRight') movePlayer(1);
             });
-            
-            document.addEventListener('keyup', (e) => {
-                if(e.key === 'ArrowLeft') player.moveLeft = false;
-                if(e.key === 'ArrowRight') player.moveRight = false;
-            });
+
+            soundBtn.addEventListener('click', toggleSound);
+        }
+
+        function movePlayer(direction) {
+            player.lane = Math.max(0, Math.min(CONFIG.ROAD.lanes - 1, player.lane + direction));
+            player.updatePosition();
         }
 
         function createEnemy() {
-            const enemyType = CONFIG.ENEMIES.types[0];
+            const lane = Math.floor(Math.random() * CONFIG.ROAD.lanes);
             enemies.push({
-                x: ROAD.left() + Math.random() * (ROAD.right() - ROAD.left() - enemyType.width),
-                y: -enemyType.height,
-                ...enemyType,
-                speed: 3
+                x: ROAD.getLaneCenter(lane) - CONFIG.ENEMIES.types[0].width/2,
+                y: -CONFIG.ENEMIES.types[0].height,
+                ...CONFIG.ENEMIES.types[0]
             });
         }
 
@@ -150,14 +133,13 @@
         function updateGame() {
             if(isGameOver) return;
 
-            if(player.moveLeft && player.x > ROAD.left()) player.x -= player.speed;
-            if(player.moveRight && player.x < ROAD.right() - player.width) player.x += player.speed;
-
+            // Движение врагов
             enemies.forEach(enemy => {
                 enemy.y += enemy.speed;
                 if(checkCollision(player, enemy)) gameOver();
             });
 
+            // Удаление вышедших за экран врагов
             enemies = enemies.filter(enemy => {
                 if(enemy.y > canvas.height) {
                     score += 10;
@@ -167,21 +149,37 @@
                 return true;
             });
 
-            if(Math.random() * 100 < 1) createEnemy();
+            // Спавн новых врагов
+            if(Math.random() * CONFIG.ENEMIES.spawnRate < 1) {
+                createEnemy();
+            }
+        }
+
+        function drawRoad() {
+            // Отрисовка дороги
+            ctx.fillStyle = CONFIG.ROAD.colors.road;
+            ctx.fillRect(ROAD.left(), 0, ROAD.right() - ROAD.left(), canvas.height);
+
+            // Разметка полос
+            ctx.strokeStyle = CONFIG.ROAD.colors.marker;
+            ctx.setLineDash([20, 15]);
+            for(let i = 1; i < CONFIG.ROAD.lanes; i++) {
+                ctx.beginPath();
+                ctx.moveTo(ROAD.left() + i * ROAD.laneWidth(), 0);
+                ctx.lineTo(ROAD.left() + i * ROAD.laneWidth(), canvas.height);
+                ctx.stroke();
+            }
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawRoad();
             
-            // Road
-            ctx.fillStyle = CONFIG.ROAD.colors.road;
-            ctx.fillRect(ROAD.left(), 0, ROAD.right() - ROAD.left(), canvas.height);
-            
-            // Player
+            // Игрок
             ctx.fillStyle = player.color;
             ctx.fillRect(player.x, player.y, player.width, player.height);
             
-            // Enemies
+            // Враги
             enemies.forEach(enemy => {
                 ctx.fillStyle = enemy.color;
                 ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
@@ -195,7 +193,8 @@
         }
 
         function restartGame() {
-            player.resetPosition();
+            player.lane = CONFIG.PLAYER.lane;
+            player.updatePosition();
             enemies = [];
             score = 0;
             isGameOver = false;
@@ -206,7 +205,7 @@
 
         function toggleSound() {
             soundEnabled = !soundEnabled;
-            document.querySelector('.settings-panel button').textContent = 
+            document.getElementById('soundBtn').textContent = 
                 `🔊 Sound: ${soundEnabled ? 'ON' : 'OFF'}`;
         }
 
@@ -216,7 +215,7 @@
             gameLoop = requestAnimationFrame(game);
         }
 
-        // Initialization
+        // Инициализация
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
         addEventListeners();
