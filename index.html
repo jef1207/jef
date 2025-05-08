@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realistic Road Racer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mobile Road Racer</title>
     <style>
         body { 
             margin: 0;
@@ -17,49 +17,60 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             user-select: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
         #gameCanvas {
             background: #34495e;
-            border-radius: 10px;
-            margin: 10px;
             touch-action: none;
+            flex-grow: 1;
+            width: 100%;
+            max-width: 100%;
+            max-height: 80vh;
         }
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 10px;
+            gap: 2vmin;
+            padding: 2vmin;
             width: 100%;
-            max-width: 400px;
+            max-width: 600px;
+            box-sizing: border-box;
         }
         button {
-            padding: 15px;
-            font-size: 18px;
+            padding: 3vmin;
+            font-size: 5vmin;
             border: none;
-            border-radius: 8px;
+            border-radius: 2vmin;
             background: #3498db;
             color: white;
             touch-action: manipulation;
+            min-height: 12vmin;
         }
         .score-board {
             color: white;
-            font-size: 24px;
-            margin: 10px;
+            font-size: 5vmin;
+            margin: 2vmin;
             font-family: Arial;
             display: flex;
-            gap: 20px;
+            gap: 4vmin;
+            width: 100%;
+            justify-content: center;
         }
         .game-over {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 5vmin;
+            border-radius: 3vmin;
             text-align: center;
             display: none;
+            width: 80%;
+            max-width: 400px;
         }
     </style>
 </head>
@@ -76,46 +87,23 @@
     </div>
     <div class="game-over" id="gameOver">
         <h2>Game Over!</h2>
-        <button onclick="restartGame()">Играть снова</button>
+        <button onclick="restartGame()" style="margin-top: 3vmin;">Играть снова</button>
     </div>
 
     <script>
-        // Инициализация localStorage
+        // Блокировка масштабирования
+        document.addEventListener('touchstart', function(e) {
+            if(e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+        
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+
+        // Инициализация игры
         let bestScore = localStorage.getItem('bestScore') || 0;
         document.getElementById('bestScore').textContent = bestScore;
 
-        // Конфигурация игры
-        const CONFIG = {
-            ROAD: {
-                widthRatio: 0.8,
-                lanes: 4,
-                colors: {
-                    road: '#7f8c8d',
-                    marker: '#ffffff',
-                    shoulder: '#34495e'
-                }
-            },
-            PLAYER: {
-                width: 30,
-                height: 50,
-                speed: 7,
-                color: '#e74c3c',
-                lane: 1
-            },
-            ENEMIES: {
-                types: [
-                    {
-                        width: 30,
-                        height: 50,
-                        speed: 4,
-                        color: '#2ecc71'
-                    }
-                ],
-                spawnRate: 100
-            }
-        };
-
-        // Инициализация элементов
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let enemies = [];
@@ -124,7 +112,16 @@
         let isGameOver = false;
         let soundEnabled = true;
 
-        // Расчет параметров дороги
+        const CONFIG = {
+            ROAD: {
+                widthRatio: 0.8,
+                lanes: 4,
+                colors: { road: '#7f8c8d', marker: '#ffffff' }
+            },
+            PLAYER: { width: 8, height: 12, speed: 0.2, color: '#e74c3c' },
+            ENEMIES: { spawnRate: 100, speed: 0.15 }
+        };
+
         const ROAD = {
             left: () => canvas.width * (1 - CONFIG.ROAD.widthRatio) / 2,
             right: () => ROAD.left() + canvas.width * CONFIG.ROAD.widthRatio,
@@ -132,98 +129,86 @@
             getLaneCenter: lane => ROAD.left() + (lane + 0.5) * ROAD.laneWidth()
         };
 
-        // Игрок
         const player = {
-            x: 0,
-            y: 0,
-            lane: CONFIG.PLAYER.lane,
-            width: CONFIG.PLAYER.width,
-            height: CONFIG.PLAYER.height,
-            color: CONFIG.PLAYER.color,
+            x: 0, y: 0, lane: 1,
             updatePosition() {
-                this.x = ROAD.getLaneCenter(this.lane) - this.width/2;
-                this.y = canvas.height - 80;
+                this.x = ROAD.getLaneCenter(this.lane) - CONFIG.PLAYER.width/2;
+                this.y = canvas.height - canvas.height * 0.15;
             }
         };
 
-        // Настройка размеров canvas
         function resizeCanvas() {
-            canvas.width = Math.min(window.innerWidth - 20, 400);
-            canvas.height = canvas.width * 0.8;
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            canvas.width = screenWidth;
+            canvas.height = screenHeight * 0.7;
+            
+            CONFIG.PLAYER.width = screenWidth * 0.07;
+            CONFIG.PLAYER.height = screenWidth * 0.12;
+            
             player.updatePosition();
             enemies = [];
         }
 
-        // Обработчики событий
         function addEventListeners() {
             const leftBtn = document.getElementById('leftBtn');
             const rightBtn = document.getElementById('rightBtn');
-            const soundBtn = document.getElementById('soundBtn');
+            
+            const handleMove = (direction) => {
+                player.lane = Math.max(0, Math.min(3, player.lane + direction));
+                player.updatePosition();
+            };
 
-            leftBtn.addEventListener('touchstart', () => movePlayer(-1));
-            rightBtn.addEventListener('touchstart', () => movePlayer(1));
-
+            leftBtn.addEventListener('touchstart', () => handleMove(-1));
+            rightBtn.addEventListener('touchstart', () => handleMove(1));
+            
             document.addEventListener('keydown', (e) => {
-                if(e.key === 'ArrowLeft') movePlayer(-1);
-                if(e.key === 'ArrowRight') movePlayer(1);
+                if(['ArrowLeft', 'a'].includes(e.key)) handleMove(-1);
+                if(['ArrowRight', 'd'].includes(e.key)) handleMove(1);
             });
-
-            soundBtn.addEventListener('click', toggleSound);
         }
 
-        // Движение игрока
-        function movePlayer(direction) {
-            player.lane = Math.max(0, Math.min(CONFIG.ROAD.lanes - 1, player.lane + direction));
-            player.updatePosition();
-        }
-
-        // Создание препятствий
         function createEnemy() {
-            const lane = Math.floor(Math.random() * CONFIG.ROAD.lanes);
             enemies.push({
-                x: ROAD.getLaneCenter(lane) - CONFIG.ENEMIES.types[0].width/2,
-                y: -CONFIG.ENEMIES.types[0].height,
-                ...CONFIG.ENEMIES.types[0]
+                lane: Math.floor(Math.random() * 4),
+                y: -CONFIG.PLAYER.height,
+                width: CONFIG.PLAYER.width,
+                height: CONFIG.PLAYER.height
             });
         }
 
-        // Проверка столкновений
-        function checkCollision(rect1, rect2) {
-            return rect1.x < rect2.x + rect2.width &&
-                   rect1.x + rect1.width > rect2.x &&
-                   rect1.y < rect2.y + rect2.height &&
-                   rect1.y + rect1.height > rect2.y;
+        function checkCollision() {
+            return enemies.some(enemy => 
+                player.lane === enemy.lane &&
+                enemy.y + CONFIG.PLAYER.height > canvas.height * 0.8
+            );
         }
 
-        // Обновление игрового состояния
         function updateGame() {
             if(isGameOver) return;
 
-            enemies.forEach(enemy => {
-                enemy.y += enemy.speed;
-                if(checkCollision(player, enemy)) gameOver();
-            });
-
-            enemies = enemies.filter(enemy => {
-                if(enemy.y > canvas.height) {
-                    score += 10;
-                    document.getElementById('currentScore').textContent = score;
-                    return false;
-                }
-                return true;
-            });
-
-            if(Math.random() * CONFIG.ENEMIES.spawnRate < 1) createEnemy();
+            enemies.forEach(enemy => enemy.y += CONFIG.ENEMIES.speed * canvas.height);
+            
+            if(checkCollision()) gameOver();
+            
+            enemies = enemies.filter(enemy => enemy.y < canvas.height);
+            
+            if(Math.random() < 0.02) createEnemy();
+            
+            score++;
+            document.getElementById('currentScore').textContent = Math.floor(score/10);
         }
 
-        // Отрисовка дороги
         function drawRoad() {
             ctx.fillStyle = CONFIG.ROAD.colors.road;
             ctx.fillRect(ROAD.left(), 0, ROAD.right() - ROAD.left(), canvas.height);
 
             ctx.strokeStyle = CONFIG.ROAD.colors.marker;
-            ctx.setLineDash([20, 15]);
-            for(let i = 1; i < CONFIG.ROAD.lanes; i++) {
+            ctx.setLineDash([canvas.height * 0.05, canvas.height * 0.03]);
+            ctx.lineWidth = canvas.width * 0.005;
+            
+            for(let i = 1; i < 4; i++) {
                 ctx.beginPath();
                 ctx.moveTo(ROAD.left() + i * ROAD.laneWidth(), 0);
                 ctx.lineTo(ROAD.left() + i * ROAD.laneWidth(), canvas.height);
@@ -231,63 +216,60 @@
             }
         }
 
-        // Основная отрисовка
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawRoad();
-            
+
             // Игрок
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-            
-            // Препятствия
+            ctx.fillStyle = CONFIG.PLAYER.color;
+            ctx.fillRect(player.x, player.y, CONFIG.PLAYER.width, CONFIG.PLAYER.height);
+
+            // Враги
+            ctx.fillStyle = '#2ecc71';
             enemies.forEach(enemy => {
-                ctx.fillStyle = enemy.color;
-                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                const x = ROAD.getLaneCenter(enemy.lane) - CONFIG.PLAYER.width/2;
+                ctx.fillRect(x, enemy.y, CONFIG.PLAYER.width, CONFIG.PLAYER.height);
             });
         }
 
-        // Обработка завершения игры
         function gameOver() {
             isGameOver = true;
             if(score > bestScore) {
                 bestScore = score;
                 localStorage.setItem('bestScore', bestScore);
-                document.getElementById('bestScore').textContent = bestScore;
+                document.getElementById('bestScore').textContent = Math.floor(bestScore/10);
             }
             document.getElementById('gameOver').style.display = 'block';
             cancelAnimationFrame(gameLoop);
         }
 
-        // Перезапуск игры
         function restartGame() {
-            player.lane = CONFIG.PLAYER.lane;
-            player.updatePosition();
-            enemies = [];
-            score = 0;
-            document.getElementById('currentScore').textContent = '0';
             isGameOver = false;
+            score = 0;
+            enemies = [];
+            player.lane = 1;
+            player.updatePosition();
             document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('currentScore').textContent = '0';
             gameLoop = requestAnimationFrame(game);
         }
 
-        // Управление звуком
         function toggleSound() {
             soundEnabled = !soundEnabled;
             document.getElementById('soundBtn').textContent = 
                 `🔊 Sound: ${soundEnabled ? 'ON' : 'OFF'}`;
         }
 
-        // Игровой цикл
         function game() {
             updateGame();
             draw();
             gameLoop = requestAnimationFrame(game);
         }
 
-        // Запуск игры
+        // Инициализация
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', resizeCanvas);
         addEventListeners();
         game();
     </script>
