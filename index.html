@@ -1,224 +1,137 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>🔥 Dragon's Crypt</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --main-bg: #1a1a2e;
-            --accent: #ff6b6b;
-        }
+<!-- Добавляем в body после статусной панели -->
+<div class="crafting-section">
+    <h3>⚒️ Крафтинг</h3>
+    <div class="crafting-grid" id="crafting-recipes"></div>
+</div>
 
-        body {
-            background: var(--main-bg);
-            color: white;
-            font-family: 'Courier New', monospace;
-        }
-
-        .game-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .pixel-art {
-            image-rendering: pixelated;
-        }
-
-        .dialog-box {
-            border: 3px solid var(--accent);
-            padding: 15px;
-            margin: 20px 0;
-            background: rgba(0,0,0,0.7);
-            position: relative;
-        }
-
-        .choice-btn {
-            background: #4a4a6d;
-            border: 2px solid var(--accent);
-            color: white;
-            margin: 5px;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .choice-btn:hover {
-            transform: scale(1.05);
-            background: var(--accent);
-        }
-
-        #map {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            margin: 20px 0;
-        }
-
-        .map-tile {
-            aspect-ratio: 1;
-            background: #2d2d44;
-            border: 1px solid var(--accent);
-            position: relative;
-        }
-
-        .player-icon {
-            width: 80%;
-            height: 80%;
-            background: var(--accent);
-            position: absolute;
-            top: 10%;
-            left: 10%;
-            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-        }
-    </style>
-</head>
-<body>
-    <div class="game-container">
-        <h1>🐉 Dragon's Crypt</h1>
-        
-        <!-- Динамическая карта -->
-        <div id="map"></div>
-
-        <!-- Диалоговое окно -->
-        <div class="dialog-box" id="dialog">
-            <div id="dialog-text">Добро пожаловать в подземелье, искатель приключений!</div>
-            <div id="choices"></div>
-        </div>
-
-        <!-- Статусная панель -->
-        <div id="status">
-            ⚔️ Уровень: <span id="level">1</span> 
-            ❤️ Здоровье: <span id="health">100</span>/100
-            💰 Золото: <span id="gold">50</span>
-        </div>
-    </div>
-
-    <script>
-        const tg = Telegram.WebApp;
-        tg.expand();
-        tg.MainButton.setText("Сохранить прогресс").hide();
-        
-        // Игровая механика
-        const gameState = {
-            level: 1,
-            health: 100,
-            gold: 50,
-            position: {x: 2, y: 2},
-            inventory: [],
-            discoveredRooms: new Set()
+<script>
+// 1. Система классов персонажей
+class CharacterClass {
+    constructor(type) {
+        this.types = {
+            warrior: { attack: 15, defense: 10, skill: 'Берсерк' },
+            mage: { attack: 8, defense: 5, skill: 'Огненный шар' },
+            rogue: { attack: 10, defense: 7, skill: 'Скрытность' }
         };
+        return this.types[type];
+    }
+}
 
-        // Генерация карты
-        function generateMap() {
-            const map = document.getElementById('map');
-            map.innerHTML = '';
-            
-            for(let y = 0; y < 5; y++) {
-                for(let x = 0; x < 5; x++) {
-                    const tile = document.createElement('div');
-                    tile.className = 'map-tile';
-                    if(x === gameState.position.x && y === gameState.position.y) {
-                        const player = document.createElement('div');
-                        player.className = 'player-icon';
-                        tile.appendChild(player);
-                    }
-                    tile.onclick = () => movePlayer(x, y);
-                    map.appendChild(tile);
-                }
-            }
+// 2. Система крафта
+const craftingRecipes = [
+    {
+        result: '🗡️ Меч дракона',
+        requirements: { '🐉 Чешуя дракона': 3, '🔥 Пламя': 5 },
+        class: 'warrior'
+    },
+    {
+        result: '🔮 Магический свиток',
+        requirements: { '📜 Пергамент': 2, '💧 Эссенция маны': 4 },
+        class: 'mage'
+    }
+];
+
+function renderCrafting() {
+    const container = document.getElementById('crafting-recipes');
+    container.innerHTML = craftingRecipes.map(recipe => `
+        <div class="recipe">
+            <h4>${recipe.result}</h4>
+            ${Object.entries(recipe.requirements).map(([item, count]) => `
+                <div>${item} x${count}</div>
+            `).join('')}
+            <button onclick="craftItem('${recipe.result}')">Создать</button>
+        </div>
+    `).join('');
+}
+
+// 3. Торговая система
+class Marketplace {
+    constructor() {
+        this.listings = [];
+    }
+
+    addListing(item, price, seller) {
+        this.listings.push({ item, price, seller });
+    }
+
+    buyItem(itemId, buyer) {
+        const item = this.listings[itemId];
+        if (buyer.gold >= item.price) {
+            buyer.gold -= item.price;
+            buyer.inventory.push(item.item);
+            Telegram.WebApp.sendData(JSON.stringify({
+                type: 'TRADE',
+                data: { item: item.item, price: item.price }
+            }));
         }
+    }
+}
 
-        // Механика движения
-        function movePlayer(x, y) {
-            if(Math.abs(x - gameState.position.x) > 1 || 
-               Math.abs(y - gameState.position.y) > 1) return;
-            
-            gameState.position = {x, y};
-            generateMap();
-            discoverRoom();
+// 4. Система гильдий
+class Guild {
+    constructor(name, leader) {
+        this.name = name;
+        this.members = [leader];
+        this.treasury = 0;
+        this.quests = [];
+    }
+
+    addMember(player) {
+        if (this.members.length < 50) {
+            this.members.push(player);
         }
+    }
+}
 
-        // Обнаружение комнаты
-        function discoverRoom() {
-            const roomId = `${gameState.position.x}-${gameState.position.y}`;
-            if(!gameState.discoveredRooms.has(roomId)) {
-                gameState.discoveredRooms.add(roomId);
-                showRandomEvent();
-            }
-        }
+// 5. Ежедневные задания
+const dailyQuests = [
+    {
+        id: 1,
+        title: 'Сбор ресурсов',
+        objective: 'Соберите 10 единиц древесины',
+        reward: { gold: 100, exp: 50 }
+    },
+    {
+        id: 2,
+        title: 'Охота на монстров',
+        objective: 'Победите 5 скелетов',
+        reward: { gold: 200, exp: 100 }
+    }
+];
 
-        // Случайные события
-        function showRandomEvent() {
-            const events = [
-                {
-                    text: "Вы нашли сундук! Что будете делать?",
-                    choices: [
-                        {text: "Открыть", action: () => findLoot()},
-                        {text: "Проверить на ловушки", action: () => checkForTraps()},
-                        {text: "Уйти", action: () => closeDialog()}
-                    ]
-                },
-                {
-                    text: "На вас напал 🧟 Скелет-воин!",
-                    choices: [
-                        {text: "⚔️ Атаковать", action: () => startCombat()},
-                        {text: "🛡️ Защищаться", action: () => defend()},
-                        {text: "🏃 Бежать", action: () => tryEscape()}
-                    ]
-                }
-            ];
-            
-            const event = events[Math.floor(Math.random() * events.length)];
-            showDialog(event.text, event.choices);
-        }
+// 6. NFT интеграция (используем TON Blockchain)
+async function mintNFT(item) {
+    const response = await fetch('https://api.tonnft.com/mint', {
+        method: 'POST',
+        body: JSON.stringify({
+            item,
+            owner: tg.initDataUnsafe.user.id
+        })
+    });
+    return response.json();
+}
 
-        // Система диалогов
-        function showDialog(text, choices) {
-            document.getElementById('dialog-text').textContent = text;
-            const choicesContainer = document.getElementById('choices');
-            choicesContainer.innerHTML = choices.map(choice => `
-                <button class="choice-btn" onclick="choice.action()">${choice.text}</button>
-            `).join('');
-        }
+// Инициализация новых систем
+const marketplace = new Marketplace();
+let playerClass = new CharacterClass('warrior');
+let guild = null;
 
-        // Пример игровой механики: бой
-        function startCombat() {
-            const enemyHP = gameState.level * 20;
-            let currentEnemyHP = enemyHP;
-            
-            showDialog(`⚔️ Бой начался! (Здоровье врага: ${currentEnemyHP})`, [
-                {
-                    text: "Удар мечом",
-                    action: () => {
-                        const damage = Math.floor(Math.random() * 15) + 5;
-                        currentEnemyHP -= damage;
-                        if(currentEnemyHP <= 0) {
-                            const goldEarned = Math.floor(Math.random() * 50) + 10;
-                            gameState.gold += goldEarned;
-                            showDialog(`Вы победили! Получено 🪙 ${goldEarned} золота`, [
-                                {text: "Продолжить", action: closeDialog}
-                            ]);
-                        } else {
-                            showDialog(`Вы нанесли ${damage} урона! (Осталось HP: ${currentEnemyHP})`, [
-                                {text: "Атаковать снова", action: () => startCombat()}
-                            ]);
-                        }
-                    }
-                }
-            ]);
-        }
+// Обновляем игровую механику
+function startCombat() {
+    // Добавляем бонусы класса
+    const classBonus = playerClass.attack * gameState.level;
+    // ... остальная логика боя ...
+}
 
-        // Инициализация игры
-        generateMap();
-        tg.ready();
+// Добавляем в gameState
+gameState.dailyQuests = [];
+gameState.craftingMaterials = {};
+gameState.nftItems = [];
 
-        // Сохранение прогресса через Telegram
-        function saveProgress() {
-            Telegram.WebApp.sendData(JSON.stringify(gameState));
-            Telegram.WebApp.close();
-        }
-    </script>
-</body>
-</html>
+// Пример использования NFT
+async function completeEpicQuest() {
+    const nft = await mintNFT('🐉 Сердце дракона');
+    gameState.nftItems.push(nft);
+    tg.showAlert(`Вы получили NFT: ${nft.id}`);
+}
+</script>
