@@ -2,200 +2,234 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Jetton Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turbo Race</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        
-        :root {
-            --primary: #1A1B25;
-            --accent: #6C4B9E;
-            --gold: #FFD700;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
             margin: 0;
-            min-height: 100vh;
-            background: var(--primary);
-            color: white;
-            position: relative;
-        }
-
-        .container {
-            padding: 20px;
-            max-width: 375px;
-            margin: 0 auto;
-        }
-
-        /* Header Section */
-        .header {
+            padding: 0;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 30px;
+            background: #2c3e50;
+            touch-action: manipulation;
+            overflow: hidden;
         }
 
-        .close-btn {
-            font-size: 24px;
-            cursor: pointer;
-            opacity: 0.8;
+        #gameCanvas {
+            background: #34495e;
+            border-radius: 10px;
+            margin: 10px;
+            touch-action: none;
         }
 
-        .balance {
-            text-align: right;
-        }
-
-        .balance-amount {
-            color: var(--gold);
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        /* Game Grid */
-        .game-grid {
+        .controls {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 25px 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 10px;
+            width: 100%;
+            max-width: 400px;
         }
 
-        .game-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-
-        .game-card:nth-child(3) {
-            grid-column: span 2;
-        }
-
-        /* Add Button */
-        .add-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 20px 0;
-        }
-
-        .add-button {
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Timer */
-        .timer {
-            text-align: center;
-            color: #FF6B6B;
-            font-size: 16px;
-            margin: 15px 0;
-        }
-
-        /* Prize Pool */
-        .prize-pool {
-            text-align: center;
+        button {
+            padding: 15px;
             font-size: 18px;
-            margin: 25px 0;
-        }
-
-        /* Spin Button */
-        .spin-section {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .spin-btn {
-            background: linear-gradient(45deg, var(--accent), #8C6BB5);
             border: none;
-            padding: 18px 45px;
-            border-radius: 25px;
+            border-radius: 8px;
+            background: #3498db;
             color: white;
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            touch-action: manipulation;
         }
 
-        /* Footer */
-        footer {
+        button:active {
+            background: #2980b9;
+        }
+
+        #score {
+            color: white;
+            font-size: 24px;
+            margin: 10px;
+            font-family: Arial;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
             text-align: center;
-            opacity: 0.7;
-            font-size: 12px;
-            padding: 20px 0;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="close-btn">×</div>
-            <div class="balance">
-                <div class="balance-amount">$0.60</div>
-                <div>355</div>
-            </div>
-        </div>
-
-        <div class="game-grid">
-            <div class="game-card">САЗН</div>
-            <div class="game-card">МАСНИРЫ</div>
-            <div class="game-card">ПОДАРОК</div>
-            <div class="game-card">ТАБЛИЦА ЛИ</div>
-        </div>
-
-        <div class="prize-pool">
-            $89,580
-        </div>
-
-        <div class="add-section">
-            <div class="add-button">
-                <span>+</span>
-                <span>0</span>
-            </div>
-        </div>
-
-        <div class="timer">
-            17d17h
-        </div>
-
-        <div class="spin-section">
-            <button class="spin-btn">SPIN FOR AD</button>
-        </div>
-
-        <footer>
-            При поддержке<br>
-            Jetton Games WEB
-        </footer>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas"></canvas>
+    <div class="controls">
+        <button id="leftBtn">←</button>
+        <button id="brakeBtn">⧖ Тормоз</button>
+        <button id="rightBtn">→</button>
+    </div>
+    <div class="game-over" id="gameOver">
+        <h2>Game Over!</h2>
+        <button onclick="restartGame()">Играть снова</button>
     </div>
 
     <script>
-        // Базовая интерактивность
-        document.querySelector('.close-btn').addEventListener('click', () => {
-            alert('Закрыть приложение');
-        });
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Адаптивный размер холста
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth - 20, 400);
+            canvas.height = canvas.width * 0.8;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-        document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('click', () => {
-                card.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    card.style.transform = 'scale(1)';
-                }, 200);
+        // Настройки игры
+        const car = {
+            x: canvas.width/2 - 15,
+            y: canvas.height - 80,
+            width: 30,
+            height: 50,
+            speed: 5,
+            moveLeft: false,
+            moveRight: false
+        };
+
+        let enemies = [];
+        let score = 0;
+        let gameLoop;
+        let spawnRate = 100;
+        let isGameOver = false;
+
+        // Управление
+        const controls = {
+            leftBtn: document.getElementById('leftBtn'),
+            rightBtn: document.getElementById('rightBtn'),
+            brakeBtn: document.getElementById('brakeBtn')
+        };
+
+        // Обработчики событий
+        function addEventListeners() {
+            controls.leftBtn.addEventListener('touchstart', () => car.moveLeft = true);
+            controls.leftBtn.addEventListener('touchend', () => car.moveLeft = false);
+            controls.rightBtn.addEventListener('touchstart', () => car.moveRight = true);
+            controls.rightBtn.addEventListener('touchend', () => car.moveRight = false);
+            
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'ArrowLeft') car.moveLeft = true;
+                if(e.key === 'ArrowRight') car.moveRight = true;
             });
-        });
+            
+            document.addEventListener('keyup', (e) => {
+                if(e.key === 'ArrowLeft') car.moveLeft = false;
+                if(e.key === 'ArrowRight') car.moveRight = false;
+            });
+        }
 
-        document.querySelector('.spin-btn').addEventListener('click', function() {
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-                alert('Запуск рекламы...');
-            }, 200);
-        });
+        // Логика игры
+        function createEnemy() {
+            enemies.push({
+                x: Math.random() * (canvas.width - 30),
+                y: -50,
+                width: 30,
+                height: 50,
+                speed: 3 + Math.random() * 3
+            });
+        }
+
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function updateGame() {
+            if(isGameOver) return;
+
+            // Движение игрока
+            if(car.moveLeft && car.x > 0) car.x -= car.speed;
+            if(car.moveRight && car.x < canvas.width - car.width) car.x += car.speed;
+
+            // Движение врагов
+            enemies.forEach(enemy => {
+                enemy.y += enemy.speed;
+                if(checkCollision(car, enemy)) {
+                    gameOver();
+                }
+            });
+
+            // Удаление врагов и подсчет очков
+            enemies = enemies.filter(enemy => {
+                if(enemy.y > canvas.height) {
+                    score += 10;
+                    document.getElementById('score').textContent = `Score: ${score}`;
+                    return false;
+                }
+                return true;
+            });
+
+            // Спавн новых врагов
+            if(Math.random() * spawnRate < 1) {
+                createEnemy();
+                spawnRate *= 0.99;
+            }
+        }
+
+        // Отрисовка
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Дорога
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillRect(canvas.width*0.15, 0, canvas.width*0.7, canvas.height);
+            
+            // Машина игрока
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(car.x, car.y, car.width, car.height);
+            
+            // Враги
+            ctx.fillStyle = '#2ecc71';
+            enemies.forEach(enemy => {
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            });
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            document.getElementById('gameOver').style.display = 'block';
+            cancelAnimationFrame(gameLoop);
+        }
+
+        function restartGame() {
+            car.x = canvas.width/2 - 15;
+            enemies = [];
+            score = 0;
+            spawnRate = 100;
+            isGameOver = false;
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('score').textContent = `Score: 0`;
+            gameLoop = requestAnimationFrame(game);
+        }
+
+        // Главный цикл
+        function game() {
+            updateGame();
+            draw();
+            gameLoop = requestAnimationFrame(game);
+        }
+
+        // Инициализация
+        addEventListeners();
+        game();
     </script>
 </body>
 </html>
