@@ -1,137 +1,137 @@
-<!-- Добавляем в body после статусной панели -->
-<div class="crafting-section">
-    <h3>⚒️ Крафтинг</h3>
-    <div class="crafting-grid" id="crafting-recipes"></div>
-</div>
-
-<script>
-// 1. Система классов персонажей
-class CharacterClass {
-    constructor(type) {
-        this.types = {
-            warrior: { attack: 15, defense: 10, skill: 'Берсерк' },
-            mage: { attack: 8, defense: 5, skill: 'Огненный шар' },
-            rogue: { attack: 10, defense: 7, skill: 'Скрытность' }
-        };
-        return this.types[type];
-    }
-}
-
-// 2. Система крафта
-const craftingRecipes = [
-    {
-        result: '🗡️ Меч дракона',
-        requirements: { '🐉 Чешуя дракона': 3, '🔥 Пламя': 5 },
-        class: 'warrior'
-    },
-    {
-        result: '🔮 Магический свиток',
-        requirements: { '📜 Пергамент': 2, '💧 Эссенция маны': 4 },
-        class: 'mage'
-    }
-];
-
-function renderCrafting() {
-    const container = document.getElementById('crafting-recipes');
-    container.innerHTML = craftingRecipes.map(recipe => `
-        <div class="recipe">
-            <h4>${recipe.result}</h4>
-            ${Object.entries(recipe.requirements).map(([item, count]) => `
-                <div>${item} x${count}</div>
-            `).join('')}
-            <button onclick="craftItem('${recipe.result}')">Создать</button>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🔥 Dragon's Crypt Lite</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Стили остаются без изменений */
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Интерфейс игры без упоминаний NFT -->
+        <div id="inventory">
+            <h3>🎒 Инвентарь</h3>
+            <div id="inventory-items"></div>
         </div>
-    `).join('');
-}
+    </div>
 
-// 3. Торговая система
-class Marketplace {
-    constructor() {
-        this.listings = [];
-    }
-
-    addListing(item, price, seller) {
-        this.listings.push({ item, price, seller });
-    }
-
-    buyItem(itemId, buyer) {
-        const item = this.listings[itemId];
-        if (buyer.gold >= item.price) {
-            buyer.gold -= item.price;
-            buyer.inventory.push(item.item);
-            Telegram.WebApp.sendData(JSON.stringify({
-                type: 'TRADE',
-                data: { item: item.item, price: item.price }
-            }));
+    <script>
+        // Упрощенная система предметов
+        class GameItem {
+            constructor(name, type, stats) {
+                this.id = Math.random().toString(36).substr(2,9);
+                this.name = name;
+                this.type = type;
+                this.stats = stats;
+            }
         }
-    }
-}
 
-// 4. Система гильдий
-class Guild {
-    constructor(name, leader) {
-        this.name = name;
-        this.members = [leader];
-        this.treasury = 0;
-        this.quests = [];
-    }
+        // База данных внутриигровых предметов
+        const itemsDB = {
+            dragonSword: new GameItem('🗡️ Меч дракона', 'weapon', { attack: 15 }),
+            healthPotion: new GameItem('🧪 Зелье здоровья', 'consumable', { hp: 50 })
+        };
 
-    addMember(player) {
-        if (this.members.length < 50) {
-            this.members.push(player);
+        // Обновленная система крафта
+        const craftingRecipes = [
+            {
+                result: itemsDB.dragonSword,
+                requirements: [
+                    { item: 'dragonScale', quantity: 3 },
+                    { item: 'ironOre', quantity: 5 }
+                ]
+            }
+        ];
+
+        // Система гильдий
+        class Guild {
+            constructor(name) {
+                this.name = name;
+                this.members = [];
+                this.level = 1;
+            }
+
+            addMember(player) {
+                if (this.members.length < 30) {
+                    this.members.push(player);
+                }
+            }
         }
-    }
-}
 
-// 5. Ежедневные задания
-const dailyQuests = [
-    {
-        id: 1,
-        title: 'Сбор ресурсов',
-        objective: 'Соберите 10 единиц древесины',
-        reward: { gold: 100, exp: 50 }
-    },
-    {
-        id: 2,
-        title: 'Охота на монстров',
-        objective: 'Победите 5 скелетов',
-        reward: { gold: 200, exp: 100 }
-    }
-];
+        // Торговая система
+        class Marketplace {
+            constructor() {
+                this.listings = [];
+            }
 
-// 6. NFT интеграция (используем TON Blockchain)
-async function mintNFT(item) {
-    const response = await fetch('https://api.tonnft.com/mint', {
-        method: 'POST',
-        body: JSON.stringify({
-            item,
-            owner: tg.initDataUnsafe.user.id
-        })
-    });
-    return response.json();
-}
+            addListing(item, price) {
+                this.listings.push({
+                    item: item.id,
+                    price: price,
+                    seller: gameState.playerId
+                });
+            }
+        }
 
-// Инициализация новых систем
-const marketplace = new Marketplace();
-let playerClass = new CharacterClass('warrior');
-let guild = null;
+        // Ежедневные задания
+        const dailyQuests = [
+            {
+                title: "Сбор ресурсов",
+                objective: { target: 'wood', amount: 10 },
+                reward: { gold: 100, items: ['healthPotion'] }
+            }
+        ];
 
-// Обновляем игровую механику
-function startCombat() {
-    // Добавляем бонусы класса
-    const classBonus = playerClass.attack * gameState.level;
-    // ... остальная логика боя ...
-}
+        // Инициализация игрового состояния
+        const gameState = {
+            inventory: [],
+            guild: null,
+            completedQuests: [],
+            currency: {
+                gold: 0,
+                gems: 0
+            }
+        };
 
-// Добавляем в gameState
-gameState.dailyQuests = [];
-gameState.craftingMaterials = {};
-gameState.nftItems = [];
+        // Обновленная система крафта
+        function craftItem(recipe) {
+            if (checkRequirements(recipe.requirements)) {
+                gameState.inventory.push(recipe.result);
+                updateInventoryUI();
+            }
+        }
 
-// Пример использования NFT
-async function completeEpicQuest() {
-    const nft = await mintNFT('🐉 Сердце дракона');
-    gameState.nftItems.push(nft);
-    tg.showAlert(`Вы получили NFT: ${nft.id}`);
-}
-</script>
+        function checkRequirements(requirements) {
+            return requirements.every(req => {
+                const itemCount = gameState.inventory.filter(
+                    i => i.id === req.item
+                ).length;
+                return itemCount >= req.quantity;
+            });
+        }
+
+        // Инициализация интерфейса
+        function initGame() {
+            renderCraftingRecipes();
+            loadDailyQuests();
+            updateInventoryUI();
+        }
+
+        // Загрузка ежедневных заданий
+        function loadDailyQuests() {
+            const now = new Date();
+            if (!localStorage.getItem('questsRefresh') || 
+                now > new Date(localStorage.getItem('questsRefresh'))) {
+                gameState.availableQuests = [...dailyQuests];
+                localStorage.setItem('questsRefresh', 
+                    new Date(now.setDate(now.getDate() + 1)));
+            }
+        }
+
+        // Пример использования
+        initGame();
+    </script>
+</body>
+</html>
