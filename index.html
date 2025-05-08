@@ -24,16 +24,28 @@
             font-family: Arial;
             font-size: 20px;
         }
+        #startBtn {
+            position: fixed;
+            bottom: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div id="score">Score: 0</div>
     <canvas id="gameCanvas"></canvas>
+    <button id="startBtn">Start Game</button>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreElement = document.getElementById('score');
+        const startBtn = document.getElementById('startBtn');
         
         // Настройки игры
         const gridSize = 20;
@@ -41,39 +53,45 @@
         canvas.width = tileCount * gridSize;
         canvas.height = tileCount * gridSize;
 
-        let snake = [{x: 10, y: 10}];
-        let food = {x: 15, y: 15};
+        let snake = [];
+        let food = {};
         let dx = 0;
         let dy = 0;
         let score = 0;
         let gameLoop;
+        let isGameRunning = false;
 
-        // Управление
-        document.addEventListener('keydown', changeDirection);
-        
-        function changeDirection(e) {
-            const LEFT_KEY = 37;
-            const RIGHT_KEY = 39;
-            const UP_KEY = 38;
-            const DOWN_KEY = 40;
+        // Инициализация игры
+        function initGame() {
+            snake = [{x: 10, y: 10}];
+            dx = 0;
+            dy = 0;
+            score = 0;
+            scoreElement.textContent = 'Score: 0';
+            generateFood();
+        }
+
+        // Управление с клавиатуры
+        document.addEventListener('keydown', (e) => {
+            if (!isGameRunning) return;
             
-            if (e.keyCode === LEFT_KEY && dx !== 1) {
+            if (e.key === 'ArrowLeft' && dx !== 1) {
                 dx = -1;
                 dy = 0;
             }
-            if (e.keyCode === RIGHT_KEY && dx !== -1) {
+            if (e.key === 'ArrowRight' && dx !== -1) {
                 dx = 1;
                 dy = 0;
             }
-            if (e.keyCode === UP_KEY && dy !== 1) {
+            if (e.key === 'ArrowUp' && dy !== 1) {
                 dx = 0;
                 dy = -1;
             }
-            if (e.keyCode === DOWN_KEY && dy !== -1) {
+            if (e.key === 'ArrowDown' && dy !== -1) {
                 dx = 0;
                 dy = 1;
             }
-        }
+        });
 
         function drawGame() {
             // Движение змейки
@@ -83,8 +101,7 @@
             if (head.x < 0 || head.x >= tileCount || 
                 head.y < 0 || head.y >= tileCount ||
                 snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-                clearInterval(gameLoop);
-                alert('Game Over! Score: ' + score);
+                gameOver();
                 return;
             }
 
@@ -135,61 +152,64 @@
             }
         }
 
+        function gameOver() {
+            clearInterval(gameLoop);
+            isGameRunning = false;
+            startBtn.disabled = false;
+            alert('Game Over! Score: ' + score);
+        }
+
         // Запуск игры
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                if (!gameLoop) {
-                    resetGame();
-                    gameLoop = setInterval(drawGame, 100);
-                }
+        startBtn.addEventListener('click', () => {
+            if (!isGameRunning) {
+                initGame();
+                isGameRunning = true;
+                startBtn.disabled = true;
+                gameLoop = setInterval(drawGame, 150);
             }
         });
 
-        function resetGame() {
-            snake = [{x: 10, y: 10}];
-            dx = 0;
-            dy = 0;
-            score = 0;
-            scoreElement.textContent = 'Score: 0';
-            generateFood();
-        }
-
-        // Для мобильных устройств
+        // Мобильное управление
         let touchStartX = 0;
         let touchStartY = 0;
 
         canvas.addEventListener('touchstart', (e) => {
+            if (!isGameRunning) return;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             e.preventDefault();
-        }, false);
+        }, {passive: false});
 
         canvas.addEventListener('touchmove', (e) => {
+            if (!isGameRunning) return;
             const touchEndX = e.touches[0].clientX;
             const touchEndY = e.touches[0].clientY;
             
-            const dx = touchEndX - touchStartX;
-            const dy = touchEndY - touchStartY;
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
 
-            if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 0 && self.dx !== -1) {
-                    self.dx = 1;
-                    self.dy = 0;
-                } else if (dx < 0 && self.dx !== 1) {
-                    self.dx = -1;
-                    self.dy = 0;
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 0 && dx !== -1) { // Вправо
+                    dx = 1;
+                    dy = 0;
+                } else if (deltaX < 0 && dx !== 1) { // Влево
+                    dx = -1;
+                    dy = 0;
                 }
             } else {
-                if (dy > 0 && self.dy !== -1) {
-                    self.dx = 0;
-                    self.dy = 1;
-                } else if (dy < 0 && self.dy !== 1) {
-                    self.dx = 0;
-                    self.dy = -1;
+                if (deltaY > 0 && dy !== -1) { // Вниз
+                    dx = 0;
+                    dy = 1;
+                } else if (deltaY < 0 && dy !== 1) { // Вверх
+                    dx = 0;
+                    dy = -1;
                 }
             }
             e.preventDefault();
-        }, false);
+        }, {passive: false});
+
+        // Инициализация при загрузке
+        initGame();
     </script>
 </body>
 </html>
