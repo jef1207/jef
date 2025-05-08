@@ -2,166 +2,223 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthTracker</title>
+    <title>🔥 Dragon's Crypt</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://unpkg.com/@materializecss/materialize@1.1.0/dist/css/materialize.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #26a69a;
-            --secondary-color: #80cbc4;
+            --main-bg: #1a1a2e;
+            --accent: #ff6b6b;
         }
-        
+
         body {
-            background: #f5f5f5;
-            color: #333;
+            background: var(--main-bg);
+            color: white;
+            font-family: 'Courier New', monospace;
+        }
+
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .pixel-art {
+            image-rendering: pixelated;
+        }
+
+        .dialog-box {
+            border: 3px solid var(--accent);
+            padding: 15px;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.7);
+            position: relative;
+        }
+
+        .choice-btn {
+            background: #4a4a6d;
+            border: 2px solid var(--accent);
+            color: white;
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
             transition: all 0.3s;
         }
-        
-        .dashboard-card {
-            border-radius: 20px;
-            padding: 20px;
-            margin: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+        .choice-btn:hover {
+            transform: scale(1.05);
+            background: var(--accent);
         }
-        
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.35s;
-        }
-        
-        .habit-tracker {
+
+        #map {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .map-tile {
+            aspect-ratio: 1;
+            background: #2d2d44;
+            border: 1px solid var(--accent);
+            position: relative;
+        }
+
+        .player-icon {
+            width: 80%;
+            height: 80%;
+            background: var(--accent);
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Шапка с персональными данными -->
-        <div class="dashboard-card teal lighten-5">
-            <h5 id="user-greeting">Доброе утро, </h5>
-            <div class="row">
-                <div class="col s6">
-                    <p>Возраст: <span id="user-age">-</span></p>
-                    <p>Рост: <span id="user-height">-</span> см</p>
-                </div>
-                <div class="col s6">
-                    <svg width="100" height="100" id="hydration-ring">
-                        <circle class="progress-ring__circle" stroke="#26a69a" stroke-width="4" fill="transparent"
-                            r="45" cx="50" cy="50"/>
-                        <text x="50%" y="50%" text-anchor="middle" dy=".3em">0%</text>
-                    </svg>
-                </div>
-            </div>
+    <div class="game-container">
+        <h1>🐉 Dragon's Crypt</h1>
+        
+        <!-- Динамическая карта -->
+        <div id="map"></div>
+
+        <!-- Диалоговое окно -->
+        <div class="dialog-box" id="dialog">
+            <div id="dialog-text">Добро пожаловать в подземелье, искатель приключений!</div>
+            <div id="choices"></div>
         </div>
 
-        <!-- Трекер воды -->
-        <div class="dashboard-card">
-            <h6>Гидробаланс</h6>
-            <div class="water-tracker">
-                <button class="btn-floating waves-effect" onclick="addWater(-250)">-</button>
-                <span id="water-amount">0</span> мл
-                <button class="btn-floating waves-effect" onclick="addWater(250)">+</button>
-            </div>
-        </div>
-
-        <!-- Трекер активности -->
-        <div class="dashboard-card">
-            <h6>Сегодняшняя активность</h6>
-            <div class="habit-tracker" id="activity-tracker"></div>
-        </div>
-
-        <!-- Аналитика здоровья -->
-        <div class="dashboard-card">
-            <h6>Ваши показатели</h6>
-            <canvas id="health-chart"></canvas>
+        <!-- Статусная панель -->
+        <div id="status">
+            ⚔️ Уровень: <span id="level">1</span> 
+            ❤️ Здоровье: <span id="health">100</span>/100
+            💰 Золото: <span id="gold">50</span>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const tg = Telegram.WebApp;
         tg.expand();
-        tg.MainButton.setText("Сохранить").hide();
-        tg.BackButton.show().onClick(() => history.back());
-
-        // Инициализация данных пользователя
-        const userData = {
-            ...tg.initDataUnsafe.user,
-            health: {
-                water: 0,
-                steps: 0,
-                habits: []
-            }
+        tg.MainButton.setText("Сохранить прогресс").hide();
+        
+        // Игровая механика
+        const gameState = {
+            level: 1,
+            health: 100,
+            gold: 50,
+            position: {x: 2, y: 2},
+            inventory: [],
+            discoveredRooms: new Set()
         };
 
-        // Инициализация графиков
-        const healthChart = new Chart(document.getElementById('health-chart'), {
-            type: 'radar',
-            data: {
-                labels: ['Гидробаланс', 'Активность', 'Сон', 'Питание'],
-                datasets: [{
-                    label: 'Показатели здоровья',
-                    data: [0, 0, 0, 0],
-                    backgroundColor: 'rgba(38,166,154,0.2)'
-                }]
+        // Генерация карты
+        function generateMap() {
+            const map = document.getElementById('map');
+            map.innerHTML = '';
+            
+            for(let y = 0; y < 5; y++) {
+                for(let x = 0; x < 5; x++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'map-tile';
+                    if(x === gameState.position.x && y === gameState.position.y) {
+                        const player = document.createElement('div');
+                        player.className = 'player-icon';
+                        tile.appendChild(player);
+                    }
+                    tile.onclick = () => movePlayer(x, y);
+                    map.appendChild(tile);
+                }
             }
-        });
-
-        // Обновление кольца гидратации
-        function updateHydrationRing() {
-            const circle = document.querySelector('#hydration-ring circle');
-            const text = document.querySelector('#hydration-ring text');
-            const percentage = (userData.health.water / 2000) * 100;
-            
-            const circumference = 2 * Math.PI * 45;
-            circle.style.strokeDasharray = `${circumference} ${circumference}`;
-            circle.style.strokeDashoffset = circumference - (percentage/100) * circumference;
-            
-            text.textContent = `${Math.round(percentage)}%`;
         }
 
-        // Управление водным балансом
-        function addWater(amount) {
-            userData.health.water = Math.max(0, userData.health.water + amount);
-            document.getElementById('water-amount').textContent = userData.health.water;
-            updateHydrationRing();
-            tg.MainButton.show();
+        // Механика движения
+        function movePlayer(x, y) {
+            if(Math.abs(x - gameState.position.x) > 1 || 
+               Math.abs(y - gameState.position.y) > 1) return;
+            
+            gameState.position = {x, y};
+            generateMap();
+            discoverRoom();
         }
 
-        // Инициализация трекера активности
-        function initActivityTracker() {
-            const activities = [
-                {icon: 'directions_walk', name: 'Шаги'},
-                {icon: 'fitness_center', name: 'Тренировка'},
-                {icon: 'local_dining', name: 'Питание'},
-                {icon: 'bedtime', name: 'Сон'}
+        // Обнаружение комнаты
+        function discoverRoom() {
+            const roomId = `${gameState.position.x}-${gameState.position.y}`;
+            if(!gameState.discoveredRooms.has(roomId)) {
+                gameState.discoveredRooms.add(roomId);
+                showRandomEvent();
+            }
+        }
+
+        // Случайные события
+        function showRandomEvent() {
+            const events = [
+                {
+                    text: "Вы нашли сундук! Что будете делать?",
+                    choices: [
+                        {text: "Открыть", action: () => findLoot()},
+                        {text: "Проверить на ловушки", action: () => checkForTraps()},
+                        {text: "Уйти", action: () => closeDialog()}
+                    ]
+                },
+                {
+                    text: "На вас напал 🧟 Скелет-воин!",
+                    choices: [
+                        {text: "⚔️ Атаковать", action: () => startCombat()},
+                        {text: "🛡️ Защищаться", action: () => defend()},
+                        {text: "🏃 Бежать", action: () => tryEscape()}
+                    ]
+                }
             ];
+            
+            const event = events[Math.floor(Math.random() * events.length)];
+            showDialog(event.text, event.choices);
+        }
 
-            const container = document.getElementById('activity-tracker');
-            container.innerHTML = activities.map(activity => `
-                <div class="activity-card">
-                    <i class="material-icons">${activity.icon}</i>
-                    <span>${activity.name}</span>
-                    <input type="number" value="0" 
-                        onchange="updateActivity('${activity.name}', this.value)">
-                </div>
+        // Система диалогов
+        function showDialog(text, choices) {
+            document.getElementById('dialog-text').textContent = text;
+            const choicesContainer = document.getElementById('choices');
+            choicesContainer.innerHTML = choices.map(choice => `
+                <button class="choice-btn" onclick="choice.action()">${choice.text}</button>
             `).join('');
         }
 
-        // Сохранение данных
-        function saveHealthData() {
-            Telegram.WebApp.sendData(JSON.stringify(userData));
-            Telegram.WebApp.close();
+        // Пример игровой механики: бой
+        function startCombat() {
+            const enemyHP = gameState.level * 20;
+            let currentEnemyHP = enemyHP;
+            
+            showDialog(`⚔️ Бой начался! (Здоровье врага: ${currentEnemyHP})`, [
+                {
+                    text: "Удар мечом",
+                    action: () => {
+                        const damage = Math.floor(Math.random() * 15) + 5;
+                        currentEnemyHP -= damage;
+                        if(currentEnemyHP <= 0) {
+                            const goldEarned = Math.floor(Math.random() * 50) + 10;
+                            gameState.gold += goldEarned;
+                            showDialog(`Вы победили! Получено 🪙 ${goldEarned} золота`, [
+                                {text: "Продолжить", action: closeDialog}
+                            ]);
+                        } else {
+                            showDialog(`Вы нанесли ${damage} урона! (Осталось HP: ${currentEnemyHP})`, [
+                                {text: "Атаковать снова", action: () => startCombat()}
+                            ]);
+                        }
+                    }
+                }
+            ]);
         }
 
-        // Инициализация приложения
-        document.getElementById('user-greeting').textContent += 
-            userData.first_name || 'Дорогой пользователь';
-        
-        initActivityTracker();
-        Telegram.WebApp.ready();
+        // Инициализация игры
+        generateMap();
+        tg.ready();
+
+        // Сохранение прогресса через Telegram
+        function saveProgress() {
+            Telegram.WebApp.sendData(JSON.stringify(gameState));
+            Telegram.WebApp.close();
+        }
     </script>
 </body>
 </html>
