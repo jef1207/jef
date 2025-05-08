@@ -2,21 +2,86 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Мобильный YouTube Плеер</title>
     <style>
-        /* Стили остаются прежними из предыдущего примера */
-        body { margin: 0; padding: 20px; font-family: Arial; background: #f0f0f0; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .player-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; border-radius: 10px; }
-        #player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 10px; }
-        .video-item { background: white; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .video-item:hover { transform: translateY(-5px); }
-        .video-thumbnail { width: 100%; height: 140px; object-fit: cover; }
-        .video-title { padding: 10px; font-size: 14px; color: #333; }
-        .controls { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
-        button { padding: 10px 20px; background: #ff0000; color: white; border: none; border-radius: 25px; cursor: pointer; }
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            background: #fff;
+            touch-action: manipulation;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .player-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        #player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 10px 0;
+        }
+        .video-item {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            touch-action: manipulation;
+        }
+        .video-thumbnail {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            pointer-events: none;
+        }
+        .video-title {
+            padding: 8px;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.3;
+        }
+        .controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        button {
+            padding: 8px 16px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            touch-action: manipulation;
+        }
+        @media (max-width: 480px) {
+            .video-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .video-thumbnail {
+                height: 80px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -26,7 +91,7 @@
         </div>
         
         <div class="controls">
-            <button onclick="playVideo()">▶ Воспроизвести</button>
+            <button onclick="playVideo()">▶ Воспр.</button>
             <button onclick="pauseVideo()">⏸ Пауза</button>
         </div>
 
@@ -34,14 +99,13 @@
     </div>
 
     <script>
-        // Список видео без ограничений
         const videos = [
-            {id: 'LXb3EKWsInQ', title: '4K Природа'},     // Проверенные ролики
-            {id: 'yPYZpwSpKmA', title: 'Расслабляющие волны'},
+            {id: 'LXb3EKWsInQ', title: 'Природа 4K'},
+            {id: 'yPYZpwSpKmA', title: 'Морские волны'},
             {id: '3bhkYoMWTFE', title: 'Космос'},
-            {id: '6stlCkUDG_s', title: 'Дикая природа'},
-            {id: 'c6HqRlFFuOA', title: 'Кофеварка'},
-            {id: 'VYOjWnS4cMY', title: 'HD Фон'}
+            {id: '6stlCkUDG_s', title: 'Животные'},
+            {id: 'VYOjWnS4cMY', title: 'HD Фон'},
+            {id: 'M7lc1UVf-VE', title: 'YouTube Демо'}
         ];
 
         let player;
@@ -52,14 +116,16 @@
                 width: '100%',
                 videoId: videos[0].id,
                 playerVars: {
-                    'origin': window.location.origin,  // Важно для CORS
-                    'rel': 0,          // Отключаем похожие видео
-                    'modestbranding': 1,// Меньше логотипов
-                    'controls': 1       // Показываем элементы управления
+                    'playsinline': 1,    // Важно для iOS
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'controls': 1,
+                    'autoplay': 0,       // Отключаем автостарт
+                    'origin': location.origin
                 },
                 events: {
                     'onReady': onPlayerReady,
-                    'onError': onPlayerError
+                    'onStateChange': onPlayerStateChange
                 }
             });
             
@@ -68,6 +134,8 @@
 
         function initVideoGrid() {
             const grid = document.getElementById('videoList');
+            grid.innerHTML = '';
+            
             videos.forEach(video => {
                 const item = document.createElement('div');
                 item.className = 'video-item';
@@ -77,33 +145,70 @@
                          alt="${video.title}">
                     <div class="video-title">${video.title}</div>
                 `;
-                item.onclick = () => loadVideo(video.id);
+                item.addEventListener('click', () => handleVideoClick(video.id));
                 grid.appendChild(item);
             });
         }
 
-        function onPlayerReady(event) {
-            event.target.playVideo();
+        function handleVideoClick(videoId) {
+            // Для мобилок: показываем интерактивный элемент перед воспроизведением
+            const clickHandler = () => {
+                loadVideo(videoId);
+                document.removeEventListener('touchend', clickHandler);
+            };
+            document.addEventListener('touchend', clickHandler);
         }
 
-        function onPlayerError(event) {
-            console.error('Ошибка плеера:', event.data);
-            alert('Это видео недоступно. Попробуйте другое.');
+        function onPlayerReady(event) {
+            // Не запускаем автоматически на мобилках
+            if(!isMobile()) {
+                event.target.playVideo();
+            }
+        }
+
+        function onPlayerStateChange(event) {
+            if(event.data === YT.PlayerState.PLAYING) {
+                // Активируем аудио контекст для iOS
+                unlockAudio();
+            }
         }
 
         function loadVideo(videoId) {
-            player.loadVideoById({
-                videoId: videoId,
-                suggestedQuality: 'hd720'
-            });
+            player.loadVideoById(videoId);
+            if(isMobile()) {
+                setTimeout(() => player.playVideo(), 500);
+            }
         }
 
         function playVideo() {
-            player.playVideo();
+            unlockAudio().then(() => player.playVideo());
         }
 
         function pauseVideo() {
             player.pauseVideo();
+        }
+
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Решение для аудио на iOS
+        function unlockAudio() {
+            return new Promise(resolve => {
+                if(!window.AudioContext && !window.webkitAudioContext) return resolve();
+                
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                oscillator.start(0);
+                setTimeout(() => {
+                    oscillator.stop();
+                    resolve();
+                }, 0);
+            });
         }
 
         // Загрузка YouTube API
