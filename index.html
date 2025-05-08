@@ -2,108 +2,101 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YouTube Mobile Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Auth без хранения данных</title>
     <style>
-        /* Оптимизированные стили для мобилок */
-        body { margin: 0; padding: 10px; background: #fff; touch-action: manipulation; }
-        .player-container { position: relative; padding-bottom: 56.25%; }
-        #player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .video-item { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .video-thumbnail { width: 100%; height: 120px; object-fit: cover; }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        #gsi-btn {
+            background: #4285F4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
-    <div class="player-container">
-        <div id="player"></div>
+    <div class="container">
+        <div id="gsi-btn"></div>
+        <div id="user-info"></div>
     </div>
-    <div class="video-grid" id="videoList"></div>
 
     <script>
-        // Конфигурация для обхода проверки
-        const config = {
-            apiKey: 'AIzaSyA1miNuUM4xGdUNQw8zvP4MuybZbI-f4Js', // Публичный ключ API
-            videos: [
-                {id: 'LXb3EKWsInQ', title: 'Природа 4K'},
-                {id: 'yPYZpwSpKmA', title: 'Море'},
-                {id: 'M7lc1UVf-VE', title: 'Демо'}
-            ]
-        };
-
-        let player;
-        
-        // Инициализация с использованием API ключа
-        function init() {
-            const tag = document.createElement('script');
-            tag.src = `https://www.youtube.com/iframe_api?key=${config.apiKey}`;
-            document.head.appendChild(tag);
-        }
-
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '100%',
-                width: '100%',
-                videoId: config.videos[0].id,
-                playerVars: {
-                    'origin': location.origin,
-                    'rel': 0,
-                    'modestbranding': 1,
-                    'playsinline': 1,
-                    'autoplay': 0,
-                    'enablejsapi': 1,
-                    'widget_referrer': location.href
-                },
-                events: {
-                    'onReady': initVideoGrid,
-                    'onStateChange': handleStateChange
-                }
+        // Конфигурация Google Identity Services
+        function initializeGsi() {
+            google.accounts.id.initialize({
+                client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
+                callback: handleCredentialResponse,
+                auto_select: false,
+                cancel_on_tap_outside: true,
+                context: 'use'
             });
-        }
-
-        function initVideoGrid() {
-            const grid = document.getElementById('videoList');
-            config.videos.forEach(video => {
-                const item = document.createElement('div');
-                item.className = 'video-item';
-                item.innerHTML = `
-                    <img src="https://i.ytimg.com/vi/${video.id}/hqdefault.jpg" 
-                         class="video-thumbnail"
-                         onclick="loadVideo('${video.id}')">
-                `;
-                grid.appendChild(item);
-            });
-        }
-
-        function loadVideo(videoId) {
-            // Для iOS: создаем временную кнопку
-            const fakeButton = document.createElement('button');
-            fakeButton.style.display = 'none';
-            document.body.appendChild(fakeButton);
-            fakeButton.click();
             
-            player.loadVideoById(videoId);
-            setTimeout(() => player.playVideo(), 300);
+            google.accounts.id.renderButton(
+                document.getElementById("gsi-btn"),
+                { 
+                    type: "standard",
+                    size: "large",
+                    text: "signin_with",
+                    shape: "rectangular"
+                }
+            );
         }
 
-        function handleStateChange(event) {
-            if(event.data === YT.PlayerState.PLAYING) {
-                unlockMobileAudio();
+        // Обработка ответа авторизации
+        function handleCredentialResponse(response) {
+            // Декодирование JWT без отправки на сервер
+            const userData = parseJwt(response.credential);
+            
+            // Отображение информации (без сохранения)
+            showUserInfo(userData);
+            
+            // Важно: не сохраняем credential в localStorage/sessionStorage
+            console.log('Аутентификация успешна, данные не сохранены');
+        }
+
+        // Парсинг JWT токена
+        function parseJwt(token) {
+            try {
+                return JSON.parse(atob(token.split('.')[1]));
+            } catch (e) {
+                console.error('Ошибка парсинга JWT:', e);
+                return null;
             }
         }
 
-        function unlockMobileAudio() {
-            if(/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                oscillator.connect(context.destination);
-                oscillator.start();
-                setTimeout(() => oscillator.stop(), 10);
-            }
+        // Отображение информации о пользователе
+        function showUserInfo(data) {
+            const userInfo = document.getElementById('user-info');
+            userInfo.innerHTML = `
+                <h3>Добро пожаловать, ${data.name}!</h3>
+                <p>Email: ${data.email}</p>
+                <button onclick="logout()">Выйти</button>
+            `;
         }
 
-        // Запуск приложения
-        init();
+        // Выход без сохранения сессии
+        function logout() {
+            google.accounts.id.disableAutoSelect();
+            document.getElementById('user-info').innerHTML = '';
+            console.log('Сессия завершена, данные удалены из памяти');
+        }
+
+        // Загрузка GSI скрипта
+        (function() {
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+            script.onload = initializeGsi;
+        })();
     </script>
 </body>
 </html>
