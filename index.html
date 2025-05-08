@@ -1,133 +1,111 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Мобильный YouTube Плеер</title>
+    <title>Угадай число!</title>
     <style>
         body {
-            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        input {
             padding: 10px;
-            background: #000;
-            touch-action: manipulation;
+            font-size: 16px;
+            margin: 10px;
+            width: 150px;
         }
-        .player-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%;
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
         }
-        #player {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
+        button:hover {
+            background: #0056b3;
         }
-        .video-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
+        #message {
+            margin: 20px;
+            min-height: 40px;
+            font-weight: bold;
         }
-        .video-thumb {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
+        #attempts {
+            color: #666;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="player-container">
-        <div id="player"></div>
+    <div class="container">
+        <h1>Угадай число от 1 до 100!</h1>
+        <input type="number" id="guessInput" placeholder="Введите число">
+        <button onclick="checkGuess()">Проверить</button>
+        <div id="message"></div>
+        <div id="attempts">Попыток: 0</div>
+        <button onclick="newGame()" style="background: #28a745; margin-top: 20px;">Новая игра</button>
     </div>
-    <div class="video-list" id="videoList"></div>
 
-<script>
-// Конфигурация
-const videos = [
-    {id: 'LXb3EKWsInQ', title: 'Природа 4K'}, // Проверенные видео
-    {id: 'yPYZpwSpKmA', title: 'Море'},
-    {id: '3bhkYoMWTFE', title: 'Космос'}
-];
-
-let player;
-let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-// Инициализация плеера
-function initPlayer(videoId) {
-    player = new YT.Player('player', {
-        videoId: videoId,
-        playerVars: {
-            'playsinline': 1,
-            'rel': 0,
-            'modestbranding': 1,
-            'origin': location.origin,
-            'enablejsapi': 1,
-            'autoplay': isMobile ? 0 : 1
-        },
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onStateChange
+    <script>
+        let targetNumber;
+        let attempts = 0;
+        
+        function initGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            updateAttempts();
+            document.getElementById('message').textContent = '';
+            document.getElementById('guessInput').value = '';
         }
-    });
-}
 
-function onPlayerReady(event) {
-    if(!isMobile) event.target.playVideo();
-}
-
-function onStateChange(event) {
-    if(event.data === YT.PlayerState.PLAYING && isMobile) {
-        unlockAudio();
-    }
-}
-
-// Загрузка видео
-function loadVideo(videoId) {
-    if(player) {
-        player.loadVideoById(videoId);
-        if(isMobile) setTimeout(() => player.playVideo(), 300);
-    }
-}
-
-// iOS аудио разблокировка
-function unlockAudio() {
-    const context = new (window.AudioContext || window.webkitAudioContext)();
-    const source = context.createBufferSource();
-    source.connect(context.destination);
-    source.start(0);
-    setTimeout(() => source.stop(), 10);
-}
-
-// Инициализация
-window.onYouTubeIframeAPIReady = () => {
-    initPlayer(videos[0].id);
-    
-    // Генерация списка видео
-    const container = document.getElementById('videoList');
-    videos.forEach(video => {
-        const thumb = document.createElement('img');
-        thumb.className = 'video-thumb';
-        thumb.src = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
-        thumb.onclick = () => {
-            if(isMobile) {
-                const btn = document.createElement('button');
-                btn.style.display = 'none';
-                document.body.appendChild(btn);
-                btn.click();
+        function checkGuess() {
+            const userGuess = parseInt(document.getElementById('guessInput').value);
+            const messageElement = document.getElementById('message');
+            
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+                messageElement.textContent = 'Введите число от 1 до 100!';
+                messageElement.style.color = 'red';
+                return;
             }
-            loadVideo(video.id);
-        };
-        container.appendChild(thumb);
-    });
-};
 
-// Динамическая загрузка YouTube API
-const tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-document.head.appendChild(tag);
-</script>
+            attempts++;
+            updateAttempts();
+
+            if (userGuess === targetNumber) {
+                messageElement.textContent = `🎉 Поздравляем! Вы угадали за ${attempts} попыток!`;
+                messageElement.style.color = 'green';
+            } else if (userGuess < targetNumber) {
+                messageElement.textContent = '⬆️ Попробуйте число побольше!';
+                messageElement.style.color = 'blue';
+            } else {
+                messageElement.textContent = '⬇️ Попробуйте число поменьше!';
+                messageElement.style.color = 'blue';
+            }
+        }
+
+        function updateAttempts() {
+            document.getElementById('attempts').textContent = `Попыток: ${attempts}`;
+        }
+
+        function newGame() {
+            initGame();
+            document.getElementById('message').textContent = 'Игра началась! Угадайте число!';
+            document.getElementById('message').style.color = 'black';
+        }
+
+        // Инициализация при загрузке
+        window.onload = initGame;
+    </script>
 </body>
 </html>
