@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Mini</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+        }
+
+        #container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        #player {
+            width: 100%;
+            height: 35vh;
+            background: #000;
+        }
+
+        .search-box {
+            padding: 15px;
+            background: #181818;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 24px;
+            border: 1px solid #303030;
+            background: #121212;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .video-list {
+            padding: 15px;
+            display: grid;
+            gap: 15px;
+        }
+
+        .video-item {
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .thumbnail {
+            width: 160px;
+            height: 90px;
+            border-radius: 8px;
+            background: #333;
+        }
+
+        .video-info {
+            flex: 1;
+        }
+
+        .video-title {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .channel-name {
+            color: #aaa;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="player"></div>
+        
+        <div class="search-box">
+            <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Поиск на YouTube..."
+                id="searchInput"
+            >
+        </div>
+
+        <div class="video-list" id="videoList">
+            <!-- Видео будут загружаться здесь -->
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.MainButton.hide();
+
+        let player;
+        let currentVideoId = '';
+
+        // Инициализация плеера
+        function initPlayer(videoId) {
+            if (!player) {
+                player = new YT.Player('player', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: videoId,
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    },
+                    playerVars: {
+                        autoplay: 1,
+                        modestbranding: 1,
+                        rel: 0
+                    }
+                });
+            } else {
+                player.loadVideoById(videoId);
+            }
+        }
+
+        // Поиск видео
+        async function searchVideos(query) {
+            try {
+                const response = await fetch(
+                    `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`
+                );
+                const html = await response.text();
+                const videoIds = [...new Set(html.match(/"videoId":"([^"]{11})"/g))].map(id => id.slice(10,21));
+                renderVideos(videoIds.slice(0, 10));
+            } catch (error) {
+                console.error('Ошибка поиска:', error);
+            }
+        }
+
+        // Отображение списка видео
+        async function renderVideos(videoIds) {
+            const videoList = document.getElementById('videoList');
+            videoList.innerHTML = '';
+            
+            for (const videoId of videoIds) {
+                try {
+                    const response = await fetch(`https://noembed.com/embed?url=https://youtu.be/${videoId}`);
+                    const data = await response.json();
+                    
+                    const videoItem = document.createElement('div');
+                    videoItem.className = 'video-item';
+                    videoItem.innerHTML = `
+                        <div class="thumbnail" 
+                             style="background-image: url(${data.thumbnail_url})"></div>
+                        <div class="video-info">
+                            <div class="video-title">${data.title}</div>
+                            <div class="channel-name">${data.author}</div>
+                        </div>
+                    `;
+                    
+                    videoItem.addEventListener('click', () => {
+                        currentVideoId = videoId;
+                        initPlayer(videoId);
+                    });
+                    
+                    videoList.appendChild(videoItem);
+                } catch (error) {
+                    console.error('Ошибка загрузки видео:', error);
+                }
+            }
+        }
+
+        // Обработчик поиска
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchVideos(e.target.value);
+            }
+        });
+
+        // Загрузка YouTube API
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            tg.MainButton.setText('Смотреть').show();
+        }
+
+        function onPlayerStateChange(event) {
+            // Логика управления плеером
+        }
+
+        // Первоначальная загрузка популярных видео
+        searchVideos('новинки');
+    </script>
+</body>
+</html>
