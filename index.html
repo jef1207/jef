@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Emoji Car Racer</title>
+    <title>Car Racer with Tilt</title>
     <style>
         body { 
             margin: 0;
@@ -109,12 +109,11 @@
         let score = 0;
         let gameLoop;
         let isGameOver = false;
-        let soundEnabled = true;
         let enemySpeed = 0.1;
         let speedIncreaseTimer = 0;
         const speedIncreaseInterval = 2000;
-        const emojis = ['🧟‍♂️', '🧌', '🧟‍♀️'];
-        const playerEmoji = '🧚';
+        const emojis = ['🚘', '🚖', '🚔'];
+        const playerEmoji = '🚗';
 
         const CONFIG = {
             ROAD: {
@@ -125,13 +124,14 @@
             PLAYER: { 
                 width: 8, 
                 height: 12, 
-                speed: 0.2, 
-                color: '#e74c3c',
-                emojiSize: 30
+                emojiSize: 40,
+                maxRotation: 25,
+                rotationSpeed: 0.3,
+                color: '#e74c3c'
             },
             ENEMIES: { 
-                spawnRate: 500,
-                minSpeed: 0.05,
+                spawnRate: 100,
+                minSpeed: 0.1,
                 maxSpeed: 0.3 
             }
         };
@@ -147,7 +147,20 @@
             x: 0, 
             y: 0, 
             lane: 1,
+            rotation: 0,
+            targetRotation: 0,
+            lastLane: 1,
             updatePosition() {
+                // Определяем направление движения
+                if(this.lane > this.lastLane) this.targetRotation = CONFIG.PLAYER.maxRotation;
+                else if(this.lane < this.lastLane) this.targetRotation = -CONFIG.PLAYER.maxRotation;
+                
+                this.lastLane = this.lane;
+                
+                // Плавный возврат к нулевому вращению
+                this.rotation += (this.targetRotation - this.rotation) * CONFIG.PLAYER.rotationSpeed;
+                
+                // Обновляем позицию
                 this.x = ROAD.getLaneCenter(this.lane) - CONFIG.PLAYER.width/2;
                 this.y = canvas.height - canvas.height * 0.15;
             }
@@ -162,7 +175,7 @@
             
             CONFIG.PLAYER.width = screenWidth * 0.07;
             CONFIG.PLAYER.height = screenWidth * 0.12;
-            CONFIG.PLAYER.emojiSize = screenWidth * 0.07;
+            CONFIG.PLAYER.emojiSize = screenWidth * 0.1;
             
             player.updatePosition();
             enemies = [];
@@ -248,27 +261,32 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawRoad();
 
-            // Отрисовка игрока
+            // Отрисовка игрока с поворотом
+            ctx.save();
+            ctx.translate(
+                ROAD.getLaneCenter(player.lane),
+                player.y + CONFIG.PLAYER.height/2
+            );
+            ctx.rotate(player.rotation * Math.PI / 180);
             ctx.font = `${CONFIG.PLAYER.emojiSize}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = CONFIG.PLAYER.color;
-            ctx.fillText(
-                playerEmoji,
-                ROAD.getLaneCenter(player.lane),
-                player.y + CONFIG.PLAYER.height/2
-            );
+            ctx.fillText(playerEmoji, 0, 0);
+            ctx.restore();
 
             // Отрисовка врагов
             ctx.textBaseline = 'bottom';
             enemies.forEach(enemy => {
-                ctx.font = `${CONFIG.PLAYER.emojiSize}px Arial`;
-                ctx.fillStyle = '#2ecc71';
-                ctx.fillText(
-                    emojis[enemy.type],
+                ctx.save();
+                ctx.translate(
                     ROAD.getLaneCenter(enemy.lane),
                     enemy.y + CONFIG.PLAYER.height
                 );
+                ctx.font = `${CONFIG.PLAYER.emojiSize}px Arial`;
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillText(emojis[enemy.type], 0, 0);
+                ctx.restore();
             });
         }
 
@@ -290,6 +308,8 @@
             speedIncreaseTimer = 0;
             enemies = [];
             player.lane = 1;
+            player.rotation = 0;
+            player.targetRotation = 0;
             player.updatePosition();
             document.getElementById('gameOver').style.display = 'none';
             document.getElementById('currentScore').textContent = '0';
