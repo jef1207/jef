@@ -1,387 +1,277 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Гонки с исправленным управлением</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mobile Road Racer</title>
     <style>
-        :root {
-            --primary-color: #e74c3c;
-            --road-color: #7f8c8d;
-            --bg-color: #2c3e50;
-            --text-color: #ecf0f1;
-            --button-bg: #3498db;
-        }
-
-        body {
+        body { 
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: var(--bg-color);
-            color: var(--text-color);
-            touch-action: pan-x pan-y;
-            min-height: 100dvh;
-            font-family: Arial, sans-serif;
+            background: #2c3e50;
+            touch-action: manipulation;
+            overflow: hidden;
             -webkit-user-select: none;
+            -moz-user-select: none;
             user-select: none;
-        }
-
-        #gameContainer {
-            position: relative;
+            position: fixed;
             width: 100%;
-            flex-grow: 1;
-            max-width: 600px;
+            height: 100%;
         }
-
         #gameCanvas {
-            display: block;
-            background: var(--road-color);
+            background: #34495e;
             touch-action: none;
+            flex-grow: 1;
             width: 100%;
-            height: 70vh;
+            max-width: 100%;
+            max-height: 80vh;
         }
-
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            padding: 1rem;
+            gap: 2vmin;
+            padding: 2vmin;
             width: 100%;
             max-width: 600px;
             box-sizing: border-box;
         }
-
-        .control-btn {
-            padding: 1rem;
-            font-size: 1.5rem;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            background: var(--button-bg);
+        button {
+            padding: 3vmin;
+            font-size: 5vmin;
+            border: none;
+            border-radius: 2vmin;
+            background: #3498db;
             color: white;
-            transition: transform 0.1s;
             touch-action: manipulation;
+            min-height: 12vmin;
         }
-
-        .control-btn:active {
-            transform: scale(0.95);
-        }
-
         .score-board {
+            color: white;
+            font-size: 5vmin;
+            margin: 2vmin;
+            font-family: Arial;
             display: flex;
-            gap: 2rem;
-            padding: 1rem;
-            font-size: 1.2rem;
+            gap: 4vmin;
+            width: 100%;
+            justify-content: center;
         }
-
         .game-over {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.9);
-            padding: 2rem;
-            border-radius: 1rem;
+            color: white;
+            padding: 5vmin;
+            border-radius: 3vmin;
             text-align: center;
             display: none;
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0,0,0,0);
-            border: 0;
+            width: 80%;
+            max-width: 400px;
         }
     </style>
 </head>
 <body>
-    <header role="banner">
-        <div class="score-board">
-            <div>Счёт: <span id="currentScore">0</span></div>
-            <div>Рекорд: <span id="bestScore">0</span></div>
-        </div>
-    </header>
-
-    <main id="gameContainer" role="main">
-        <canvas id="gameCanvas" aria-label="Игровое поле с движущейся машинкой">
-            <p>Ваш браузер не поддерживает Canvas. Пожалуйста, обновите браузер.</p>
-        </canvas>
-        
-        <div class="game-over" id="gameOver" role="alert">
-            <h2>Игра окончена!</h2>
-            <button class="control-btn" onclick="restartGame()">Играть снова</button>
-        </div>
-    </main>
-
-    <footer role="contentinfo">
-        <div class="controls">
-            <button 
-                id="leftBtn" 
-                class="control-btn"
-                aria-label="Движение влево"
-                onpointerdown="startMove(-1)"
-                onpointerup="stopMove()"
-                onpointercancel="stopMove()">
-                ←
-            </button>
-            
-            <button 
-                id="soundBtn" 
-                class="control-btn"
-                aria-label="Переключить звук"
-                onclick="toggleSound()">
-                <span aria-hidden="true">🔊</span>
-                <span class="sr-only">Звук:</span>
-                <span id="soundState">Вкл</span>
-            </button>
-            
-            <button 
-                id="rightBtn" 
-                class="control-btn"
-                aria-label="Движение вправо"
-                onpointerdown="startMove(1)"
-                onpointerup="stopMove()"
-                onpointercancel="stopMove()">
-                →
-            </button>
-        </div>
-    </footer>
+    <div class="score-board">
+        <div>Score: <span id="currentScore">0</span></div>
+        <div>Best: <span id="bestScore">0</span></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div class="controls">
+        <button id="leftBtn">←</button>
+        <button id="soundBtn">🔊 Sound</button>
+        <button id="rightBtn">→</button>
+    </div>
+    <div class="game-over" id="gameOver">
+        <h2>Game Over!</h2>
+        <button onclick="restartGame()" style="margin-top: 3vmin;">Играть снова</button>
+    </div>
 
     <script>
+        // Блокировка масштабирования
+        document.addEventListener('touchstart', function(e) {
+            if(e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+        
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+
         // Инициализация игры
+        let bestScore = localStorage.getItem('bestScore') || 0;
+        document.getElementById('bestScore').textContent = bestScore;
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let enemies = [];
         let score = 0;
-        let bestScore = localStorage.getItem('bestScore') || 0;
+        let gameLoop;
         let isGameOver = false;
         let soundEnabled = true;
-        let lastTime = 0;
-        let animationFrameId;
-        
-        // Переменные управления
-        let moveDirection = 0;
-        let isMoving = false;
 
-        // Конфигурация
         const CONFIG = {
             ROAD: {
                 widthRatio: 0.8,
                 lanes: 4,
-                dash: [50, 30]
+                colors: { road: '#7f8c8d', marker: '#ffffff' }
             },
-            PLAYER: {
-                maxSpeed: 12,
-                acceleration: 0.6,
-                friction: 0.1,
-                width: 40,
-                height: 60
-            },
-            ENEMY: {
-                spawnRate: 1500,
-                minSpeed: 3,
-                maxSpeed: 6
-            }
+            PLAYER: { width: 8, height: 12, speed: 0.2, color: '#e74c3c' },
+            ENEMIES: { spawnRate: 100, speed: 0.15 }
         };
 
-        // Игрок
+        const ROAD = {
+            left: () => canvas.width * (1 - CONFIG.ROAD.widthRatio) / 2,
+            right: () => ROAD.left() + canvas.width * CONFIG.ROAD.widthRatio,
+            laneWidth: () => (ROAD.right() - ROAD.left()) / CONFIG.ROAD.lanes,
+            getLaneCenter: lane => ROAD.left() + (lane + 0.5) * ROAD.laneWidth()
+        };
+
         const player = {
-            x: 0,
-            y: 0,
-            lane: 1,
-            speed: 0,
-            targetLane: 1,
-            updatePosition(deltaTime) {
-                const targetX = getLaneCenter(this.targetLane) - CONFIG.PLAYER.width/2;
-                const dx = targetX - this.x;
-                
-                if(Math.abs(dx) > 1) {
-                    this.speed += CONFIG.PLAYER.acceleration * Math.sign(dx) * (deltaTime/16);
-                    this.speed = Math.max(-CONFIG.PLAYER.maxSpeed, 
-                                      Math.min(CONFIG.PLAYER.maxSpeed, this.speed));
-                } else {
-                    this.speed *= (1 - CONFIG.PLAYER.friction);
-                }
-                
-                this.x += this.speed * (deltaTime/16);
-                this.x = Math.max(getLaneCenter(0) - CONFIG.PLAYER.width/2, 
-                               Math.min(getLaneCenter(3) - CONFIG.PLAYER.width/2, this.x));
-                this.y = canvas.height - CONFIG.PLAYER.height * 1.5;
+            x: 0, y: 0, lane: 1,
+            updatePosition() {
+                this.x = ROAD.getLaneCenter(this.lane) - CONFIG.PLAYER.width/2;
+                this.y = canvas.height - canvas.height * 0.15;
             }
         };
-
-        // Глобальные функции управления
-        window.startMove = function(direction) {
-            if (isGameOver) return;
-            moveDirection = direction;
-            isMoving = true;
-        };
-
-        window.stopMove = function() {
-            isMoving = false;
-            moveDirection = 0;
-        };
-
-        function updateControl() {
-            if (!isMoving) return;
-            
-            const newLane = player.targetLane + moveDirection;
-            player.targetLane = Math.max(0, Math.min(3, newLane));
-        }
-
-        // Инициализация
-        function init() {
-            resizeCanvas();
-            player.updatePosition(0);
-            window.addEventListener('resize', resizeCanvas);
-            document.getElementById('bestScore').textContent = Math.floor(bestScore/100);
-            startGame();
-        }
-
-        function startGame() {
-            isGameOver = false;
-            score = 0;
-            enemies = [];
-            player.lane = 1;
-            player.targetLane = 1;
-            lastTime = 0;
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            animationFrameId = requestAnimationFrame(gameLoop);
-        }
 
         function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight * 0.7;
-            CONFIG.PLAYER.width = canvas.width * 0.07;
-            CONFIG.PLAYER.height = canvas.width * 0.12;
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            canvas.width = screenWidth;
+            canvas.height = screenHeight * 0.7;
+            
+            CONFIG.PLAYER.width = screenWidth * 0.07;
+            CONFIG.PLAYER.height = screenWidth * 0.12;
+            
+            player.updatePosition();
+            enemies = [];
+        }
+
+        function addEventListeners() {
+            const leftBtn = document.getElementById('leftBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            
+            const handleMove = (direction) => {
+                player.lane = Math.max(0, Math.min(3, player.lane + direction));
+                player.updatePosition();
+            };
+
+            leftBtn.addEventListener('touchstart', () => handleMove(-1));
+            rightBtn.addEventListener('touchstart', () => handleMove(1));
+            
+            document.addEventListener('keydown', (e) => {
+                if(['ArrowLeft', 'a'].includes(e.key)) handleMove(-1);
+                if(['ArrowRight', 'd'].includes(e.key)) handleMove(1);
+            });
+        }
+
+        function createEnemy() {
+            enemies.push({
+                lane: Math.floor(Math.random() * 4),
+                y: -CONFIG.PLAYER.height,
+                width: CONFIG.PLAYER.width,
+                height: CONFIG.PLAYER.height
+            });
+        }
+
+        function checkCollision() {
+            return enemies.some(enemy => 
+                player.lane === enemy.lane &&
+                enemy.y + CONFIG.PLAYER.height > canvas.height * 0.8
+            );
+        }
+
+        function updateGame() {
+            if(isGameOver) return;
+
+            enemies.forEach(enemy => enemy.y += CONFIG.ENEMIES.speed * canvas.height);
+            
+            if(checkCollision()) gameOver();
+            
+            enemies = enemies.filter(enemy => enemy.y < canvas.height);
+            
+            if(Math.random() < 0.02) createEnemy();
+            
+            score++;
+            document.getElementById('currentScore').textContent = Math.floor(score/10);
         }
 
         function drawRoad() {
-            ctx.fillStyle = '#7f8c8d';
-            const roadWidth = canvas.width * CONFIG.ROAD.widthRatio;
-            const roadLeft = (canvas.width - roadWidth) / 2;
-            ctx.fillRect(roadLeft, 0, roadWidth, canvas.height);
+            ctx.fillStyle = CONFIG.ROAD.colors.road;
+            ctx.fillRect(ROAD.left(), 0, ROAD.right() - ROAD.left(), canvas.height);
 
-            ctx.strokeStyle = '#ffffff';
-            ctx.setLineDash(CONFIG.ROAD.dash);
-            ctx.lineWidth = 4;
+            ctx.strokeStyle = CONFIG.ROAD.colors.marker;
+            ctx.setLineDash([canvas.height * 0.05, canvas.height * 0.03]);
+            ctx.lineWidth = canvas.width * 0.005;
             
-            for(let i = 1; i < CONFIG.ROAD.lanes; i++) {
-                const x = roadLeft + (roadWidth / CONFIG.ROAD.lanes) * i;
+            for(let i = 1; i < 4; i++) {
                 ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
+                ctx.moveTo(ROAD.left() + i * ROAD.laneWidth(), 0);
+                ctx.lineTo(ROAD.left() + i * ROAD.laneWidth(), canvas.height);
                 ctx.stroke();
             }
-        }
-
-        function gameLoop(timestamp) {
-            const deltaTime = timestamp - lastTime;
-            lastTime = timestamp;
-
-            updateControl();
-            player.updatePosition(deltaTime);
-            
-            if (!isGameOver) {
-                updateGame(deltaTime);
-                draw();
-            }
-            
-            animationFrameId = requestAnimationFrame(gameLoop);
-        }
-
-        function updateGame(deltaTime) {
-            enemies.forEach(enemy => {
-                enemy.y += enemy.speed * (deltaTime/16);
-            });
-
-            if (Math.random() < deltaTime / CONFIG.ENEMY.spawnRate) {
-                enemies.push({
-                    lane: Math.floor(Math.random() * 4),
-                    x: getLaneCenter(Math.floor(Math.random() * 4)) - CONFIG.PLAYER.width/2,
-                    y: -CONFIG.PLAYER.height,
-                    speed: CONFIG.ENEMY.minSpeed + Math.random() * (CONFIG.ENEMY.maxSpeed - CONFIG.ENEMY.minSpeed)
-                });
-            }
-
-            if (checkCollision()) gameOver();
-
-            score += deltaTime / 16;
-            document.getElementById('currentScore').textContent = Math.floor(score/100);
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawRoad();
 
-            ctx.fillStyle = '#e74c3c';
+            // Игрок
+            ctx.fillStyle = CONFIG.PLAYER.color;
             ctx.fillRect(player.x, player.y, CONFIG.PLAYER.width, CONFIG.PLAYER.height);
 
+            // Враги
             ctx.fillStyle = '#2ecc71';
             enemies.forEach(enemy => {
-                ctx.fillRect(enemy.x, enemy.y, CONFIG.PLAYER.width, CONFIG.PLAYER.height);
-            });
-        }
-
-        function checkCollision() {
-            const playerRect = {
-                x: player.x,
-                y: player.y,
-                width: CONFIG.PLAYER.width,
-                height: CONFIG.PLAYER.height
-            };
-
-            return enemies.some(enemy => {
-                const enemyRect = {
-                    x: enemy.x,
-                    y: enemy.y,
-                    width: CONFIG.PLAYER.width,
-                    height: CONFIG.PLAYER.height
-                };
-
-                return !(playerRect.x > enemyRect.x + enemyRect.width ||
-                       playerRect.x + playerRect.width < enemyRect.x ||
-                       playerRect.y > enemyRect.y + enemyRect.height ||
-                       playerRect.y + playerRect.height < enemyRect.y);
+                const x = ROAD.getLaneCenter(enemy.lane) - CONFIG.PLAYER.width/2;
+                ctx.fillRect(x, enemy.y, CONFIG.PLAYER.width, CONFIG.PLAYER.height);
             });
         }
 
         function gameOver() {
             isGameOver = true;
-            if (score > bestScore) {
+            if(score > bestScore) {
                 bestScore = score;
                 localStorage.setItem('bestScore', bestScore);
-                document.getElementById('bestScore').textContent = Math.floor(bestScore/100);
+                document.getElementById('bestScore').textContent = Math.floor(bestScore/10);
             }
             document.getElementById('gameOver').style.display = 'block';
-            if (navigator.vibrate) navigator.vibrate(200);
-            cancelAnimationFrame(animationFrameId);
+            cancelAnimationFrame(gameLoop);
         }
 
         function restartGame() {
+            isGameOver = false;
+            score = 0;
+            enemies = [];
+            player.lane = 1;
+            player.updatePosition();
             document.getElementById('gameOver').style.display = 'none';
-            startGame();
+            document.getElementById('currentScore').textContent = '0';
+            gameLoop = requestAnimationFrame(game);
         }
 
         function toggleSound() {
             soundEnabled = !soundEnabled;
-            document.getElementById('soundState').textContent = soundEnabled ? 'Вкл' : 'Выкл';
+            document.getElementById('soundBtn').textContent = 
+                `🔊 Sound: ${soundEnabled ? 'ON' : 'OFF'}`;
         }
 
-        function getLaneCenter(lane) {
-            const roadWidth = canvas.width * CONFIG.ROAD.widthRatio;
-            const laneWidth = roadWidth / CONFIG.ROAD.lanes;
-            return (canvas.width - roadWidth)/2 + laneWidth * (lane + 0.5);
+        function game() {
+            updateGame();
+            draw();
+            gameLoop = requestAnimationFrame(game);
         }
 
-        window.addEventListener('DOMContentLoaded', init);
-        document.addEventListener('touchstart', e => e.touches.length > 1 && e.preventDefault(), { passive: false });
-        document.addEventListener('gesturestart', e => e.preventDefault());
+        // Инициализация
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', resizeCanvas);
+        addEventListeners();
+        game();
     </script>
 </body>
 </html>
