@@ -159,6 +159,7 @@
         let soundEnabled = true;
         let lastTime = 0;
         let spawnCounter = 0;
+        let animationFrameId;
 
         // Конфигурация
         const CONFIG = {
@@ -178,12 +179,6 @@
             }
         };
 
-        // Аудио
-        const audio = {
-            crash: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'),
-            engine: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU')
-        };
-
         // Игрок
         const player = {
             x: 0,
@@ -197,16 +192,32 @@
             }
         };
 
-        // Инициализация
+        // Звуковые эффекты (заглушки)
+        const audio = {
+            crash: { play: () => {} },
+            engine: { play: () => {}, muted: false }
+        };
+
         function init() {
             resizeCanvas();
             player.updatePosition();
             window.addEventListener('resize', resizeCanvas);
             document.getElementById('bestScore').textContent = Math.floor(bestScore/100);
             toggleSound();
+            startGame();
         }
 
-        // Ресайз канваса
+        function startGame() {
+            isGameOver = false;
+            score = 0;
+            enemies = [];
+            player.lane = 1;
+            lastTime = 0;
+            spawnCounter = 0;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight * 0.7;
@@ -214,14 +225,12 @@
             CONFIG.PLAYER.height = canvas.width * 0.12;
         }
 
-        // Генерация дороги
         function drawRoad() {
-            ctx.fillStyle = var(--road-color);
+            ctx.fillStyle = '#7f8c8d';
             const roadWidth = canvas.width * CONFIG.ROAD.widthRatio;
             const roadLeft = (canvas.width - roadWidth) / 2;
             ctx.fillRect(roadLeft, 0, roadWidth, canvas.height);
 
-            // Разметка
             ctx.strokeStyle = '#ffffff';
             ctx.setLineDash(CONFIG.ROAD.dash);
             ctx.lineWidth = 4;
@@ -235,7 +244,6 @@
             }
         }
 
-        // Обновление игры
         function update(timestamp) {
             if (!lastTime) lastTime = timestamp;
             const deltaTime = timestamp - lastTime;
@@ -243,41 +251,32 @@
 
             if (isGameOver) return;
 
-            // Движение врагов
             enemies.forEach(enemy => {
                 enemy.y += CONFIG.ENEMY.speed * deltaTime / 16;
             });
 
-            // Спавн врагов
             spawnCounter += deltaTime;
             if (spawnCounter >= CONFIG.ENEMY.spawnRate) {
                 spawnEnemy();
                 spawnCounter = 0;
             }
 
-            // Коллизии
             if (checkCollision()) {
                 gameOver();
                 return;
             }
 
-            // Обновление счёта
             score += deltaTime / 16;
             document.getElementById('currentScore').textContent = Math.floor(score/100);
-            
-            requestAnimationFrame(update);
         }
 
-        // Отрисовка
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawRoad();
 
-            // Игрок
-            ctx.fillStyle = var(--primary-color);
+            ctx.fillStyle = '#e74c3c';
             ctx.fillRect(player.x, player.y, CONFIG.PLAYER.width, CONFIG.PLAYER.height);
 
-            // Враги
             ctx.fillStyle = '#2ecc71';
             enemies.forEach(enemy => {
                 const x = getLaneCenter(enemy.lane) - CONFIG.PLAYER.width/2;
@@ -285,18 +284,17 @@
             });
         }
 
-        // Запуск игры
         function gameLoop(timestamp) {
             player.updatePosition();
             update(timestamp);
             draw();
-            requestAnimationFrame(gameLoop);
+            animationFrameId = requestAnimationFrame(gameLoop);
         }
 
-        // Обработчики управления
-        function move(direction) {
+        window.move = function(direction) {
+            if (isGameOver) return;
             player.lane = Math.max(0, Math.min(3, player.lane + direction));
-        }
+        };
 
         function toggleSound() {
             soundEnabled = !soundEnabled;
@@ -304,7 +302,6 @@
             Object.values(audio).forEach(sound => sound.muted = !soundEnabled);
         }
 
-        // Коллизии
         function checkCollision() {
             const playerRect = {
                 x: player.x,
@@ -317,7 +314,8 @@
                 const enemyRect = {
                     x: getLaneCenter(enemy.lane) - CONFIG.PLAYER.width/2,
                     y: enemy.y,
-                    ...CONFIG.PLAYER
+                    width: CONFIG.PLAYER.width,
+                    height: CONFIG.PLAYER.height
                 };
 
                 return !(playerRect.x > enemyRect.x + enemyRect.width ||
@@ -327,7 +325,6 @@
             });
         }
 
-        // Завершение игры
         function gameOver() {
             isGameOver = true;
             if (score > bestScore) {
@@ -338,6 +335,7 @@
             document.getElementById('gameOver').style.display = 'block';
             if (navigator.vibrate) navigator.vibrate(200);
             if (soundEnabled) audio.crash.play();
+            cancelAnimationFrame(animationFrameId);
         }
 
         function restartGame() {
@@ -346,10 +344,9 @@
             enemies = [];
             player.lane = 1;
             document.getElementById('gameOver').style.display = 'none';
-            requestAnimationFrame(gameLoop);
+            startGame();
         }
 
-        // Вспомогательные функции
         function getLaneCenter(lane) {
             const roadWidth = canvas.width * CONFIG.ROAD.widthRatio;
             const laneWidth = roadWidth / CONFIG.ROAD.lanes;
@@ -359,13 +356,12 @@
         function spawnEnemy() {
             enemies.push({
                 lane: Math.floor(Math.random() * 4),
-                y: -CONFIG.PLAYER.height
+                y: -CONFIG.PLAYER.height,
+                speed: CONFIG.ENEMY.speed
             });
         }
 
-        // Старт игры
-        init();
-        gameLoop();
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
