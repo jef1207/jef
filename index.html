@@ -2,151 +2,193 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Snake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Full Screen Snake</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background: #2c3e50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            box-sizing: border-box;
             touch-action: none;
         }
 
+        body {
+            background: #2c3e50;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vmin;
+            height: 100vmin;
+            margin: auto;
+        }
+
         #gameCanvas {
-            border: 2px solid #ecf0f1;
-            margin-top: 20px;
+            width: 100%;
+            height: 100%;
         }
 
         #controls {
-            margin-top: 20px;
+            position: fixed;
+            bottom: 20px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            user-select: none;
+            width: 60vmin;
         }
 
         .control-btn {
-            width: 60px;
-            height: 60px;
+            width: 15vmin;
+            height: 15vmin;
             background: #3498db;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
-            font-size: 24px;
-            cursor: pointer;
+            font-size: 6vmin;
+            user-select: none;
             touch-action: manipulation;
         }
 
         #score {
+            position: fixed;
+            top: 20px;
             color: white;
-            font-size: 24px;
-            margin: 10px 0;
+            font-size: 6vmin;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
-    <div id="score">Score: 0</div>
-    <canvas id="gameCanvas" width="300" height="300"></canvas>
+    <div id="score">0</div>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+    </div>
     <div id="controls">
         <div></div>
-        <div class="control-btn" ontouchstart="move('up')" ontouchend="stopMove()">↑</div>
+        <div class="control-btn" ontouchstart="changeDirection('up')">↑</div>
         <div></div>
-        <div class="control-btn" ontouchstart="move('left')" ontouchend="stopMove()">←</div>
-        <div class="control-btn" ontouchstart="move('down')" ontouchend="stopMove()">↓</div>
-        <div class="control-btn" ontouchstart="move('right')" ontouchend="stopMove()">→</div>
+        <div class="control-btn" ontouchstart="changeDirection('left')">←</div>
+        <div class="control-btn" ontouchstart="changeDirection('down')">↓</div>
+        <div class="control-btn" ontouchstart="changeDirection('right')">→</div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const GRID_SIZE = 15;
-        const TILE_COUNT = canvas.width / GRID_SIZE;
-        
+        let gridSize = 20;
+        let tileCount;
         let snake = [{x: 10, y: 10}];
         let food = {x: 15, y: 15};
-        let dx = 0;
+        let dx = 1;
         let dy = 0;
         let score = 0;
         let gameLoop;
-        let isMoving = false;
+        let lastDirection = 'right';
 
-        // Touch controls
-        function move(direction) {
-            event.preventDefault();
-            isMoving = true;
+        // Размеры canvas
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const size = Math.min(window.innerWidth, window.innerHeight);
+            gridSize = Math.floor(size / 30);
+            tileCount = Math.floor(size / gridSize);
+            
+            canvas.width = tileCount * gridSize;
+            canvas.height = tileCount * gridSize;
+        }
+
+        // Направление движения
+        function changeDirection(direction) {
             switch(direction) {
-                case 'up': if(dy !== 1) { dx = 0; dy = -1; } break;
-                case 'down': if(dy !== -1) { dx = 0; dy = 1; } break;
-                case 'left': if(dx !== 1) { dx = -1; dy = 0; } break;
-                case 'right': if(dx !== -1) { dx = 1; dy = 0; } break;
+                case 'up':
+                    if(lastDirection !== 'down') {
+                        dx = 0;
+                        dy = -1;
+                        lastDirection = 'up';
+                    }
+                    break;
+                case 'down':
+                    if(lastDirection !== 'up') {
+                        dx = 0;
+                        dy = 1;
+                        lastDirection = 'down';
+                    }
+                    break;
+                case 'left':
+                    if(lastDirection !== 'right') {
+                        dx = -1;
+                        dy = 0;
+                        lastDirection = 'left';
+                    }
+                    break;
+                case 'right':
+                    if(lastDirection !== 'left') {
+                        dx = 1;
+                        dy = 0;
+                        lastDirection = 'right';
+                    }
+                    break;
             }
         }
 
-        function stopMove() {
-            isMoving = false;
-        }
+        // Основной игровой цикл
+        function gameStep() {
+            // Движение змейки
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            snake.unshift(head);
 
-        function drawGame() {
-            // Move snake
-            if(isMoving) {
-                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-                snake.unshift(head);
-
-                // Eat food
-                if(head.x === food.x && head.y === food.y) {
-                    score += 10;
-                    document.getElementById('score').textContent = `Score: ${score}`;
-                    generateFood();
-                } else {
-                    snake.pop();
-                }
+            // Проверка на съедение еды
+            if(head.x === food.x && head.y === food.y) {
+                score++;
+                document.getElementById('score').textContent = score;
+                generateFood();
+            } else {
+                snake.pop();
             }
 
-            // Clear canvas
+            // Отрисовка
             ctx.fillStyle = '#2c3e50';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw snake
+            // Змейка
             ctx.fillStyle = '#2ecc71';
-            snake.forEach((segment, index) => {
+            snake.forEach(segment => {
                 ctx.fillRect(
-                    segment.x * GRID_SIZE,
-                    segment.y * GRID_SIZE,
-                    GRID_SIZE - 1,
-                    GRID_SIZE - 1
+                    segment.x * gridSize,
+                    segment.y * gridSize,
+                    gridSize - 1,
+                    gridSize - 1
                 );
             });
 
-            // Draw food
+            // Еда
             ctx.fillStyle = '#e74c3c';
             ctx.fillRect(
-                food.x * GRID_SIZE,
-                food.y * GRID_SIZE,
-                GRID_SIZE - 1,
-                GRID_SIZE - 1
+                food.x * gridSize,
+                food.y * gridSize,
+                gridSize - 1,
+                gridSize - 1
             );
 
-            // Collision check
-            if(checkCollision()) gameOver();
+            // Коллизии
+            if(head.x < 0 || head.x >= tileCount || 
+               head.y < 0 || head.y >= tileCount ||
+               snake.slice(1).some(s => s.x === head.x && s.y === head.y)) {
+                gameOver();
+            }
         }
 
         function generateFood() {
-            food.x = Math.floor(Math.random() * TILE_COUNT);
-            food.y = Math.floor(Math.random() * TILE_COUNT);
-        }
-
-        function checkCollision() {
-            const head = snake[0];
-            return (
-                head.x < 0 || head.x >= TILE_COUNT ||
-                head.y < 0 || head.y >= TILE_COUNT ||
-                snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
-            );
+            do {
+                food.x = Math.floor(Math.random() * tileCount);
+                food.y = Math.floor(Math.random() * tileCount);
+            } while(snake.some(s => s.x === food.x && s.y === food.y));
         }
 
         function gameOver() {
@@ -158,16 +200,22 @@
         function resetGame() {
             snake = [{x: 10, y: 10}];
             food = {x: 15, y: 15};
-            dx = 0;
+            dx = 1;
             dy = 0;
             score = 0;
-            isMoving = false;
-            document.getElementById('score').textContent = `Score: ${score}`;
-            gameLoop = setInterval(drawGame, 150);
+            lastDirection = 'right';
+            document.getElementById('score').textContent = '0';
+            gameLoop = setInterval(gameStep, 100);
         }
 
-        // Init game
+        // Инициализация
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
         resetGame();
+
+        // Блокировка масштабирования
+        document.addEventListener('touchstart', e => e.preventDefault(), {passive: false});
+        document.addEventListener('gesturestart', e => e.preventDefault());
     </script>
 </body>
 </html>
