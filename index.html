@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal Snake</title>
+    <title>Super Snake</title>
     <style>
         * {
             margin: 0;
@@ -65,10 +65,28 @@
             font-size: 6vmin;
             z-index: 1;
         }
+
+        #best-score {
+            position: fixed;
+            top: 12vmin;
+            color: #888;
+            font-size: 4vmin;
+        }
+
+        .bonus-pulse {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
     </style>
 </head>
 <body>
     <div id="score">0</div>
+    <div id="best-score">Рекорд: 0</div>
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
     </div>
@@ -88,14 +106,28 @@
         let tileCount;
         let snake = [{x: 10, y: 10}];
         let food = {x: 15, y: 15};
+        let bonusFood = null;
         let dx = 1;
         let dy = 0;
         let score = 0;
+        let bestScore = localStorage.getItem('snakeBestScore') || 0;
         let gameLoop;
+        let bonusTimer = null;
         let lastDirection = 'right';
 
+        // Инициализация игры
+        function initGame() {
+            document.getElementById('best-score').textContent = `Рекорд: ${bestScore}`;
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            resetGame();
+            
+            document.addEventListener('touchstart', e => e.preventDefault(), {passive: false});
+            document.addEventListener('gesturestart', e => e.preventDefault());
+        }
+
+        // Изменение размера поля
         function resizeCanvas() {
-            const container = document.getElementById('gameContainer');
             const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
             gridSize = Math.floor(size / 30);
             tileCount = Math.floor(size / gridSize);
@@ -104,6 +136,7 @@
             canvas.height = tileCount * gridSize;
         }
 
+        // Управление направлением
         function changeDirection(direction) {
             switch(direction) {
                 case 'up':
@@ -137,40 +170,41 @@
             }
         }
 
+        // Основной игровой цикл
         function gameStep() {
             // Телепортация через границы
             let head = {
-                x: snake[0].x + dx,
-                y: snake[0].y + dy
+                x: (snake[0].x + dx + tileCount) % tileCount,
+                y: (snake[0].y + dy + tileCount) % tileCount
             };
-
-            if(head.x >= tileCount) head.x = 0;
-            if(head.x < 0) head.x = tileCount - 1;
-            if(head.y >= tileCount) head.y = 0;
-            if(head.y < 0) head.y = tileCount - 1;
 
             snake.unshift(head);
 
+            // Проверка обычной еды
             if(head.x === food.x && head.y === food.y) {
-                score++;
-                document.getElementById('score').textContent = score;
+                score += 5;
+                updateScore();
                 generateFood();
-            } else {
-                snake.pop();
+                checkForBonus();
             }
 
+            // Проверка бонусной еды
+            if(bonusFood && head.x === bonusFood.x && head.y === bonusFood.y) {
+                score += 5;
+                updateScore();
+                clearTimeout(bonusTimer);
+                bonusFood = null;
+            }
+
+            if(!checkCollision()) snake.pop();
+
             // Отрисовка
-            ctx.fillStyle = '#2c3e50';
+            ctx.fillStyle = '#1a1a1a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Границы
-            ctx.strokeStyle = '#4a4a4a';
-            ctx.lineWidth = gridSize;
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-            // Змейка
+            // Отрисовка змейки
             ctx.fillStyle = '#2ecc71';
-            snake.forEach(segment => {
+            snake.forEach((segment, index) => {
                 ctx.fillRect(
                     segment.x * gridSize + 2,
                     segment.y * gridSize + 2,
@@ -179,7 +213,7 @@
                 );
             });
 
-            // Еда
+            // Обычная еда
             ctx.fillStyle = '#e74c3c';
             ctx.beginPath();
             ctx.arc(
@@ -191,12 +225,56 @@
             );
             ctx.fill();
 
-            // Проверка на самопоедание
-            if(snake.slice(1).some(s => s.x === head.x && s.y === head.y)) {
-                gameOver();
+            // Бонусная еда
+            if(bonusFood) {
+                ctx.fillStyle = '#f1c40f';
+                ctx.beginPath();
+                ctx.arc(
+                    bonusFood.x * gridSize + gridSize/2,
+                    bonusFood.y * gridSize + gridSize/2,
+                    gridSize/2 - 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
             }
         }
 
+        // Обновление счета
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            if(score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('snakeBestScore', bestScore);
+                document.getElementById('best-score').textContent = `Рекорд: ${bestScore}`;
+            }
+        }
+
+        // Генерация бонусной еды
+        function generateBonusFood() {
+            do {
+                bonusFood = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while(
+                snake.some(s => s.x === bonusFood.x && s.y === bonusFood.y) ||
+                (bonusFood.x === food.x && bonusFood.y === food.y)
+            );
+            
+            bonusTimer = setTimeout(() => {
+                bonusFood = null;
+            }, 5000);
+        }
+
+        // Проверка на бонус
+        function checkForBonus() {
+            if(score % 10 === 0 && score > 0 && !bonusFood) {
+                generateBonusFood();
+            }
+        }
+
+        // Генерация обычной еды
         function generateFood() {
             do {
                 food.x = Math.floor(Math.random() * tileCount);
@@ -204,31 +282,35 @@
             } while(snake.some(s => s.x === food.x && s.y === food.y));
         }
 
+        // Проверка столкновений
+        function checkCollision() {
+            return snake.slice(1).some(s => s.x === snake[0].x && s.y === snake[0].y);
+        }
+
+        // Завершение игры
         function gameOver() {
             clearInterval(gameLoop);
-            alert(`Game Over! Score: ${score}`);
+            clearTimeout(bonusTimer);
+            alert(`Игра окончена! Счет: ${score}`);
             resetGame();
         }
 
+        // Сброс игры
         function resetGame() {
             snake = [{x: 10, y: 10}];
             food = {x: 15, y: 15};
+            bonusFood = null;
             dx = 1;
             dy = 0;
             score = 0;
             lastDirection = 'right';
-            document.getElementById('score').textContent = '0';
+            clearTimeout(bonusTimer);
+            updateScore();
             gameLoop = setInterval(gameStep, 100);
         }
 
-        // Инициализация
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        resetGame();
-
-        // Блокировка масштабирования
-        document.addEventListener('touchstart', e => e.preventDefault(), {passive: false});
-        document.addEventListener('gesturestart', e => e.preventDefault());
+        // Запуск игры
+        initGame();
     </script>
 </body>
-</html>ш
+</html>
