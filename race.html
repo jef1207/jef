@@ -71,6 +71,23 @@
             width: 80%;
             max-width: 400px;
         }
+        /* Добавленные стили для кнопки "На главную" */
+        .game-over button {
+            background: #3498db;
+            padding: 2vmin 4vmin;
+            font-size: 4vmin;
+            margin: 2vmin;
+            transition: all 0.3s;
+        }
+        .game-over button:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+        .game-over a {
+            text-decoration: none;
+            display: block;
+            margin-top: 3vmin;
+        }
     </style>
 </head>
 <body>
@@ -86,7 +103,10 @@
     </div>
     <div class="game-over" id="gameOver">
         <h2>Game Over!</h2>
-        <button onclick="restartGame()" style="margin-top: 3vmin;">Играть снова</button>
+        <button onclick="restartGame()">Играть снова</button>
+        <a href="index.html">
+            <button style="background: #e74c3c;">На главную</button>
+        </a>
     </div>
 
     <script>
@@ -151,16 +171,11 @@
             targetRotation: 0,
             lastLane: 1,
             updatePosition() {
-                // Определяем направление движения
                 if(this.lane > this.lastLane) this.targetRotation = CONFIG.PLAYER.maxRotation;
                 else if(this.lane < this.lastLane) this.targetRotation = -CONFIG.PLAYER.maxRotation;
                 
                 this.lastLane = this.lane;
-                
-                // Плавный возврат к нулевому вращению
                 this.rotation += (this.targetRotation - this.rotation) * CONFIG.PLAYER.rotationSpeed;
-                
-                // Обновляем позицию
                 this.x = ROAD.getLaneCenter(this.lane) - CONFIG.PLAYER.width/2;
                 this.y = canvas.height - canvas.height * 0.15;
             }
@@ -220,7 +235,6 @@
         function updateGame(timestamp) {
             if(isGameOver) return;
 
-            // Увеличение скорости со временем
             speedIncreaseTimer += timestamp - lastTime;
             if(speedIncreaseTimer > speedIncreaseInterval) {
                 enemySpeed = Math.min(CONFIG.ENEMIES.maxSpeed, enemySpeed + 0.02);
@@ -251,94 +265,4 @@
             
             for(let i = 1; i < 4; i++) {
                 ctx.beginPath();
-                ctx.moveTo(ROAD.left() + i * ROAD.laneWidth(), 0);
-                ctx.lineTo(ROAD.left() + i * ROAD.laneWidth(), canvas.height);
-                ctx.stroke();
-            }
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawRoad();
-
-            // Отрисовка игрока с поворотом
-            ctx.save();
-            ctx.translate(
-                ROAD.getLaneCenter(player.lane),
-                player.y + CONFIG.PLAYER.height/2
-            );
-            ctx.rotate(player.rotation * Math.PI / 180);
-            ctx.font = `${CONFIG.PLAYER.emojiSize}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = CONFIG.PLAYER.color;
-            ctx.fillText(playerEmoji, 0, 0);
-            ctx.restore();
-
-            // Отрисовка врагов
-            ctx.textBaseline = 'bottom';
-            enemies.forEach(enemy => {
-                ctx.save();
-                ctx.translate(
-                    ROAD.getLaneCenter(enemy.lane),
-                    enemy.y + CONFIG.PLAYER.height
-                );
-                ctx.font = `${CONFIG.PLAYER.emojiSize}px Arial`;
-                ctx.fillStyle = '#2ecc71';
-                ctx.fillText(emojis[enemy.type], 0, 0);
-                ctx.restore();
-            });
-        }
-
-        function gameOver() {
-            isGameOver = true;
-            if(score > bestScore) {
-                bestScore = score;
-                localStorage.setItem('bestScore', bestScore);
-                document.getElementById('bestScore').textContent = Math.floor(bestScore/10);
-            }
-            document.getElementById('gameOver').style.display = 'block';
-            cancelAnimationFrame(gameLoop);
-        }
-
-        function restartGame() {
-            isGameOver = false;
-            score = 0;
-            enemySpeed = CONFIG.ENEMIES.minSpeed;
-            speedIncreaseTimer = 0;
-            enemies = [];
-            player.lane = 1;
-            player.rotation = 0;
-            player.targetRotation = 0;
-            player.updatePosition();
-            document.getElementById('gameOver').style.display = 'none';
-            document.getElementById('currentScore').textContent = '0';
-            gameLoop = requestAnimationFrame(game);
-        }
-
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            document.getElementById('soundBtn').textContent = 
-                `🔊 Sound: ${soundEnabled ? 'ON' : 'OFF'}`;
-        }
-
-        let lastTime = 0;
-        function game(timestamp) {
-            if(!lastTime) lastTime = timestamp;
-            const deltaTime = timestamp - lastTime;
-            lastTime = timestamp;
-
-            updateGame(deltaTime);
-            draw();
-            gameLoop = requestAnimationFrame(game);
-        }
-
-        // Инициализация
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('orientationchange', resizeCanvas);
-        addEventListeners();
-        game();
-    </script>
-</body>
-</html>
+                ctx.moveTo(ROAD.left() +
