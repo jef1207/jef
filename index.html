@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Full Screen Snake</title>
+    <title>Portal Snake</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
 
         body {
-            background: #2c3e50;
+            background: #1a1a1a;
             overflow: hidden;
             height: 100vh;
             display: flex;
@@ -26,6 +26,8 @@
             width: 100vmin;
             height: 100vmin;
             margin: auto;
+            border: 2vmin solid #4a4a4a;
+            border-radius: 3vmin;
         }
 
         #gameCanvas {
@@ -45,7 +47,7 @@
         .control-btn {
             width: 15vmin;
             height: 15vmin;
-            background: #3498db;
+            background: #3a3a3a;
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -92,10 +94,9 @@
         let gameLoop;
         let lastDirection = 'right';
 
-        // Размеры canvas
         function resizeCanvas() {
             const container = document.getElementById('gameContainer');
-            const size = Math.min(window.innerWidth, window.innerHeight);
+            const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
             gridSize = Math.floor(size / 30);
             tileCount = Math.floor(size / gridSize);
             
@@ -103,7 +104,6 @@
             canvas.height = tileCount * gridSize;
         }
 
-        // Направление движения
         function changeDirection(direction) {
             switch(direction) {
                 case 'up':
@@ -137,13 +137,20 @@
             }
         }
 
-        // Основной игровой цикл
         function gameStep() {
-            // Движение змейки
-            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            // Телепортация через границы
+            let head = {
+                x: snake[0].x + dx,
+                y: snake[0].y + dy
+            };
+
+            if(head.x >= tileCount) head.x = 0;
+            if(head.x < 0) head.x = tileCount - 1;
+            if(head.y >= tileCount) head.y = 0;
+            if(head.y < 0) head.y = tileCount - 1;
+
             snake.unshift(head);
 
-            // Проверка на съедение еды
             if(head.x === food.x && head.y === food.y) {
                 score++;
                 document.getElementById('score').textContent = score;
@@ -156,30 +163,36 @@
             ctx.fillStyle = '#2c3e50';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Границы
+            ctx.strokeStyle = '#4a4a4a';
+            ctx.lineWidth = gridSize;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
             // Змейка
             ctx.fillStyle = '#2ecc71';
             snake.forEach(segment => {
                 ctx.fillRect(
-                    segment.x * gridSize,
-                    segment.y * gridSize,
-                    gridSize - 1,
-                    gridSize - 1
+                    segment.x * gridSize + 2,
+                    segment.y * gridSize + 2,
+                    gridSize - 4,
+                    gridSize - 4
                 );
             });
 
             // Еда
             ctx.fillStyle = '#e74c3c';
-            ctx.fillRect(
-                food.x * gridSize,
-                food.y * gridSize,
-                gridSize - 1,
-                gridSize - 1
+            ctx.beginPath();
+            ctx.arc(
+                food.x * gridSize + gridSize/2,
+                food.y * gridSize + gridSize/2,
+                gridSize/2 - 2,
+                0,
+                Math.PI * 2
             );
+            ctx.fill();
 
-            // Коллизии
-            if(head.x < 0 || head.x >= tileCount || 
-               head.y < 0 || head.y >= tileCount ||
-               snake.slice(1).some(s => s.x === head.x && s.y === head.y)) {
+            // Проверка на самопоедание
+            if(snake.slice(1).some(s => s.x === head.x && s.y === head.y)) {
                 gameOver();
             }
         }
@@ -218,4 +231,4 @@
         document.addEventListener('gesturestart', e => e.preventDefault());
     </script>
 </body>
-</html>
+</html>ш
