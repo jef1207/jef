@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Car Racer with Tilt</title>
+    <style>
+        body { 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #2c3e50;
+            touch-action: manipulation;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        #gameCanvas {
+            background: #34495e;
+            touch-action: none;
+            flex-grow: 1;
+            width: 100%;
+            max-width: 100%;
+            max-height: 80vh;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2vmin;
+            padding: 2vmin;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 3vmin;
+            font-size: 5vmin;
+            border: none;
+            border-radius: 2vmin;
+            background: #3498db;
+            color: white;
+            touch-action: manipulation;
+            min-height: 12vmin;
+        }
+        .score-board {
+            color: white;
+            font-size: 5vmin;
+            margin: 2vmin;
+            font-family: Arial;
+            display: flex;
+            gap: 4vmin;
+            width: 100%;
+            justify-content: center;
+        }
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 5vmin;
+            border-radius: 3vmin;
+            text-align: center;
+            display: none;
+            width: 80%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="score-board">
+        <div>Score: <span id="currentScore">0</span></div>
+        <div>Best: <span id="bestScore">0</span></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div class="controls">
+        <button id="leftBtn">←</button>
+        <button id="soundBtn">🔊 Sound</button>
+        <button id="rightBtn">→</button>
+    </div>
+    <div class="game-over" id="gameOver">
+        <h2>Game Over!</h2>
+        <button onclick="restartGame()" style="margin-top: 3vmin;">Играть снова</button>
+    </div>
+
+    <script>
+        // Блокировка масштабирования
+        document.addEventListener('touchstart', function(e) {
+            if(e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+        
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+
+        // Инициализация игры
+        let bestScore = localStorage.getItem('bestScore') || 0;
+        document.getElementById('bestScore').textContent = bestScore;
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let enemies = [];
+        let score = 0;
+        let gameLoop;
+        let isGameOver = false;
+        let enemySpeed = 0.1;
+        let speedIncreaseTimer = 0;
+        const speedIncreaseInterval = 2000;
+        const emojis = ['🚘', '🚖', '🚔'];
+        const playerEmoji = '🚗';
+
+        const CONFIG = {
+            ROAD: {
+                widthRatio: 0.8,
+                lanes: 4,
+                colors: { road: '#7f8c8d', marker: '#ffffff' }
+            },
+            PLAYER: { 
+                width: 8, 
+                height: 12, 
+                emojiSize: 40,
+                maxRotation: 25,
+                rotationSpeed: 0.3,
+                color: '#e74c3c'
+            },
+            ENEMIES: { 
+                spawnRate: 100,
+                minSpeed: 0.1,
+                maxSpeed: 0.3 
+            }
+        };
+
+        const ROAD = {
+            left: () => canvas.width * (1 - CONFIG.ROAD.widthRatio) / 2,
+            right: () => ROAD.left() + canvas.width * CONFIG.ROAD.widthRatio,
+            laneWidth: () => (ROAD.right() - ROAD.left()) / CONFIG.ROAD.lanes,
+            getLaneCenter: lane => ROAD.left() + (lane + 0.5) * ROAD.laneWidth()
+        };
+
+        const player = {
+            x: 0, 
+            y: 0, 
+            lane: 1,
+            rotation: 0,
+            targetRotation: 0,
+            lastLane: 1,
+            updatePosition() {
+                // Определяем направление движения
+                if(this.lane > this.lastLane) this.targetRotation = CONFIG.PLAYER.maxRotation;
+                else if(this.lane < this.lastLane) this.targetRotation = -CONFIG.PLAYER.maxRotation;
+                
+                this.lastLane = this.lane;
+                
+                // Плавный возврат к нулевому вращению
+                this.rotation += (this.targetRotation - this.rotation) * CONFIG.PLAYER.rotationSpeed;
+                
+                // Обновляем позицию
+                this.x = ROAD.getLaneCenter(this.lane) - CONFIG.PLAYER.width/2;
+                this.y = canvas.height - canvas.height * 0.15;
+            }
+        };
+
+        function resizeCanvas() {
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            canvas.width = screenWidth;
+            canvas.height = screenHeight * 0.7;
+            
+            CONFIG.PLAYER.width = screenWidth * 0.07;
+            CONFIG.PLAYER.height = screenWidth * 0.12;
+            CONFIG.PLAYER.emojiSize = screenWidth * 0.1;
+            
+            player.updatePosition();
+            enemies = [];
+        }
+
+        function addEventListeners() {
+            const leftBtn = document.getElementById('leftBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            
+            const handleMove = (direction) => {
+                player.lane = Math.max(0, Math.min(3, player.lane + direction));
+                player.updatePosition();
+            };
+
+            leftBtn.addEventListener('touchstart', () => handleMove(-1));
+            rightBtn.addEventListener('touchstart', () => handleMove(1));
+            
+            document.addEventListener('keydown', (e) => {
+                if(['ArrowLeft', 'a'].includes(e.key)) handleMove(-1);
+                if(['ArrowRight', 'd'].includes(e.key)) handleMove(1);
+            });
+        }
+
+        function createEnemy() {
+            enemies.push({
+                lane: Math.floor(Math.random() * 4),
+                y: -CONFIG.PLAYER.height,
+                width: CONFIG.PLAYER.width,
+                height: CONFIG.PLAYER.height,
+                type: Math.floor(Math.random() * emojis.length),
+                speed: CONFIG.ENEMIES.minSpeed + Math.random() * (CONFIG.ENEMIES.maxSpeed - CONFIG.ENEMIES.minSpeed)
+            });
+        }
+
+        function checkCollision() {
+            return enemies.some(enemy => 
+                player.lane === enemy.lane &&
+                enemy.y + CONFIG.PLAYER.height > canvas.height * 0.8
+            );
+        }
+
+        function updateGame(timestamp) {
+            if(isGameOver) return;
+
+            // Увеличение скорости со временем
+            speedIncreaseTimer += timestamp - lastTime;
+            if(speedIncreaseTimer > speedIncreaseInterval) {
+                enemySpeed = Math.min(CONFIG.ENEMIES.maxSpeed, enemySpeed + 0.02);
+                speedIncreaseTimer = 0;
+            }
+
+            enemies.forEach(enemy => {
+                enemy.y += enemySpeed * canvas.height;
+            });
+            
+            if(checkCollision()) gameOver();
+            
+            enemies = enemies.filter(enemy => enemy.y < canvas.height);
+            
+            if(Math.random() < 0.02) createEnemy();
+            
+            score++;
+            document.getElementById('currentScore').textContent = Math.floor(score/10);
+        }
+
+        function drawRoad() {
+            ctx.fillStyle = CONFIG.ROAD.colors.road;
+            ctx.fillRect(ROAD.left(), 0, ROAD.right() - ROAD.left(), canvas.height);
+
+            ctx.strokeStyle = CONFIG.ROAD.colors.marker;
+            ctx.setLineDash([canvas.height * 0.05, canvas.height * 0.03]);
+            ctx.lineWidth = canvas.width * 0.005;
+            
+            for(let i = 1; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(ROAD.left() + i * ROAD.laneWidth(), 0);
+                ctx.lineTo(ROAD.left() + i * ROAD.laneWidth(), canvas.height);
+                ctx.stroke();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawRoad();
+
+            // Отрисовка игрока с поворотом
+            ctx.save();
+            ctx.translate(
+                ROAD.getLaneCenter(player.lane),
+                player.y + CONFIG.PLAYER.height/2
+            );
+            ctx.rotate(player.rotation * Math.PI / 180);
+            ctx.font = `${CONFIG.PLAYER.emojiSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = CONFIG.PLAYER.color;
+            ctx.fillText(playerEmoji, 0, 0);
+            ctx.restore();
+
+            // Отрисовка врагов
+            ctx.textBaseline = 'bottom';
+            enemies.forEach(enemy => {
+                ctx.save();
+                ctx.translate(
+                    ROAD.getLaneCenter(enemy.lane),
+                    enemy.y + CONFIG.PLAYER.height
+                );
+                ctx.font = `${CONFIG.PLAYER.emojiSize}px Arial`;
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillText(emojis[enemy.type], 0, 0);
+                ctx.restore();
+            });
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            if(score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('bestScore', bestScore);
+                document.getElementById('bestScore').textContent = Math.floor(bestScore/10);
+            }
+            document.getElementById('gameOver').style.display = 'block';
+            cancelAnimationFrame(gameLoop);
+        }
+
+        function restartGame() {
+            isGameOver = false;
+            score = 0;
+            enemySpeed = CONFIG.ENEMIES.minSpeed;
+            speedIncreaseTimer = 0;
+            enemies = [];
+            player.lane = 1;
+            player.rotation = 0;
+            player.targetRotation = 0;
+            player.updatePosition();
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('currentScore').textContent = '0';
+            gameLoop = requestAnimationFrame(game);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundBtn').textContent = 
+                `🔊 Sound: ${soundEnabled ? 'ON' : 'OFF'}`;
+        }
+
+        let lastTime = 0;
+        function game(timestamp) {
+            if(!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            updateGame(deltaTime);
+            draw();
+            gameLoop = requestAnimationFrame(game);
+        }
+
+        // Инициализация
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', resizeCanvas);
+        addEventListeners();
+        game();
+    </script>
+</body>
+</html>
