@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        canvas {
+            touch-action: none;
+            background: #87CEEB;
+        }
+        .joystick {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+        }
+        .actions {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            gap: 15px;
+            display: flex;
+        }
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div class="joystick" id="joystick"></div>
+    <div class="actions">
+        <div class="action-btn" id="jumpBtn">↑</div>
+        <div class="action-btn" id="actionBtn">✎</div>
+    </div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const BLOCK_SIZE = 24;
+const PLAYER_SIZE = 20;
+
+// Инициализация Telegram WebApp
+Telegram.WebApp.ready();
+const user = Telegram.WebApp.initDataUnsafe.user;
+
+// Настройка размеров
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+let world = {};
+let currentBlock = 'grass';
+const player = {
+    x: 100,
+    y: 100,
+    dx: 0,
+    dy: 0,
+    grounded: false
+};
+
+// Генерация мира
+function generateWorld() {
+    for(let x = 0; x < canvas.width; x += BLOCK_SIZE) {
+        for(let y = canvas.height - BLOCK_SIZE; y >= 0; y -= BLOCK_SIZE) {
+            if(y === canvas.height - BLOCK_SIZE) {
+                world[`${x},${y}`] = 'grass';
+            } else if(y > canvas.height - BLOCK_SIZE * 4) {
+                world[`${x},${y}`] = 'dirt';
+            }
+        }
+    }
+}
+
+// Сенсорное управление
+let joystickActive = false;
+let joystickStartX = 0;
+let joystickStartY = 0;
+let joystickX = 0;
+let joystickY = 0;
+
+document.getElementById('joystick').addEventListener('touchstart', (e) => {
+    joystickActive = true;
+    const rect = e.target.getBoundingClientRect();
+    joystickStartX = rect.left + 40;
+    joystickStartY = rect.top + 40;
+});
+
+document.addEventListener('touchmove', (e) => {
+    if(!joystickActive) return;
+    const touch = e.touches[0];
+    joystickX = touch.clientX - joystickStartX;
+    joystickY = touch.clientY - joystickStartY;
+    
+    // Ограничение радиуса джойстика
+    const dist = Math.sqrt(joystickX**2 + joystickY**2);
+    if(dist > 40) {
+        joystickX = (joystickX / dist) * 40;
+        joystickY = (joystickY / dist) * 40;
+    }
+});
+
+document.addEventListener('touchend', () => {
+    joystickActive = false;
+    joystickX = joystickY = 0;
+});
+
+// Действия
+document.getElementById('jumpBtn').addEventListener('touchstart', () => {
+    if(player.grounded) player.dy = -12;
+});
+
+let actionTimeout;
+document.getElementById('actionBtn').addEventListener('touchstart', (e) => {
+    actionTimeout = setTimeout(() => {
+        // Длинное нажатие - разрушение
+        breakBlock(player.x + PLAYER_SIZE/2, player.y + PLAYER_SIZE);
+    }, 500);
+});
+
+document.getElementById('actionBtn').addEventListener('touchend', (e) => {
+    clearTimeout(actionTimeout);
+    // Короткое нажатие - установка
+    placeBlock(player.x + PLAYER_SIZE/2, player.y + PLAYER_SIZE);
+});
+
+// Физика
+function updatePlayer() {
+    // Горизонтальное движение
+    player.dx = joystickX * 0.3;
+    player.x += player.dx;
+    
+    // Гравитация
+    player.dy += 0.5;
+    player.y += player.dy;
+    
+    // Коллизии
+    player.grounded = false;
+    Object.keys(world).forEach(key => {
+        const [x, y] = key.split(',').map(Number);
+        if(checkCollision(player.x, player.y, PLAYER_SIZE, PLAYER_SIZE, x, y, BLOCK_SIZE, BLOCK_SIZE)) {
+            resolveCollision(x, y);
+        }
+    });
+}
+
+function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+    return x1 < x2 + w2 && 
+           x1 + w1 > x2 && 
+           y1 < y2 + h2 && 
+           y1 + h1 > y2;
+}
+
+function resolveCollision(bx, by) {
+    const px = player.x + PLAYER_SIZE/2;
+    const py = player.y + PLAYER_SIZE/2;
+    
+    const dx = (bx + BLOCK_SIZE/2) - px;
+    const dy = (by + BLOCK_SIZE/2) - py;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if(absDx > absDy) {
+        if(dx > 0) player.x = bx - PLAYER_SIZE;
+        else player.x = bx + BLOCK_SIZE;
+        player.dx = 0;
+    } else {
+        if(dy > 0) {
+            player.y = by - PLAYER_SIZE;
+            player.dy = 0;
+            player.grounded = true;
+        } else {
+            player.y = by + BLOCK_SIZE;
+            player.dy = 0;
+        }
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Блоки
+    Object.entries(world).forEach(([key, type]) => {
+        const [x, y] = key.split(',').map(Number);
+        ctx.fillStyle = type === 'grass' ? '#567D46' : '#8B4513';
+        ctx.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+    });
+    
+    // Игрок
+    ctx.fillStyle = '#FF0000';
+    ctx.fillRect(player.x, player.y, PLAYER_SIZE, PLAYER_SIZE);
+    
+    // Джойстик
+    ctx.beginPath();
+    ctx.arc(joystickStartX, joystickStartY, 40, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(joystickStartX + joystickX, joystickStartY + joystickY, 20, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fill();
+}
+
+function gameLoop() {
+    updatePlayer();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+generateWorld();
+gameLoop();
+
+// Интеграция с Telegram
+Telegram.WebApp.MainButton.setText(`Играет: ${user?.first_name || 'Игрок'}`).show();
+
+// Сохранение мира
+function saveWorld() {
+    localStorage.setItem('world', JSON.stringify(world));
+    Telegram.WebApp.sendData(JSON.stringify(world));
+}
+
+// Загрузка мира
+function loadWorld() {
+    const saved = localStorage.getItem('world');
+    if(saved) world = JSON.parse(saved);
+}
+
+loadWorld();
+setInterval(saveWorld, 10000);
+</script>
+</body>
+</html>
