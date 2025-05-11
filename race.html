@@ -2,93 +2,132 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Racer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гонки</title>
     <style>
-        body { 
+        body {
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             background: #2c3e50;
-            touch-action: manipulation;
-            overflow: hidden;
-            -webkit-user-select: none;
-            user-select: none;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
         }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px;
+            flex-grow: 1;
+        }
+
         #gameCanvas {
             background: #34495e;
-            touch-action: none;
             width: 100%;
-            max-width: 100%;
             height: 70vh;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            padding: 10px;
+            padding: 20px;
             width: 100%;
             max-width: 600px;
         }
-        button {
-            padding: 15px;
-            font-size: 20px;
+
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             background: #3498db;
             color: white;
-            touch-action: manipulation;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #7f8c8d;
+            z-index: 100;
+        }
+
         .score-board {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
             color: white;
-            font-size: 20px;
-            margin: 10px;
-            display: flex;
-            gap: 20px;
+            text-align: right;
+            z-index: 100;
         }
+
         .game-over {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
+            background: rgba(0,0,0,0.9);
+            padding: 30px 40px;
+            border-radius: 15px;
             text-align: center;
-            display: none;
-        }
-        .back-button {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            padding: 10px 20px;
-            background: #e74c3c;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 200;
+        }
+
+        .road-line {
+            position: absolute;
+            width: 20px;
+            height: 60px;
+            background: #fff;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
-    <button class="back-button" onclick="window.location.href='index.html'">← Назад</button>
-    <div class="score-board">
-        <div>Счет: <span id="currentScore">0</span></div>
-        <div>Рекорд: <span id="bestScore">0</span></div>
+    <button class="btn back-btn" onclick="window.location.href='index.html'">← Назад</button>
+    
+    <div class="game-container">
+        <div class="score-board">
+            <div>Счет: <span id="currentScore">0</span></div>
+            <div>Рекорд: <span id="bestScore">0</span></div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="game-over" id="gameOver">
+            <h2 style="margin: 0 0 20px 0;">Игра окончена!</h2>
+            <button class="btn" onclick="restartGame()">🔄 Играть снова</button>
+            <button class="btn" onclick="window.location.href='index.html'" style="margin-top: 15px; background: #7f8c8d;">🏠 На главную</button>
+        </div>
     </div>
-    <canvas id="gameCanvas"></canvas>
+
     <div class="controls">
-        <button id="leftBtn">←</button>
-        <button id="startBtn">Старт</button>
-        <button id="rightBtn">→</button>
-    </div>
-    <div class="game-over" id="gameOver">
-        <h2>Game Over!</h2>
-        <button onclick="restartGame()">Играть снова</button>
-        <button onclick="window.location.href='index.html'">На главную</button>
+        <button class="btn" id="leftBtn">← Влево</button>
+        <button class="btn" id="startBtn" style="background: #27ae60;">🚘 Старт!</button>
+        <button class="btn" id="rightBtn">→ Вправо</button>
     </div>
 
     <script>
@@ -98,124 +137,157 @@
         let bestScore = localStorage.getItem('raceBestScore') || 0;
         document.getElementById('bestScore').textContent = bestScore;
 
-        const player = {
-            x: canvas.width/2 - 25,
-            y: canvas.height - 80,
-            width: 50,
-            height: 80,
-            speed: 5,
-            lane: 1
+        // Настройки игры
+        const config = {
+            player: {
+                width: 60,
+                height: 90,
+                color: '#e74c3c',
+                maxSpeed: 8,
+                lanes: [100, 300, 500] // Позиции трех полос
+            },
+            enemy: {
+                width: 60,
+                height: 90,
+                minSpeed: 3,
+                maxSpeed: 6,
+                spawnInterval: 2000
+            }
+        };
+
+        let player = {
+            x: config.player.lanes[1],
+            y: canvas.height - 120,
+            lane: 1,
+            score: 0
         };
 
         let enemies = [];
-        let score = 0;
-        let gameLoop;
+        let animationId;
 
         function initGame() {
-            canvas.width = window.innerWidth;
+            canvas.width = window.innerWidth > 600 ? 600 : window.innerWidth;
             canvas.height = window.innerHeight * 0.7;
-            
-            document.getElementById('leftBtn').addEventListener('touchstart', moveLeft);
-            document.getElementById('rightBtn').addEventListener('touchstart', moveRight);
+
+            // Обработчики управления
+            document.getElementById('leftBtn').addEventListener('touchstart', () => changeLane(-1));
+            document.getElementById('rightBtn').addEventListener('touchstart', () => changeLane(1));
             document.getElementById('startBtn').addEventListener('click', startGame);
             
             document.addEventListener('keydown', (e) => {
-                if(e.key === 'ArrowLeft') moveLeft();
-                if(e.key === 'ArrowRight') moveRight();
+                if(e.key === 'ArrowLeft') changeLane(-1);
+                if(e.key === 'ArrowRight') changeLane(1);
             });
+
+            drawStaticElements();
         }
 
-        function moveLeft() {
-            if(player.lane > 0) player.lane--;
+        function drawStaticElements() {
+            // Отрисовка дорожной разметки
+            ctx.fillStyle = '#ffffff80';
+            for(let y = 20; y < canvas.height; y += 120) {
+                ctx.fillRect(canvas.width/2 - 10, y, 20, 60);
+            }
         }
 
-        function moveRight() {
-            if(player.lane < 2) player.lane++;
+        function changeLane(direction) {
+            if(!isGameRunning) return;
+            const newLane = player.lane + direction;
+            if(newLane >= 0 && newLane < 3) {
+                player.lane = newLane;
+                player.x = config.player.lanes[player.lane];
+            }
         }
 
         function startGame() {
-            if(!isGameRunning) {
-                isGameRunning = true;
-                gameLoop = requestAnimationFrame(update);
-                spawnEnemy();
-            }
+            if(isGameRunning) return;
+            
+            isGameRunning = true;
+            player.score = 0;
+            enemies = [];
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('gameOver').style.display = 'none';
+            
+            gameLoop();
+            enemySpawner();
         }
 
-        function spawnEnemy() {
-            if(isGameRunning) {
-                enemies.push({
-                    x: Math.random() * (canvas.width - 50),
-                    y: -60,
-                    width: 50,
-                    height: 60,
-                    speed: 3 + Math.random() * 3
-                });
-                setTimeout(spawnEnemy, 2000);
-            }
-        }
-
-        function update() {
+        function enemySpawner() {
             if(!isGameRunning) return;
+            
+            enemies.push({
+                x: config.player.lanes[Math.floor(Math.random() * 3)],
+                y: -100,
+                speed: config.enemy.minSpeed + Math.random() * (config.enemy.maxSpeed - config.enemy.minSpeed)
+            });
+            
+            setTimeout(enemySpawner, config.enemy.spawnInterval);
+        }
 
-            // Движение игрока
-            player.x = canvas.width/2 - 25 + (player.lane - 1) * 100;
+        function gameLoop() {
+            if(!isGameRunning) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawStaticElements();
 
-            // Движение врагов
-            enemies.forEach(enemy => {
+            // Движение противников
+            enemies.forEach((enemy, index) => {
                 enemy.y += enemy.speed;
-                if(enemy.y > canvas.height) {
-                    enemies.splice(enemies.indexOf(enemy), 1);
-                    score++;
-                    document.getElementById('currentScore').textContent = score;
-                }
-
-                // Проверка столкновений
+                
+                // Проверка столкновения
                 if(
-                    player.x < enemy.x + enemy.width &&
-                    player.x + player.width > enemy.x &&
-                    player.y < enemy.y + enemy.height &&
-                    player.y + player.height > enemy.y
+                    Math.abs(player.x - enemy.x) < config.player.width &&
+                    Math.abs(player.y - enemy.y) < config.player.height
                 ) {
                     gameOver();
+                    return;
+                }
+
+                // Отрисовка противника
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillRect(enemy.x, enemy.y, config.enemy.width, config.enemy.height);
+                
+                // Удаление вышедших за пределы
+                if(enemy.y > canvas.height) {
+                    enemies.splice(index, 1);
+                    player.score += 10;
+                    document.getElementById('currentScore').textContent = player.score;
                 }
             });
 
-            // Отрисовка
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Игрок
-            ctx.fillStyle = '#e74c3c';
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-            
-            // Враги
-            ctx.fillStyle = '#2ecc71';
-            enemies.forEach(enemy => {
-                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-            });
+            // Отрисовка игрока
+            ctx.fillStyle = config.player.color;
+            ctx.fillRect(player.x, player.y, config.player.width, config.player.height);
 
-            gameLoop = requestAnimationFrame(update);
+            animationId = requestAnimationFrame(gameLoop);
         }
 
         function gameOver() {
             isGameRunning = false;
-            cancelAnimationFrame(gameLoop);
-            if(score > bestScore) {
-                bestScore = score;
+            cancelAnimationFrame(animationId);
+            
+            if(player.score > bestScore) {
+                bestScore = player.score;
                 localStorage.setItem('raceBestScore', bestScore);
+                document.getElementById('bestScore').textContent = bestScore;
             }
+            
+            document.getElementById('startBtn').style.display = 'block';
             document.getElementById('gameOver').style.display = 'block';
         }
 
         function restartGame() {
-            enemies = [];
-            score = 0;
-            player.lane = 1;
-            document.getElementById('currentScore').textContent = '0';
-            document.getElementById('gameOver').style.display = 'none';
+            player = {
+                x: config.player.lanes[1],
+                y: canvas.height - 120,
+                lane: 1,
+                score: 0
+            };
             startGame();
         }
 
         initGame();
+        window.addEventListener('resize', initGame);
     </script>
 </body>
 </html>
