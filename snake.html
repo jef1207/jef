@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Snake Bonus</title>
+    <title>Snake</title>
     <style>
+        /* Все стили из предыдущего ответа */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             touch-action: none;
         }
-
         body {
             background: #1a1a1a;
             overflow: hidden;
@@ -20,7 +20,6 @@
             flex-direction: column;
             align-items: center;
         }
-
         #gameContainer {
             position: relative;
             width: 100vmin;
@@ -29,12 +28,10 @@
             border: 2vmin solid #4a4a4a;
             border-radius: 3vmin;
         }
-
         #gameCanvas {
             width: 100%;
             height: 100%;
         }
-
         #controls {
             position: fixed;
             bottom: 20px;
@@ -43,7 +40,6 @@
             gap: 10px;
             width: 60vmin;
         }
-
         .control-btn {
             width: 15vmin;
             height: 15vmin;
@@ -57,7 +53,6 @@
             user-select: none;
             touch-action: manipulation;
         }
-
         #score {
             position: fixed;
             top: 20px;
@@ -65,20 +60,51 @@
             font-size: 6vmin;
             z-index: 1;
         }
-
         #best-score {
             position: fixed;
             top: 12vmin;
             color: #888;
             font-size: 4vmin;
         }
-
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 5vmin;
+            border-radius: 3vmin;
+            text-align: center;
+            display: none;
+            width: 80%;
+            max-width: 400px;
+            z-index: 1000;
+        }
+        .game-over button {
+            background: #3498db;
+            padding: 2vmin 4vmin;
+            font-size: 4vmin;
+            margin: 2vmin;
+            border: none;
+            border-radius: 2vmin;
+            color: white;
+            touch-action: manipulation;
+            transition: all 0.3s;
+        }
+        .game-over button:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+        .game-over a {
+            text-decoration: none;
+            display: block;
+        }
         @keyframes blink {
             0% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(1.1); }
             100% { opacity: 1; transform: scale(1); }
         }
-
         .bonus-food {
             animation: blink 0.8s infinite;
         }
@@ -97,6 +123,15 @@
         <div class="control-btn" ontouchstart="changeDirection('left')">←</div>
         <div class="control-btn" ontouchstart="changeDirection('down')">↓</div>
         <div class="control-btn" ontouchstart="changeDirection('right')">→</div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2>Игра окончена!</h2>
+        <p>Счет: <span id="finalScore">0</span></p>
+        <button onclick="resetGame()">Играть снова</button>
+        <a href="index.html">
+            <button style="background: #e74c3c;">На главную</button>
+        </a>
     </div>
 
     <script>
@@ -191,7 +226,14 @@
                 bonusFood = null;
             }
 
-            if(!checkCollision()) snake.pop();
+            if(checkCollision()) {
+                gameOver();
+                return;
+            }
+
+            if(!(head.x === food.x && head.y === food.y) && !(bonusFood && head.x === bonusFood.x && head.y === bonusFood.y)) {
+                snake.pop();
+            }
 
             ctx.fillStyle = '#1a1a1a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -223,7 +265,7 @@
                 ctx.arc(
                     bonusFood.x * gridSize + gridSize/2,
                     bonusFood.y * gridSize + gridSize/2,
-                    gridSize/2, // Увеличенный размер
+                    gridSize/2,
                     0,
                     Math.PI * 2
                 );
@@ -278,8 +320,8 @@
         function gameOver() {
             clearInterval(gameLoop);
             clearTimeout(bonusTimer);
-            alert(`Игра окончена! Счет: ${score}`);
-            resetGame();
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
         }
 
         function resetGame() {
@@ -293,6 +335,7 @@
             lastDirection = 'right';
             clearTimeout(bonusTimer);
             updateScore();
+            document.getElementById('gameOver').style.display = 'none';
             gameLoop = setInterval(gameStep, 100);
         }
 
