@@ -1,55 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>BlockCraft Debug</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            background: #ff0000; /* Красный фон для теста */
-        }
-        #debug {
+        #fallback-msg {
             position: fixed;
-            top: 10px;
-            left: 10px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: white;
-            z-index: 1000;
+            text-align: center;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="debug">Статус: загрузка...</div>
     <canvas id="gameCanvas"></canvas>
+    <div id="fallback-msg" style="display: none;">
+        Ваше устройство не поддерживает 3D-графику.<br>
+        Попробуйте обновить браузер или использовать другое устройство.
+    </div>
 
 <script>
-// 1. Телеграм инициализация
-try {
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-    document.getElementById('debug').innerHTML = 'Telegram API: OK';
-} catch(e) {
-    document.getElementById('debug').innerHTML = 'Ошибка Telegram API: ' + e;
+Telegram.WebApp.ready(() => {
+    const canvas = document.getElementById('gameCanvas');
+    const gl = canvas.getContext('webgl');
+    
+    if (!gl) {
+        document.getElementById('fallback-msg').style.display = 'block';
+        canvas.style.display = 'none';
+        return;
+    }
+
+    // Основная логика игры
+    initWebGLGame();
+});
+
+function initWebGLGame() {
+    // Ваш код WebGL
 }
-
-// 2. Проверка canvas
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = 300;
-canvas.height = 300;
-ctx.fillStyle = '#00ff00';
-ctx.fillRect(0, 0, 300, 300);
-
-// 3. Проверка WebGL
-const gl = canvas.getContext('webgl');
-if (!gl) {
-    document.getElementById('debug').innerHTML += '<br>WebGL не поддерживается!';
-}
-
-// 4. Проверка ошибок
-window.onerror = function(msg, url, line) {
-    document.getElementById('debug').innerHTML += `<br>ОШИБКА: ${msg} (строка ${line})`;
-};
 </script>
 </body>
 </html>
