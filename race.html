@@ -2,34 +2,38 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Гонки</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Car Racer Pro</title>
     <style>
-        body {
+        body { 
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             background: #2c3e50;
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-        }
-
-        .game-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin: 20px;
-            flex-grow: 1;
+            touch-action: manipulation;
+            overflow: hidden;
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
         }
 
         #gameCanvas {
             background: #34495e;
             width: 100%;
             height: 70vh;
+            max-width: 600px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            width: 100%;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            color: white;
         }
 
         .controls {
@@ -41,60 +45,57 @@
             max-width: 600px;
         }
 
-        .btn {
+        button {
             padding: 15px 25px;
-            font-size: 18px;
+            font-size: 1.2em;
             border: none;
             border-radius: 8px;
             background: #3498db;
             color: white;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .btn:hover {
-            background: #2980b9;
+        button:hover {
             transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         .back-btn {
+            background: #7f8c8d;
             position: absolute;
             top: 20px;
             left: 20px;
-            background: #7f8c8d;
-            z-index: 100;
-        }
-
-        .score-board {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 10px 20px;
-            border-radius: 8px;
-            color: white;
-            text-align: right;
             z-index: 100;
         }
 
         .game-over {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             padding: 30px 40px;
             border-radius: 15px;
             text-align: center;
             color: white;
             display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 200;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .car {
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            background: #e74c3c;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .enemy {
+            background: #2ecc71;
         }
 
         .road-line {
@@ -103,31 +104,31 @@
             height: 60px;
             background: #fff;
             opacity: 0.8;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
-    <button class="btn back-btn" onclick="window.location.href='index.html'">← Назад</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Назад</button>
     
-    <div class="game-container">
-        <div class="score-board">
-            <div>Счет: <span id="currentScore">0</span></div>
-            <div>Рекорд: <span id="bestScore">0</span></div>
-        </div>
-        
-        <canvas id="gameCanvas"></canvas>
-        
-        <div class="game-over" id="gameOver">
-            <h2 style="margin: 0 0 20px 0;">Игра окончена!</h2>
-            <button class="btn" onclick="restartGame()">🔄 Играть снова</button>
-            <button class="btn" onclick="window.location.href='index.html'" style="margin-top: 15px; background: #7f8c8d;">🏠 На главную</button>
-        </div>
+    <div class="header">
+        <div>Счет: <span id="currentScore">0</span></div>
+        <div>Рекорд: <span id="bestScore">0</span></div>
     </div>
 
+    <canvas id="gameCanvas"></canvas>
+
     <div class="controls">
-        <button class="btn" id="leftBtn">← Влево</button>
-        <button class="btn" id="startBtn" style="background: #27ae60;">🚘 Старт!</button>
-        <button class="btn" id="rightBtn">→ Вправо</button>
+        <button id="leftBtn">← Влево</button>
+        <button id="startBtn" style="background: #27ae60;">Старт</button>
+        <button id="rightBtn">→ Вправо</button>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2 style="margin: 0 0 20px 0; color: #e74c3c;">АВАРИЯ!</h2>
+        <p style="font-size: 1.2em;">Ваш счет: <span id="finalScore">0</span></p>
+        <button onclick="restartGame()" style="background: #27ae60;">🔄 Новая игра</button>
+        <button onclick="window.location.href='index.html'" style="margin-top: 15px; background: #7f8c8d;">🏠 Главное меню</button>
     </div>
 
     <script>
@@ -137,27 +138,26 @@
         let bestScore = localStorage.getItem('raceBestScore') || 0;
         document.getElementById('bestScore').textContent = bestScore;
 
-        // Настройки игры
         const config = {
             player: {
                 width: 60,
                 height: 90,
-                color: '#e74c3c',
-                maxSpeed: 8,
-                lanes: [100, 300, 500] // Позиции трех полос
+                speed: 8,
+                lanes: [100, 300, 500],
+                color: '#e74c3c'
             },
             enemy: {
                 width: 60,
                 height: 90,
                 minSpeed: 3,
-                maxSpeed: 6,
-                spawnInterval: 2000
+                maxSpeed: 7,
+                spawnInterval: 1500
             }
         };
 
         let player = {
             x: config.player.lanes[1],
-            y: canvas.height - 120,
+            y: 0,
             lane: 1,
             score: 0
         };
@@ -166,8 +166,9 @@
         let animationId;
 
         function initGame() {
-            canvas.width = window.innerWidth > 600 ? 600 : window.innerWidth;
+            canvas.width = Math.min(window.innerWidth, 600);
             canvas.height = window.innerHeight * 0.7;
+            player.y = canvas.height - config.player.height - 20;
 
             // Обработчики управления
             document.getElementById('leftBtn').addEventListener('touchstart', () => changeLane(-1));
@@ -183,7 +184,7 @@
         }
 
         function drawStaticElements() {
-            // Отрисовка дорожной разметки
+            // Дорожная разметка
             ctx.fillStyle = '#ffffff80';
             for(let y = 20; y < canvas.height; y += 120) {
                 ctx.fillRect(canvas.width/2 - 10, y, 20, 60);
@@ -205,7 +206,6 @@
             isGameRunning = true;
             player.score = 0;
             enemies = [];
-            document.getElementById('startBtn').style.display = 'none';
             document.getElementById('gameOver').style.display = 'none';
             
             gameLoop();
@@ -217,7 +217,7 @@
             
             enemies.push({
                 x: config.player.lanes[Math.floor(Math.random() * 3)],
-                y: -100,
+                y: -config.enemy.height,
                 speed: config.enemy.minSpeed + Math.random() * (config.enemy.maxSpeed - config.enemy.minSpeed)
             });
             
@@ -230,7 +230,11 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawStaticElements();
 
-            // Движение противников
+            // Отрисовка игрока
+            ctx.fillStyle = config.player.color;
+            ctx.fillRect(player.x, player.y, config.player.width, config.player.height);
+
+            // Обновление врагов
             enemies.forEach((enemy, index) => {
                 enemy.y += enemy.speed;
                 
@@ -243,7 +247,7 @@
                     return;
                 }
 
-                // Отрисовка противника
+                // Отрисовка врага
                 ctx.fillStyle = '#2ecc71';
                 ctx.fillRect(enemy.x, enemy.y, config.enemy.width, config.enemy.height);
                 
@@ -254,10 +258,6 @@
                     document.getElementById('currentScore').textContent = player.score;
                 }
             });
-
-            // Отрисовка игрока
-            ctx.fillStyle = config.player.color;
-            ctx.fillRect(player.x, player.y, config.player.width, config.player.height);
 
             animationId = requestAnimationFrame(gameLoop);
         }
@@ -272,14 +272,14 @@
                 document.getElementById('bestScore').textContent = bestScore;
             }
             
-            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('finalScore').textContent = player.score;
             document.getElementById('gameOver').style.display = 'block';
         }
 
         function restartGame() {
             player = {
                 x: config.player.lanes[1],
-                y: canvas.height - 120,
+                y: canvas.height - config.player.height - 20,
                 lane: 1,
                 score: 0
             };
