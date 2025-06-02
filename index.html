@@ -138,7 +138,7 @@
             animation: targetAppear 0.3s ease-out, pulse 1.5s infinite;
             font-size: 28px;
             text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
-            z-index: 3; /* Убедимся, что мишени поверх других элементов */
+            z-index: 3;
         }
         
         .target[data-clicked="true"] {
@@ -191,6 +191,7 @@
             gap: 15px;
             background: rgba(0, 0, 0, 0.1);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2;
         }
         
         .control-btn {
@@ -208,7 +209,6 @@
             border: none;
             position: relative;
             overflow: hidden;
-            z-index: 2; /* Убедимся, что кнопки поверх игровой области */
         }
         
         .control-btn:active {
@@ -254,8 +254,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             line-height: 1.5;
             font-size: 14px;
-            position: relative;
-            z-index: 2; /* Убедимся, что инструкции поверх */
+            z-index: 2;
         }
         
         .particle {
@@ -353,12 +352,12 @@
         }
         
         .game-stats {
-            display: flex;
-            justify-content: space-around;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
             padding: 10px 0;
             background: rgba(0, 0, 0, 0.1);
-            flex-wrap: wrap; /* Разрешить перенос на маленьких экранах */
-            gap: 5px; /* Добавим промежуток между элементами */
+            text-align: center;
         }
         
         .stat-item {
@@ -366,13 +365,14 @@
             flex-direction: column;
             align-items: center;
             color: white;
-            min-width: 60px; /* Минимальная ширина для сохранения читаемости */
+            min-width: 0;
         }
         
         .stat-value {
             font-size: 18px;
             font-weight: bold;
             margin-top: 3px;
+            white-space: nowrap;
         }
         
         .stat-label {
@@ -408,7 +408,7 @@
             font-weight: bold;
             color: gold;
             text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-            z-index: 5;
+            z-index: 10;
             pointer-events: none;
             opacity: 0;
             max-width: 90%;
@@ -428,10 +428,11 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            z-index: 5;
+            z-index: 10;
             opacity: 0;
             transition: opacity 0.3s;
             max-width: 70%;
+            white-space: nowrap;
         }
         
         .bonus-active {
@@ -441,7 +442,7 @@
         .lives-container {
             display: flex;
             gap: 5px;
-            margin-left: 10px;
+            justify-content: center;
         }
         
         .life {
@@ -478,11 +479,15 @@
             }
             
             .game-stats {
-                gap: 3px;
+                grid-template-columns: repeat(3, 1fr);
             }
             
-            .stat-item {
-                min-width: 55px;
+            .stat-item:nth-child(4) {
+                grid-column: 1 / 2;
+            }
+            
+            .stat-item:nth-child(5) {
+                grid-column: 2 / 3;
             }
             
             .stat-label {
@@ -493,8 +498,8 @@
                 font-size: 16px;
             }
             
-            .lives-container {
-                margin-left: 5px;
+            .combo-display {
+                font-size: 36px;
             }
         }
         
@@ -689,7 +694,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            z-index: 5;
+            z-index: 10;
             max-width: 40%;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -698,7 +703,7 @@
         
         .multiplayer-btn {
             position: absolute;
-            bottom: 20px;
+            bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(45deg, #9C27B0, #E040FB);
@@ -719,21 +724,8 @@
                 height: 280px;
             }
             
-            .game-stats {
-                padding: 8px 0;
-            }
-            
-            .game-controls {
-                padding: 15px;
-            }
-            
-            .multiplayer-buttons {
-                gap: 10px;
-            }
-            
-            .mp-btn {
-                padding: 12px 15px;
-                font-size: 16px;
+            .multiplayer-btn {
+                bottom: 70px;
             }
         }
     </style>
@@ -836,10 +828,12 @@
         // Инициализация игры только после взаимодействия с пользователем
         let gameInitialized = false;
         let tg = null;
+        let isTelegramWebApp = false;
         
         // Проверяем, запущена ли игра в Telegram WebApp
-        if (typeof Telegram !== 'undefined') {
+        if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
             tg = Telegram.WebApp;
+            isTelegramWebApp = true;
             tg.expand();
             tg.enableClosingConfirmation();
         }
@@ -851,7 +845,7 @@
             
             // Обновляем индикатор мультиплеера
             const multiplayerIndicator = document.getElementById('multiplayerIndicator');
-            if (tg) {
+            if (isTelegramWebApp) {
                 multiplayerIndicator.textContent = '🟢 Online';
                 multiplayerIndicator.style.background = 'rgba(76, 175, 80, 0.3)';
             } else {
@@ -1431,7 +1425,7 @@
             
             // Мультиплеерные функции
             function saveScore() {
-                if (!tg) return;
+                if (!isTelegramWebApp) return;
                 
                 try {
                     // Сохраняем текущий результат
@@ -1488,7 +1482,7 @@
             }
             
             function createRoom() {
-                if (!tg) {
+                if (!isTelegramWebApp) {
                     alert("Функция доступна только в Telegram");
                     return;
                 }
@@ -1503,7 +1497,7 @@
             }
             
             function joinRoom() {
-                if (!tg) {
+                if (!isTelegramWebApp) {
                     alert("Функция доступна только в Telegram");
                     return;
                 }
@@ -1524,7 +1518,7 @@
             }
             
             function challengeFriend() {
-                if (!tg) {
+                if (!isTelegramWebApp) {
                     alert("Функция доступна только в Telegram");
                     return;
                 }
@@ -1551,7 +1545,7 @@
             }
             
             function shareResult() {
-                if (!tg) {
+                if (!isTelegramWebApp) {
                     alert("Функция доступна только в Telegram");
                     return;
                 }
