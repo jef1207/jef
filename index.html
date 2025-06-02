@@ -2,15 +2,16 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Burst - Яркая мини-игра</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Color Burst - Telegram Game</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
@@ -21,24 +22,32 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            padding: 20px;
+            padding: 15px;
+            perspective: 1000px;
         }
         
         .game-container {
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 25px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.2);
             position: relative;
+            transform-style: preserve-3d;
+            animation: containerAppear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes containerAppear {
+            0% { transform: translateY(50px) rotateX(20deg); opacity: 0; }
+            100% { transform: translateY(0) rotateX(0); opacity: 1; }
         }
         
         .game-header {
             background: rgba(0, 0, 0, 0.15);
-            padding: 20px;
+            padding: 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -48,22 +57,34 @@
         .game-title {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             color: white;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
-        .game-title i {
-            color: #ffeb3b;
-            font-size: 28px;
-            filter: drop-shadow(0 0 5px rgba(255, 235, 59, 0.7));
+        .title-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0, 200, 255, 0.6);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         
         .score-container {
             background: linear-gradient(45deg, #ff4081, #e040fb);
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 50px;
             display: flex;
             align-items: center;
@@ -74,17 +95,17 @@
         .score-label {
             color: white;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
         }
         
         .score-value {
             background: white;
             color: #ff4081;
             font-weight: bold;
-            font-size: 22px;
-            width: 50px;
-            height: 40px;
-            border-radius: 20px;
+            font-size: 20px;
+            width: 45px;
+            height: 35px;
+            border-radius: 18px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -92,7 +113,7 @@
         }
         
         .game-area {
-            height: 400px;
+            height: 350px;
             position: relative;
             overflow: hidden;
         }
@@ -107,33 +128,28 @@
             transition: transform 0.2s;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
                         inset 0 0 10px rgba(255, 255, 255, 0.8);
-            animation: pulse 2s infinite;
-        }
-        
-        .target i {
-            color: white;
-            font-size: 24px;
+            animation: targetAppear 0.3s ease-out;
+            font-size: 28px;
             text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes targetAppear {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
         
         .game-controls {
-            padding: 25px;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             background: rgba(0, 0, 0, 0.1);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .control-btn {
-            width: 70px;
-            height: 70px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -144,10 +160,24 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.2s;
             border: none;
+            position: relative;
+            overflow: hidden;
         }
         
-        .control-btn:active {
-            transform: scale(0.95);
+        .control-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .control-btn:active::after {
+            opacity: 1;
         }
         
         .play-btn {
@@ -166,12 +196,13 @@
         }
         
         .instructions {
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             color: rgba(255, 255, 255, 0.9);
             background: rgba(0, 0, 0, 0.1);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             line-height: 1.5;
+            font-size: 14px;
         }
         
         .particle {
@@ -179,6 +210,7 @@
             border-radius: 50%;
             pointer-events: none;
             opacity: 0.8;
+            z-index: 5;
         }
         
         .game-message {
@@ -190,7 +222,7 @@
             color: white;
             padding: 20px 40px;
             border-radius: 15px;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
             text-align: center;
             z-index: 10;
@@ -198,31 +230,76 @@
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(5px);
             border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: messageAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes messageAppear {
+            0% { transform: translate(-50%, -30%); opacity: 0; }
+            100% { transform: translate(-50%, -50%); opacity: 1; }
         }
         
         .level-indicator {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
             background: rgba(0, 0, 0, 0.4);
             color: white;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 14px;
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 5px;
+            z-index: 5;
         }
         
-        @media (max-width: 500px) {
+        .telegram-watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            z-index: 5;
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 400px) {
             .game-area {
-                height: 350px;
+                height: 320px;
             }
             
             .control-btn {
                 width: 60px;
                 height: 60px;
+            }
+            
+            .game-title {
+                font-size: 20px;
             }
         }
     </style>
@@ -231,7 +308,7 @@
     <div class="game-container">
         <div class="game-header">
             <div class="game-title">
-                <i class="fas fa-gamepad"></i>
+                <div class="title-icon">⚡</div>
                 <span>COLOR BURST</span>
             </div>
             <div class="score-container">
@@ -240,12 +317,24 @@
             </div>
         </div>
         
-        <div class="game-area" id="gameArea">
-            <div class="level-indicator">
-                <i class="fas fa-bolt"></i>
-                <span>LEVEL: <span id="level">1</span></span>
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-label">LEVEL</span>
+                <span class="stat-value" id="level">1</span>
             </div>
-            <div class="game-message" id="gameMessage">GAME OVER</div>
+            <div class="stat-item">
+                <span class="stat-label">TARGETS</span>
+                <span class="stat-value" id="targets">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">TIME</span>
+                <span class="stat-value" id="time">60</span>
+            </div>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="game-message" id="gameMessage">CLICK PLAY TO START</div>
+            <div class="telegram-watermark">Telegram Game</div>
         </div>
         
         <div class="instructions">
@@ -254,289 +343,320 @@
         
         <div class="game-controls">
             <button class="control-btn play-btn" id="playBtn">
-                <i class="fas fa-play"></i>
+                ▶️
             </button>
             <button class="control-btn pause-btn" id="pauseBtn">
-                <i class="fas fa-pause"></i>
+                ⏸️
             </button>
             <button class="control-btn restart-btn" id="restartBtn">
-                <i class="fas fa-redo"></i>
+                🔄
             </button>
         </div>
     </div>
     
     <script>
-        // Элементы DOM
-        const gameArea = document.getElementById('gameArea');
-        const scoreDisplay = document.getElementById('score');
-        const levelDisplay = document.getElementById('level');
-        const gameMessage = document.getElementById('gameMessage');
-        const playBtn = document.getElementById('playBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const restartBtn = document.getElementById('restartBtn');
+        // Инициализация игры только после взаимодействия с пользователем
+        let gameInitialized = false;
         
-        // Игровые переменные
-        let score = 0;
-        let level = 1;
-        let gameActive = false;
-        let gameSpeed = 1500; // интервал появления мишеней (мс)
-        let targetTimer;
-        let gameTimer;
-        let targets = [];
-        const colors = [
-            {bg: '#FF5252', icon: 'fas fa-heart'},    // Красный
-            {bg: '#FF4081', icon: 'fas fa-star'},    // Розовый
-            {bg: '#E040FB', icon: 'fas fa-gem'},     // Фиолетовый
-            {bg: '#7C4DFF', icon: 'fas fa-moon'},    // Индиго
-            {bg: '#448AFF', icon: 'fas fa-cloud'},   // Голубой
-            {bg: '#18FFFF', icon: 'fas fa-snowflake'},// Бирюзовый
-            {bg: '#64FFDA', icon: 'fas fa-leaf'},    // Зеленый
-            {bg: '#69F0AE', icon: 'fas fa-apple-alt'},// Светло-зеленый
-            {bg: '#B2FF59', icon: 'fas fa-lemon'},   // Лаймовый
-            {bg: '#EEFF41', icon: 'fas fa-sun'},     // Желтый
-            {bg: '#FFFF00', icon: 'fas fa-bolt'},    // Ярко-желтый
-            {bg: '#FFD740', icon: 'fas fa-fire'},    // Оранжевый
-            {bg: '#FFAB40', icon: 'fas fa-carrot'}   // Темно-оранжевый
-        ];
-        
-        // Инициализация игры
+        // Функция для инициализации игры
         function initGame() {
-            score = 0;
-            level = 1;
-            scoreDisplay.textContent = score;
-            levelDisplay.textContent = level;
-            gameActive = true;
-            gameMessage.style.display = 'none';
+            if (gameInitialized) return;
+            gameInitialized = true;
             
-            // Очистка игровой области
-            gameArea.innerHTML = '<div class="level-indicator"><i class="fas fa-bolt"></i><span>LEVEL: <span id="level">1</span></span></div><div class="game-message" id="gameMessage">GAME OVER</div>';
+            // Элементы DOM
+            const gameArea = document.getElementById('gameArea');
+            const scoreDisplay = document.getElementById('score');
+            const levelDisplay = document.getElementById('level');
+            const targetsDisplay = document.getElementById('targets');
+            const timeDisplay = document.getElementById('time');
+            const gameMessage = document.getElementById('gameMessage');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const restartBtn = document.getElementById('restartBtn');
             
-            // Обновление ссылок после очистки
-            levelDisplay = document.getElementById('level');
-            gameMessage = document.getElementById('gameMessage');
+            // Игровые переменные
+            let score = 0;
+            let level = 1;
+            let targetsClicked = 0;
+            let gameActive = false;
+            let gameSpeed = 1500; // интервал появления мишеней (мс)
+            let gameTime = 60; // время игры в секундах
+            let targetTimer;
+            let gameTimer;
+            let timeTimer;
+            let targets = [];
+            const colors = [
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF5252)', icon: '❤️'},    // Красный
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF4081)', icon: '⭐'},    // Розовый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #E040FB)', icon: '💎'},     // Фиолетовый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #7C4DFF)', icon: '🌙'},    // Индиго
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #448AFF)', icon: '☁️'},   // Голубой
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #18FFFF)', icon: '❄️'},// Бирюзовый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #64FFDA)', icon: '🍃'},    // Зеленый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #69F0AE)', icon: '🍎'},// Светло-зеленый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #B2FF59)', icon: '🍋'},   // Лаймовый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #EEFF41)', icon: '☀️'},     // Желтый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFFF00)', icon: '⚡'},    // Ярко-желтый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFD740)', icon: '🔥'},    // Оранжевый
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFAB40)', icon: '🥕'}   // Темно-оранжевый
+            ];
             
-            // Запуск таймеров
-            startGameTimers();
-        }
-        
-        // Запуск игровых таймеров
-        function startGameTimers() {
-            // Таймер создания мишеней
-            targetTimer = setInterval(createTarget, gameSpeed);
+            // Инициализация игры
+            function initGameSession() {
+                score = 0;
+                level = 1;
+                targetsClicked = 0;
+                gameTime = 60;
+                scoreDisplay.textContent = score;
+                levelDisplay.textContent = level;
+                targetsDisplay.textContent = targetsClicked;
+                timeDisplay.textContent = gameTime;
+                gameActive = true;
+                gameMessage.style.display = 'none';
+                
+                // Очистка игровой области
+                gameArea.querySelectorAll('.target').forEach(t => t.remove());
+                targets = [];
+                
+                // Запуск таймеров
+                startGameTimers();
+            }
             
-            // Таймер игры
-            gameTimer = setInterval(() => {
-                // Каждые 30 секунд увеличиваем уровень
-                if (score > 0 && score % 30 === 0) {
-                    increaseLevel();
-                }
-            }, 1000);
-        }
-        
-        // Создание мишени
-        function createTarget() {
-            if (!gameActive) return;
+            // Запуск игровых таймеров
+            function startGameTimers() {
+                // Таймер создания мишеней
+                targetTimer = setInterval(createTarget, gameSpeed);
+                
+                // Таймер времени игры
+                timeTimer = setInterval(() => {
+                    if (!gameActive) return;
+                    
+                    gameTime--;
+                    timeDisplay.textContent = gameTime;
+                    
+                    if (gameTime <= 0) {
+                        endGame();
+                    }
+                }, 1000);
+                
+                // Таймер уровня
+                gameTimer = setInterval(() => {
+                    if (!gameActive) return;
+                    
+                    // Каждые 15 очков увеличиваем уровень
+                    if (score > 0 && score % 15 === 0) {
+                        increaseLevel();
+                    }
+                }, 1000);
+            }
             
-            const target = document.createElement('div');
-            target.className = 'target';
-            
-            // Случайный размер (от 60 до 100 пикселей)
-            const size = Math.floor(Math.random() * 40) + 60;
-            target.style.width = `${size}px`;
-            target.style.height = `${size}px`;
-            
-            // Случайная позиция в пределах игрового поля
-            const maxX = gameArea.offsetWidth - size;
-            const maxY = gameArea.offsetHeight - size;
-            const x = Math.floor(Math.random() * maxX);
-            const y = Math.floor(Math.random() * maxY);
-            target.style.left = `${x}px`;
-            target.style.top = `${y}px`;
-            
-            // Случайный цвет и иконка
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            target.style.background = `radial-gradient(circle at 30% 30%, white, ${color.bg})`;
-            
-            // Добавление иконки
-            const icon = document.createElement('i');
-            icon.className = color.icon;
-            target.appendChild(icon);
-            
-            // Время жизни мишени (от 1.5 до 3 секунд в зависимости от уровня)
-            const lifeTime = Math.max(500, 3000 - (level * 200));
-            
-            // Добавляем мишень в игровую область
-            gameArea.appendChild(target);
-            targets.push(target);
-            
-            // Удаление мишени через время жизни
-            setTimeout(() => {
-                if (target.parentNode && gameActive) {
-                    animateDisappearance(target);
-                    gameArea.removeChild(target);
-                    targets = targets.filter(t => t !== target);
-                }
-            }, lifeTime);
-            
-            // Обработчик клика
-            target.addEventListener('click', () => {
+            // Создание мишени
+            function createTarget() {
                 if (!gameActive) return;
                 
-                // Увеличиваем счет
-                score += level;
-                scoreDisplay.textContent = score;
+                const target = document.createElement('div');
+                target.className = 'target';
                 
-                // Создаем эффект частиц
-                createParticles(target);
+                // Случайный размер (от 60 до 90 пикселей)
+                const size = Math.floor(Math.random() * 30) + 60;
+                target.style.width = `${size}px`;
+                target.style.height = `${size}px`;
                 
-                // Анимация при клике
-                target.style.transform = 'scale(1.2)';
-                target.style.opacity = '0.7';
+                // Случайная позиция в пределах игрового поля
+                const maxX = gameArea.offsetWidth - size;
+                const maxY = gameArea.offsetHeight - size;
+                const x = Math.floor(Math.random() * maxX);
+                const y = Math.floor(Math.random() * maxY);
+                target.style.left = `${x}px`;
+                target.style.top = `${y}px`;
                 
-                // Удаляем мишень
+                // Случайный цвет и иконка
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                target.style.background = color.bg;
+                target.innerHTML = color.icon;
+                
+                // Время жизни мишени (от 1.5 до 3 секунд в зависимости от уровня)
+                const lifeTime = Math.max(500, 3000 - (level * 150));
+                
+                // Добавляем мишень в игровую область
+                gameArea.appendChild(target);
+                targets.push(target);
+                
+                // Удаление мишени через время жизни
                 setTimeout(() => {
-                    if (target.parentNode) {
+                    if (target.parentNode && gameActive) {
+                        animateDisappearance(target);
                         gameArea.removeChild(target);
                         targets = targets.filter(t => t !== target);
                     }
-                }, 200);
-            });
-        }
-        
-        // Создание эффекта частиц
-        function createParticles(target) {
-            const rect = target.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const color = window.getComputedStyle(target).background;
+                }, lifeTime);
+                
+                // Обработчик клика
+                target.addEventListener('click', () => {
+                    if (!gameActive) return;
+                    
+                    // Увеличиваем счет
+                    score += level;
+                    targetsClicked++;
+                    scoreDisplay.textContent = score;
+                    targetsDisplay.textContent = targetsClicked;
+                    
+                    // Создаем эффект частиц
+                    createParticles(target);
+                    
+                    // Анимация при клике
+                    target.style.transform = 'scale(1.2)';
+                    target.style.opacity = '0.7';
+                    
+                    // Удаляем мишень
+                    setTimeout(() => {
+                        if (target.parentNode) {
+                            gameArea.removeChild(target);
+                            targets = targets.filter(t => t !== target);
+                        }
+                    }, 200);
+                });
+            }
             
-            // Создаем 15 частиц
-            for (let i = 0; i < 15; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
+            // Создание эффекта частиц
+            function createParticles(target) {
+                const rect = target.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const color = window.getComputedStyle(target).background;
                 
-                // Размер частицы
-                const size = Math.random() * 15 + 5;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                
-                // Цвет частицы
-                particle.style.background = color;
-                
-                // Начальная позиция
-                particle.style.left = `${centerX}px`;
-                particle.style.top = `${centerY}px`;
-                
-                // Добавляем частицу в игровую область
-                document.body.appendChild(particle);
-                
-                // Анимация движения
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 100 + 50;
-                const vx = Math.cos(angle) * speed;
-                const vy = Math.sin(angle) * speed;
-                
-                // Анимация
-                let startTime = null;
-                function animateParticle(timestamp) {
-                    if (!startTime) startTime = timestamp;
-                    const progress = timestamp - startTime;
+                // Создаем 10 частиц
+                for (let i = 0; i < 10; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
                     
-                    // Позиция частицы
-                    particle.style.left = `${centerX + vx * progress / 1000}px`;
-                    particle.style.top = `${centerY + vy * progress / 1000}px`;
+                    // Размер частицы
+                    const size = Math.random() * 12 + 4;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
                     
-                    // Прозрачность уменьшается со временем
-                    particle.style.opacity = `${1 - progress / 1000}`;
+                    // Цвет частицы
+                    particle.style.background = color;
                     
-                    if (progress < 1000) {
-                        requestAnimationFrame(animateParticle);
-                    } else {
-                        document.body.removeChild(particle);
+                    // Начальная позиция
+                    particle.style.left = `${centerX}px`;
+                    particle.style.top = `${centerY}px`;
+                    
+                    // Добавляем частицу в игровую область
+                    gameArea.appendChild(particle);
+                    
+                    // Анимация движения
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 80 + 40;
+                    const vx = Math.cos(angle) * speed;
+                    const vy = Math.sin(angle) * speed;
+                    
+                    // Анимация
+                    let start = Date.now();
+                    let duration = 800;
+                    
+                    function animate() {
+                        let timePassed = Date.now() - start;
+                        if (timePassed > duration) {
+                            particle.remove();
+                            return;
+                        }
+                        
+                        particle.style.left = centerX + vx * timePassed / 1000 + 'px';
+                        particle.style.top = centerY + vy * timePassed / 1000 + 'px';
+                        particle.style.opacity = 1 - timePassed / duration;
+                        
+                        requestAnimationFrame(animate);
                     }
+                    
+                    requestAnimationFrame(animate);
                 }
+            }
+            
+            // Анимация исчезновения мишени
+            function animateDisappearance(target) {
+                target.style.transform = 'scale(0)';
+                target.style.opacity = '0';
+                target.style.transition = 'all 0.3s ease-out';
+            }
+            
+            // Увеличение уровня
+            function increaseLevel() {
+                level++;
+                levelDisplay.textContent = level;
                 
-                requestAnimationFrame(animateParticle);
-            }
-        }
-        
-        // Анимация исчезновения мишени
-        function animateDisappearance(target) {
-            target.style.transform = 'scale(0)';
-            target.style.opacity = '0';
-            target.style.transition = 'all 0.3s ease-out';
-        }
-        
-        // Увеличение уровня
-        function increaseLevel() {
-            level++;
-            levelDisplay.textContent = level;
-            
-            // Увеличиваем скорость игры
-            clearInterval(targetTimer);
-            gameSpeed = Math.max(300, 1500 - (level * 100));
-            targetTimer = setInterval(createTarget, gameSpeed);
-            
-            // Эффект при увеличении уровня
-            gameArea.style.boxShadow = '0 0 30px gold';
-            setTimeout(() => {
-                gameArea.style.boxShadow = '';
-            }, 1000);
-        }
-        
-        // Конец игры
-        function endGame() {
-            gameActive = false;
-            clearInterval(targetTimer);
-            clearInterval(gameTimer);
-            
-            // Удаляем все мишени с анимацией
-            targets.forEach(target => {
-                animateDisappearance(target);
+                // Увеличиваем скорость игры
+                clearInterval(targetTimer);
+                gameSpeed = Math.max(400, 1500 - (level * 100));
+                targetTimer = setInterval(createTarget, gameSpeed);
+                
+                // Эффект при увеличении уровня
+                gameArea.style.boxShadow = 'inset 0 0 30px gold, 0 0 30px gold';
                 setTimeout(() => {
-                    if (target.parentNode) {
-                        gameArea.removeChild(target);
-                    }
-                }, 300);
-            });
-            targets = [];
-            
-            // Показываем сообщение
-            gameMessage.textContent = `GAME OVER! SCORE: ${score}`;
-            gameMessage.style.display = 'block';
-        }
-        
-        // Обработчики кнопок
-        playBtn.addEventListener('click', () => {
-            if (!gameActive) {
-                initGame();
+                    gameArea.style.boxShadow = '';
+                }, 800);
             }
-        });
-        
-        pauseBtn.addEventListener('click', () => {
-            if (gameActive) {
+            
+            // Конец игры
+            function endGame() {
                 gameActive = false;
                 clearInterval(targetTimer);
                 clearInterval(gameTimer);
-                gameMessage.textContent = 'PAUSED';
+                clearInterval(timeTimer);
+                
+                // Удаляем все мишени с анимацией
+                targets.forEach(target => {
+                    animateDisappearance(target);
+                    setTimeout(() => {
+                        if (target.parentNode) {
+                            gameArea.removeChild(target);
+                        }
+                    }, 300);
+                });
+                targets = [];
+                
+                // Показываем сообщение
+                gameMessage.textContent = `GAME OVER!\nSCORE: ${score}`;
                 gameMessage.style.display = 'block';
-            } else {
-                gameActive = true;
-                gameMessage.style.display = 'none';
-                startGameTimers();
             }
-        });
-        
-        restartBtn.addEventListener('click', () => {
-            endGame();
-            setTimeout(initGame, 1000);
-        });
-        
-        // Инициализация при загрузке
-        window.addEventListener('load', () => {
+            
+            // Обработчики кнопок
+            playBtn.addEventListener('click', () => {
+                if (!gameActive) {
+                    initGameSession();
+                }
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                if (gameActive) {
+                    gameActive = false;
+                    clearInterval(targetTimer);
+                    clearInterval(gameTimer);
+                    gameMessage.textContent = 'PAUSED';
+                    gameMessage.style.display = 'block';
+                } else {
+                    gameActive = true;
+                    gameMessage.style.display = 'none';
+                    startGameTimers();
+                }
+            });
+            
+            restartBtn.addEventListener('click', () => {
+                if (gameActive) {
+                    endGame();
+                }
+                setTimeout(initGameSession, 500);
+            });
+            
+            // Начальное состояние
             gameMessage.textContent = 'CLICK PLAY TO START';
             gameMessage.style.display = 'block';
-        });
+        }
+        
+        // Инициализация при первом взаимодействии
+        document.body.addEventListener('touchstart', initGame, {once: true});
+        document.body.addEventListener('mousedown', initGame, {once: true});
+        document.body.addEventListener('click', initGame, {once: true});
     </script>
 </body>
 </html>
