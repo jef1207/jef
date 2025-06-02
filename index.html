@@ -140,6 +140,10 @@
             text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
         }
         
+        .target[data-clicked="true"] {
+            pointer-events: none !important;
+        }
+        
         @keyframes targetAppear {
             0% { transform: scale(0); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
@@ -509,6 +513,7 @@
                 
                 const target = document.createElement('div');
                 target.className = 'target';
+                target.dataset.clicked = 'false'; // Инициализация флага клика
                 
                 // Случайный размер (от 60 до 90 пикселей)
                 const size = Math.floor(Math.random() * 30) + 60;
@@ -544,13 +549,12 @@
                     }
                 }, lifeTime);
                 
-                // Флаг для отслеживания кликов
-                let clicked = false;
-                
-                // Обработчик клика
+                // Обработчик клика - срабатывает только один раз!
                 target.addEventListener('click', () => {
-                    if (!gameActive || clicked) return;
-                    clicked = true;
+                    if (!gameActive || target.dataset.clicked === 'true') return;
+                    
+                    // Помечаем мишень как обработанную
+                    target.dataset.clicked = 'true';
                     
                     // Увеличиваем счет
                     score += level;
@@ -578,7 +582,7 @@
                             targets = targets.filter(t => t !== target);
                         }
                     }, 300);
-                });
+                }, { once: true }); // Гарантирует однократное выполнение
             }
             
             // Создание эффекта частиц
