@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Color Burst - SAID Game</title>
+    <title>Color Burst - Telegram Game</title>
     <style>
         * {
             margin: 0;
@@ -300,6 +300,24 @@
             opacity: 0.8;
         }
         
+        .sound-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
         @media (max-width: 400px) {
             .game-area {
                 height: 320px;
@@ -329,6 +347,8 @@
             </div>
         </div>
         
+        <div class="sound-toggle" id="soundToggle">🔊</div>
+        
         <div class="game-stats">
             <div class="stat-item">
                 <span class="stat-label">LEVEL</span>
@@ -346,7 +366,7 @@
         
         <div class="game-area" id="gameArea">
             <div class="game-message" id="gameMessage">CLICK PLAY TO START</div>
-            <div class="telegram-watermark">SAID Game</div>
+            <div class="telegram-watermark">Telegram Game</div>
         </div>
         
         <div class="instructions">
@@ -385,6 +405,7 @@
             const playBtn = document.getElementById('playBtn');
             const pauseBtn = document.getElementById('pauseBtn');
             const restartBtn = document.getElementById('restartBtn');
+            const soundToggle = document.getElementById('soundToggle');
             
             // Игровые переменные
             let score = 0;
@@ -398,6 +419,7 @@
             let timeTimer;
             let targets = [];
             let lastLevelUpScore = 0; // Для отслеживания перехода уровней
+            let soundEnabled = true;
             const colors = [
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF5252)', icon: '❤️'},    // Красный
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF4081)', icon: '⭐'},    // Розовый
@@ -413,6 +435,12 @@
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFD740)', icon: '🔥'},    // Оранжевый
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFAB40)', icon: '🥕'}   // Темно-оранжевый
             ];
+            
+            // Создаем звуковой элемент
+            const popSound = new Audio();
+            popSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-balloon-pop-splash-2897.mp3';
+            popSound.preload = 'auto';
+            popSound.volume = 0.4;
             
             // Инициализация игры
             function initGameSession() {
@@ -515,6 +543,12 @@
                     targetsClicked++;
                     scoreDisplay.textContent = score;
                     targetsDisplay.textContent = targetsClicked;
+                    
+                    // Воспроизводим звук лопания
+                    if (soundEnabled) {
+                        popSound.currentTime = 0;
+                        popSound.play().catch(e => console.log("Audio play error:", e));
+                    }
                     
                     // Создаем эффект частиц
                     createParticles(target);
@@ -653,6 +687,13 @@
                     endGame();
                 }
                 setTimeout(initGameSession, 500);
+            });
+            
+            // Переключатель звука
+            soundToggle.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+                soundToggle.style.background = soundEnabled ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 50, 50, 0.4)';
             });
             
             // Начальное состояние
