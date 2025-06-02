@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Color Burst - Мультиплеер</title>
+    <title>Color Burst - Telegram Game</title>
     <style>
         * {
             margin: 0;
@@ -138,6 +138,7 @@
             animation: targetAppear 0.3s ease-out, pulse 1.5s infinite;
             font-size: 28px;
             text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+            z-index: 3; /* Убедимся, что мишени поверх других элементов */
         }
         
         .target[data-clicked="true"] {
@@ -207,6 +208,7 @@
             border: none;
             position: relative;
             overflow: hidden;
+            z-index: 2; /* Убедимся, что кнопки поверх игровой области */
         }
         
         .control-btn:active {
@@ -252,6 +254,8 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             line-height: 1.5;
             font-size: 14px;
+            position: relative;
+            z-index: 2; /* Убедимся, что инструкции поверх */
         }
         
         .particle {
@@ -314,6 +318,8 @@
             backdrop-filter: blur(5px);
             border: 2px solid rgba(255, 255, 255, 0.2);
             animation: messageAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 90%;
+            word-break: break-word;
         }
         
         @keyframes messageAppear {
@@ -351,6 +357,8 @@
             justify-content: space-around;
             padding: 10px 0;
             background: rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap; /* Разрешить перенос на маленьких экранах */
+            gap: 5px; /* Добавим промежуток между элементами */
         }
         
         .stat-item {
@@ -358,6 +366,7 @@
             flex-direction: column;
             align-items: center;
             color: white;
+            min-width: 60px; /* Минимальная ширина для сохранения читаемости */
         }
         
         .stat-value {
@@ -402,6 +411,8 @@
             z-index: 5;
             pointer-events: none;
             opacity: 0;
+            max-width: 90%;
+            text-align: center;
         }
         
         .active-bonus {
@@ -420,6 +431,7 @@
             z-index: 5;
             opacity: 0;
             transition: opacity 0.3s;
+            max-width: 70%;
         }
         
         .bonus-active {
@@ -463,6 +475,26 @@
                 width: 36px;
                 height: 36px;
                 font-size: 18px;
+            }
+            
+            .game-stats {
+                gap: 3px;
+            }
+            
+            .stat-item {
+                min-width: 55px;
+            }
+            
+            .stat-label {
+                font-size: 11px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+            
+            .lives-container {
+                margin-left: 5px;
             }
         }
         
@@ -658,6 +690,10 @@
             align-items: center;
             gap: 5px;
             z-index: 5;
+            max-width: 40%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         .multiplayer-btn {
@@ -675,6 +711,30 @@
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             z-index: 10;
+        }
+        
+        /* Улучшения для маленьких экранов */
+        @media (max-height: 600px) {
+            .game-area {
+                height: 280px;
+            }
+            
+            .game-stats {
+                padding: 8px 0;
+            }
+            
+            .game-controls {
+                padding: 15px;
+            }
+            
+            .multiplayer-buttons {
+                gap: 10px;
+            }
+            
+            .mp-btn {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -1373,18 +1433,22 @@
             function saveScore() {
                 if (!tg) return;
                 
-                // Сохраняем текущий результат
-                tg.CloudStorage.setItem('lastScore', score.toString());
-                
-                // Проверяем, является ли результат рекордным
-                tg.CloudStorage.getItem('highScore', (err, value) => {
-                    if (!err) {
-                        const highScore = value ? parseInt(value) : 0;
-                        if (score > highScore) {
-                            tg.CloudStorage.setItem('highScore', score.toString());
+                try {
+                    // Сохраняем текущий результат
+                    tg.CloudStorage.setItem('lastScore', score.toString());
+                    
+                    // Проверяем, является ли результат рекордным
+                    tg.CloudStorage.getItem('highScore', (err, value) => {
+                        if (!err) {
+                            const highScore = value ? parseInt(value) : 0;
+                            if (score > highScore) {
+                                tg.CloudStorage.setItem('highScore', score.toString());
+                            }
                         }
-                    }
-                });
+                    });
+                } catch (e) {
+                    console.error("Ошибка сохранения результата:", e);
+                }
             }
             
             function showLeaderboard() {
@@ -1431,7 +1495,11 @@
                 
                 // В реальном приложении здесь будет вызов API для создания комнаты
                 const roomId = Math.floor(Math.random() * 9000) + 1000;
-                alert(`Комната #${roomId} создана! Пригласите друзей.`);
+                tg.showPopup({
+                    title: "Комната создана",
+                    message: `ID комнаты: #${roomId}\nПригласите друзей!`,
+                    buttons: [{ type: 'default', text: "OK", id: 'ok' }]
+                });
             }
             
             function joinRoom() {
@@ -1440,10 +1508,19 @@
                     return;
                 }
                 
-                const roomId = prompt("Введите ID комнаты:");
-                if (roomId) {
-                    alert(`Вы присоединились к комнате #${roomId}`);
-                }
+                tg.showPopup({
+                    title: "Присоединиться к комнате",
+                    message: "Введите ID комнаты:",
+                    buttons: [
+                        { type: 'default', text: "Присоединиться", id: 'join' },
+                        { type: 'cancel', text: "Отмена" }
+                    ]
+                }, (btnId) => {
+                    if (btnId === 'join') {
+                        // В реальном приложении здесь будет запрос на присоединение
+                        tg.showAlert("Вы присоединились к комнате!");
+                    }
+                });
             }
             
             function challengeFriend() {
@@ -1463,10 +1540,12 @@
                     ]
                 }, (btnId) => {
                     if (btnId === 'send') {
+                        // Отправляем сообщение
                         tg.sendData(JSON.stringify({
                             action: "challenge",
                             score: score
                         }));
+                        tg.showAlert("Вызов отправлен!");
                     }
                 });
             }
@@ -1492,6 +1571,7 @@
                             action: "share",
                             score: score
                         }));
+                        tg.showAlert("Результат отправлен!");
                     }
                 });
             }
