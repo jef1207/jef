@@ -144,6 +144,12 @@
             pointer-events: none !important;
         }
         
+        .bomb {
+            background: radial-gradient(circle at 30% 30%, #fff, #212121) !important;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7),
+                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
+        }
+        
         @keyframes targetAppear {
             0% { transform: scale(0); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
@@ -232,6 +238,28 @@
             }
             100% {
                 transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+            }
+        }
+        
+        .explosion-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+            animation: explosionAnimation 0.8s forwards;
+        }
+        
+        @keyframes explosionAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
                 opacity: 0;
             }
         }
@@ -384,7 +412,7 @@
         </div>
         
         <div class="instructions">
-            Кликайте на цветные круги до того, как они исчезнут! Чем быстрее вы кликаете, тем больше очков получаете.
+            Кликайте на цветные круги до того, как они исчезнут! Избегайте черных бомбочек - они заканчивают игру!
         </div>
         
         <div class="game-controls">
@@ -432,7 +460,7 @@
             let gameTimer;
             let timeTimer;
             let targets = [];
-            let lastLevelUpScore = 0; // Для отслеживания перехода уровней
+            let nextLevelThreshold = 15; // Порог для следующего уровня
             let soundEnabled = true;
             const colors = [
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF5252)', icon: '❤️'},    // Красный
@@ -450,18 +478,30 @@
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFAB40)', icon: '🥕'}   // Темно-оранжевый
             ];
             
-            // Создаем звуковой элемент с вашим файлом из GitHub
+            // Специальный объект для бомбочки
+            const bomb = {
+                bg: 'radial-gradient(circle at 30% 30%, #fff, #212121)',
+                icon: '💣',
+                type: 'bomb'
+            };
+            
+            // Звуки
             const popSound = new Audio();
             popSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/zvyk.mp3';
             popSound.preload = 'auto';
             popSound.volume = 0.4;
+            
+            const bombSound = new Audio();
+            bombSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/explosion.mp3';
+            bombSound.preload = 'auto';
+            bombSound.volume = 0.6;
             
             // Инициализация игры
             function initGameSession() {
                 score = 0;
                 level = 1;
                 targetsClicked = 0;
-                lastLevelUpScore = 0;
+                nextLevelThreshold = 15;
                 gameTime = 60;
                 scoreDisplay.textContent = score;
                 levelDisplay.textContent = level;
@@ -491,29 +531,18 @@
                     timeDisplay.textContent = gameTime;
                     
                     if (gameTime <= 0) {
-                        endGame();
-                    }
-                }, 1000);
-                
-                // Таймер уровня
-                gameTimer = setInterval(() => {
-                    if (!gameActive) return;
-                    
-                    // Повышаем уровень каждые 15 очков, но только один раз за переход
-                    if (score >= lastLevelUpScore + 15) {
-                        increaseLevel();
-                        lastLevelUpScore = score;
+                        endGame('time');
                     }
                 }, 1000);
             }
             
-            // Создание мишени
+            // Создание мишени (или бомбочки)
             function createTarget() {
                 if (!gameActive) return;
                 
                 const target = document.createElement('div');
                 target.className = 'target';
-                target.dataset.clicked = 'false'; // Инициализация флага клика
+                target.dataset.clicked = 'false';
                 
                 // Случайный размер (от 60 до 90 пикселей)
                 const size = Math.floor(Math.random() * 30) + 60;
@@ -528,10 +557,17 @@
                 target.style.left = `${x}px`;
                 target.style.top = `${y}px`;
                 
-                // Случайный цвет и иконка
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                target.style.background = color.bg;
-                target.innerHTML = color.icon;
+                // Определяем тип объекта: мишень или бомбочка (10% вероятность бомбочки)
+                let targetType;
+                if (Math.random() < 0.1) { // 10% шанс появления бомбочки
+                    targetType = bomb;
+                    target.classList.add('bomb'); // Добавляем специальный класс для бомбочки
+                } else {
+                    targetType = colors[Math.floor(Math.random() * colors.length)];
+                }
+                
+                target.style.background = targetType.bg;
+                target.innerHTML = targetType.icon;
                 
                 // Время жизни мишени (от 1.5 до 3 секунд в зависимости от уровня)
                 const lifeTime = Math.max(500, 3000 - (level * 150));
@@ -549,12 +585,28 @@
                     }
                 }, lifeTime);
                 
-                // Обработчик клика - срабатывает только один раз!
+                // Обработчик клика
                 target.addEventListener('click', () => {
                     if (!gameActive || target.dataset.clicked === 'true') return;
                     
                     // Помечаем мишень как обработанную
                     target.dataset.clicked = 'true';
+                    
+                    // Проверяем, бомбочка ли это
+                    if (target.classList.contains('bomb')) {
+                        // Воспроизводим звук взрыва
+                        if (soundEnabled) {
+                            bombSound.currentTime = 0;
+                            bombSound.play().catch(e => console.log("Bomb sound error:", e));
+                        }
+                        
+                        // Создаем эффект взрыва
+                        createExplosion(target);
+                        
+                        // Завершаем игру
+                        endGame('bomb');
+                        return;
+                    }
                     
                     // Увеличиваем счет
                     score += level;
@@ -562,7 +614,13 @@
                     scoreDisplay.textContent = score;
                     targetsDisplay.textContent = targetsClicked;
                     
-                    // Воспроизводим ваш звук лопания
+                    // Проверка повышения уровня
+                    if (score >= nextLevelThreshold) {
+                        increaseLevel();
+                        nextLevelThreshold += 15; // Увеличиваем порог для следующего уровня
+                    }
+                    
+                    // Воспроизводим звук
                     if (soundEnabled) {
                         popSound.currentTime = 0;
                         popSound.play().catch(e => console.log("Audio play error:", e));
@@ -632,6 +690,42 @@
                 }
             }
             
+            // Создание эффекта взрыва для бомбочки
+            function createExplosion(target) {
+                const rect = target.getBoundingClientRect();
+                const gameAreaRect = gameArea.getBoundingClientRect();
+                
+                const centerX = rect.left - gameAreaRect.left + rect.width / 2;
+                const centerY = rect.top - gameAreaRect.top + rect.height / 2;
+                
+                // Создаем 20 частиц взрыва
+                for (let i = 0; i < 20; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'explosion-particle';
+                    
+                    // Размер частицы
+                    const size = Math.random() * 20 + 10;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // Цвета взрыва: черный, красный, оранжевый
+                    const explosionColors = ['#212121', '#ff0000', '#ff7700', '#ffaa00'];
+                    particle.style.background = explosionColors[Math.floor(Math.random() * explosionColors.length)];
+                    
+                    // Начальная позиция
+                    particle.style.left = `${centerX}px`;
+                    particle.style.top = `${centerY}px`;
+                    
+                    // Добавляем частицу в игровую область
+                    gameArea.appendChild(particle);
+                    
+                    // Удаляем частицу после анимации
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 800);
+                }
+            }
+            
             // Анимация исчезновения мишени
             function animateDisappearance(target) {
                 target.style.transform = 'scale(0)';
@@ -657,11 +751,10 @@
             }
             
             // Конец игры
-            function endGame() {
+            function endGame(reason) {
                 gameActive = false;
                 clearInterval(targetTimer);
-                clearInterval(gameTimer);
-                clearInterval(timeTimer);
+                if (timeTimer) clearInterval(timeTimer);
                 
                 // Удаляем все мишени с анимацией
                 targets.forEach(target => {
@@ -675,7 +768,11 @@
                 targets = [];
                 
                 // Показываем сообщение
-                gameMessage.textContent = `GAME OVER!\nSCORE: ${score}`;
+                if (reason === 'bomb') {
+                    gameMessage.textContent = `BOOM! GAME OVER\nSCORE: ${score}`;
+                } else {
+                    gameMessage.textContent = `GAME OVER!\nSCORE: ${score}`;
+                }
                 gameMessage.style.display = 'block';
             }
             
@@ -690,7 +787,7 @@
                 if (gameActive) {
                     gameActive = false;
                     clearInterval(targetTimer);
-                    clearInterval(gameTimer);
+                    if (timeTimer) clearInterval(timeTimer);
                     gameMessage.textContent = 'PAUSED';
                     gameMessage.style.display = 'block';
                 } else {
