@@ -2,85 +2,273 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Color Burst - Telegram Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Burst - Мини-приложение</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #6e45e2, #88d3ce);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            padding: 15px;
-            perspective: 1000px;
+            padding: 20px;
         }
         
         .game-container {
             width: 100%;
-            max-width: 450px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
+            max-width: 400px;
+            background: rgba(25, 25, 35, 0.85);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
-            transform-style: preserve-3d;
-            animation: containerAppear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid #3a3a5a;
         }
         
-        @keyframes containerAppear {
-            0% { transform: translateY(50px) rotateX(20deg); opacity: 0; }
-            100% { transform: translateY(0) rotateX(0); opacity: 1; }
-        }
-        
-        .game-header {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 18px;
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
+            padding: 15px 20px;
+            background: rgba(15, 15, 25, 0.95);
+            border-bottom: 1px solid #3a3a5a;
         }
         
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .game-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .title-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
+        .close-btn {
+            background: #ff4757;
+            border: none;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 15px rgba(0, 200, 255, 0.6);
-            animation: pulse 2s infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: #ff6b81;
+            transform: scale(1.1);
+        }
+        
+        .title {
+            font-size: 14px;
+            color: #a0a0c0;
+        }
+        
+        .game-header {
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(20, 20, 40, 0.7);
+        }
+        
+        .game-header h1 {
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ff9ff3, #f368e0, #5f27cd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(243, 104, 224, 0.3);
+        }
+        
+        .score {
+            font-size: 18px;
+            color: #feca57;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background: rgba(30, 30, 50, 0.6);
+            border-bottom: 1px solid #3a3a5a;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px 5px;
+            background: rgba(40, 40, 60, 0.7);
+            border-radius: 10px;
+        }
+        
+        .stat-item div:first-child {
+            font-size: 12px;
+            color: #a0a0c0;
+            margin-bottom: 5px;
+        }
+        
+        .stat-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .lives .value {
+            color: #ff6b6b;
+            font-size: 16px;
+            letter-spacing: -2px;
+        }
+        
+        .time-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            background: rgba(20, 20, 40, 0.5);
+        }
+        
+        .time {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1dd1a1;
+            text-shadow: 0 0 10px rgba(29, 209, 161, 0.4);
+            margin-bottom: 10px;
+        }
+        
+        .combo-btn {
+            background: linear-gradient(90deg, #ff9ff3, #f368e0);
+            border: none;
+            border-radius: 20px;
+            padding: 6px 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(243, 104, 224, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .combo-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(243, 104, 224, 0.5);
+        }
+        
+        .game-board {
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 15, 25, 0.4);
+        }
+        
+        .game-board::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(95, 39, 205, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(243, 104, 224, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        
+        .game-notice {
+            color: #a0a0c0;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            background: rgba(30, 30, 50, 0.5);
+            border-top: 1px solid #3a3a5a;
+        }
+        
+        footer {
+            padding: 20px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 15, 25, 0.95);
+            position: relative;
+        }
+        
+        .game-modes {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .mode-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .offline {
+            background: #1dd1a1;
+            color: #000;
+        }
+        
+        .online {
+            background: #576574;
+            color: #fff;
+            cursor: not-allowed;
+            opacity: 0.7;
+            position: relative;
+        }
+        
+        .online::after {
+            content: "скоро";
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #feca57;
+            color: #000;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .about-btn {
+            background: #5f27cd;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .about-btn:hover {
+            background: #7d5fff;
+            transform: translateY(-2px);
+        }
+        
+        .target {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            animation: pulse 1.5s infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.7);
         }
         
         @keyframes pulse {
@@ -89,1554 +277,313 @@
             100% { transform: scale(1); }
         }
         
-        .score-container {
-            background: linear-gradient(45deg, #ff4081, #e040fb);
-            padding: 8px 16px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 5px 15px rgba(224, 64, 251, 0.4);
-        }
+        .target.red { background: #ff6b6b; }
+        .target.blue { background: #48dbfb; }
+        .target.green { background: #1dd1a1; }
+        .target.yellow { background: #feca57; }
+        .target.purple { background: #9b59b6; }
         
-        .score-label {
-            color: white;
-            font-weight: bold;
-            font-size: 15px;
-        }
-        
-        .score-value {
-            background: white;
-            color: #ff4081;
-            font-weight: bold;
-            font-size: 20px;
-            width: 45px;
-            height: 35px;
-            border-radius: 18px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-        
-        .game-area {
-            height: 350px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .target {
+        .bomb {
             position: absolute;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            background: #2d3436;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 0.2s;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
-                        inset 0 0 10px rgba(255, 255, 255, 0.8);
-            animation: targetAppear 0.3s ease-out, pulse 1.5s infinite;
-            font-size: 28px;
-            text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
-            z-index: 3;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
         
-        .target[data-clicked="true"] {
-            pointer-events: none !important;
+        .bomb::before {
+            content: "💣";
+            font-size: 24px;
         }
         
-        .bomb {
-            background: radial-gradient(circle at 30% 30%, #fff, #212121) !important;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7),
-                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: #1e1e2e;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3a3a5a;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff4757;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-title {
+            color: #feca57;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .rules {
+            margin-bottom: 25px;
+        }
+        
+        .rules p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            color: #c0c0e0;
+        }
+        
+        .bonuses {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
         }
         
         .bonus {
-            animation: bonusAppear 0.4s ease-out, pulse 1.5s infinite;
-        }
-        
-        .star {
-            background: radial-gradient(circle at 30% 30%, #fff, #FFD700) !important;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8),
-                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
-        }
-        
-        .diamond {
-            background: radial-gradient(circle at 30% 30%, #fff, #00BFFF) !important;
-            box-shadow: 0 0 25px rgba(0, 191, 255, 0.8),
-                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
-        }
-        
-        .heart {
-            background: radial-gradient(circle at 30% 30%, #fff, #FF1493) !important;
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.8),
-                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
-        }
-        
-        @keyframes targetAppear {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes bonusAppear {
-            0% { transform: scale(0) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(20deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
-        
-        .game-controls {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            background: rgba(0, 0, 0, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 2;
-        }
-        
-        .control-btn {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.2s;
-            border: none;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .control-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .control-btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .control-btn:active::after {
-            opacity: 1;
-        }
-        
-        .play-btn {
-            background: linear-gradient(45deg, #4caf50, #8bc34a);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-        }
-        
-        .pause-btn {
-            background: linear-gradient(45deg, #ff9800, #ffc107);
-            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
-        }
-        
-        .restart-btn {
-            background: linear-gradient(45deg, #f44336, #e91e63);
-            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
-        }
-        
-        .instructions {
+            text-align: center;
+            background: rgba(40, 40, 60, 0.7);
             padding: 15px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(0, 0, 0, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.5;
-            font-size: 14px;
-            z-index: 2;
-        }
-        
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0.8;
-            z-index: 5;
-            animation: particleAnimation 0.8s forwards;
-        }
-        
-        @keyframes particleAnimation {
-            0% {
-                transform: translate(0, 0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--tx), var(--ty));
-                opacity: 0;
-            }
-        }
-        
-        .explosion-particle {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10;
-            animation: explosionAnimation 0.8s forwards;
-        }
-        
-        @keyframes explosionAnimation {
-            0% {
-                transform: scale(0);
-                opacity: 1;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1.5);
-                opacity: 0;
-            }
-        }
-        
-        .game-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 15px;
-            font-size: 26px;
-            font-weight: bold;
-            text-align: center;
-            z-index: 10;
-            display: none;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(5px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            animation: messageAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-width: 90%;
-            word-break: break-word;
-        }
-        
-        @keyframes messageAppear {
-            0% { transform: translate(-50%, -30%); opacity: 0; }
-            100% { transform: translate(-50%, -50%); opacity: 1; }
-        }
-        
-        .level-indicator {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 5;
-        }
-        
-        .telegram-watermark {
-            position: absolute;
-            bottom: 10px;
-            right: 15px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            z-index: 5;
-        }
-        
-        .game-stats {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            padding: 10px 0;
-            background: rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            min-width: 0;
-        }
-        
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 3px;
-            white-space: nowrap;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        
-        .sound-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.3);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-        }
-        
-        .sound-toggle:active {
-            transform: scale(0.9);
-        }
-        
-        .combo-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 48px;
-            font-weight: bold;
-            color: gold;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-            z-index: 10;
-            pointer-events: none;
-            opacity: 0;
-            max-width: 90%;
-            text-align: center;
-        }
-        
-        .active-bonus {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 20px;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.3s;
-            max-width: 70%;
-            white-space: nowrap;
-        }
-        
-        .bonus-active {
-            opacity: 1;
-        }
-        
-        .lives-container {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-        }
-        
-        .life {
-            width: 20px;
-            height: 20px;
-            background: #ff4081;
-            border-radius: 50%;
-            box-shadow: 0 0 5px rgba(255, 64, 129, 0.8);
-        }
-        
-        .life.lost {
-            background: #555;
-            box-shadow: none;
-        }
-        
-        @media (max-width: 400px) {
-            .game-area {
-                height: 320px;
-            }
-            
-            .control-btn {
-                width: 60px;
-                height: 60px;
-            }
-            
-            .game-title {
-                font-size: 20px;
-            }
-            
-            .sound-toggle {
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
-            }
-            
-            .game-stats {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .stat-item:nth-child(4) {
-                grid-column: 1 / 2;
-            }
-            
-            .stat-item:nth-child(5) {
-                grid-column: 2 / 3;
-            }
-            
-            .stat-label {
-                font-size: 11px;
-            }
-            
-            .stat-value {
-                font-size: 16px;
-            }
-            
-            .combo-display {
-                font-size: 36px;
-            }
-        }
-        
-        .slow-time-effect {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 191, 255, 0.2);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: 4;
-        }
-        
-        .slow-time-active {
-            opacity: 1;
-        }
-        
-        /* Мультиплеерные элементы */
-        .multiplayer-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            display: none;
-        }
-        
-        .multiplayer-title {
-            color: white;
-            font-size: 28px;
-            margin-bottom: 20px;
-            text-align: center;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-        
-        .multiplayer-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            max-width: 300px;
-        }
-        
-        .mp-btn {
-            background: linear-gradient(45deg, #4caf50, #8bc34a);
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .mp-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .mp-btn.leaderboard {
-            background: linear-gradient(45deg, #ff9800, #ffc107);
-        }
-        
-        .mp-btn.challenge {
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-        }
-        
-        .mp-btn.share {
-            background: linear-gradient(45deg, #9C27B0, #E040FB);
-        }
-        
-        .close-multiplayer {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        
-        .leaderboard-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 25;
-            display: none;
-            flex-direction: column;
-            padding: 20px;
-            color: white;
-        }
-        
-        .leaderboard-title {
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 20px;
-            color: gold;
-        }
-        
-        .leaderboard-list {
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-        
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
+            width: 30%;
         }
         
-        .leaderboard-item.you {
-            background: rgba(100, 100, 255, 0.3);
-            font-weight: bold;
+        .bonus i {
+            font-size: 24px;
+            margin-bottom: 10px;
         }
         
-        .player-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .bonus.multiplier i { color: #feca57; }
+        .bonus.slowdown i { color: #48dbfb; }
+        .bonus.life i { color: #ff6b6b; }
         
-        .player-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-        }
-        
-        .player-name {
-            font-size: 16px;
-        }
-        
-        .player-score {
-            font-size: 18px;
-            font-weight: bold;
-            color: gold;
-        }
-        
-        .close-leaderboard {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        
-        .multiplayer-indicator {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 20px;
-            color: white;
+        .bonus h3 {
             font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 10;
-            max-width: 40%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            margin-bottom: 5px;
+            color: #a0a0c0;
         }
         
-        .multiplayer-btn {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(45deg, #9C27B0, #E040FB);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            z-index: 10;
+        .bonus p {
+            font-size: 12px;
+            color: #9090b0;
         }
         
-        /* Улучшения для маленьких экранов */
-        @media (max-height: 600px) {
-            .game-area {
-                height: 280px;
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
             }
             
-            .multiplayer-btn {
-                bottom: 70px;
+            .bonuses {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .bonus {
+                width: 80%;
             }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
+        <!-- Верхняя панель -->
+        <div class="top-bar">
+            <button class="close-btn">&times;</button>
+            <div class="title">saidgame_bot • мини-приложение</div>
+        </div>
+        
+        <!-- Заголовок игры -->
         <div class="game-header">
-            <div class="game-title">
-                <div class="title-icon">⚡</div>
-                <span>COLOR BURST</span>
+            <h1>COLOR BURST</h1>
+            <div class="score">SCORE: <span>13</span></div>
+        </div>
+        
+        <!-- Основные показатели -->
+        <div class="stats">
+            <div class="stat-item">
+                <div>LEVEL</div>
+                <div class="value">1</div>
             </div>
-            <div class="header-right">
-                <div class="score-container">
-                    <span class="score-label">SCORE:</span>
-                    <div class="score-value" id="score">0</div>
+            <div class="stat-item lives">
+                <div>LIVES</div>
+                <div class="value">❤️❤️❤️</div>
+            </div>
+            <div class="stat-item">
+                <div>TARGETS</div>
+                <div class="value">12</div>
+            </div>
+            <div class="stat-item">
+                <div>MULTIPLIER</div>
+                <div class="value">2x</div>
+            </div>
+        </div>
+        
+        <!-- Таймер и комбо -->
+        <div class="time-container">
+            <div class="time">44</div>
+            <button class="combo-btn">2 КОМБО! 12</button>
+        </div>
+        
+        <!-- Игровое поле -->
+        <div class="game-board">
+            <div class="target red" style="top: 50px; left: 70px;">3</div>
+            <div class="target blue" style="top: 120px; left: 200px;">2</div>
+            <div class="target green" style="top: 200px; left: 100px;">5</div>
+            <div class="target yellow" style="top: 80px; left: 280px;">1</div>
+            <div class="target purple" style="top: 180px; left: 250px;">4</div>
+            <div class="bomb" style="top: 230px; left: 150px;"></div>
+        </div>
+        
+        <div class="game-notice">
+            Кликайте на цветные круги до того, как они исчезнут! Избегайте черных бомб!
+        </div>
+        
+        <!-- Нижняя панель -->
+        <footer>
+            <div class="game-modes">
+                <button class="mode-btn offline">Офлайн</button>
+                <button class="mode-btn online">Онлайн</button>
+            </div>
+            
+            <button class="about-btn">Об игре</button>
+        </footer>
+    </div>
+    
+    <!-- Модальное окно "Об игре" -->
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title">Правила игры COLOR BURST</h2>
+            
+            <div class="rules">
+                <p>Кликайте на цветные круги до того, как они исчезнут!</p>
+                <p>Избегайте черных бомбочек - они отнимают жизни!</p>
+                <p>Чем быстрее вы кликаете на круги, тем выше ваш множитель и больше очков!</p>
+                <p>Создавайте комбинации из последовательных кликов для бонусных очков!</p>
+            </div>
+            
+            <h3 style="text-align: center; color: #feca57; margin-bottom: 15px;">Бонусы</h3>
+            <div class="bonuses">
+                <div class="bonus multiplier">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Множитель</h3>
+                    <p>Увеличивает ваши очки в 2-5 раз</p>
                 </div>
-                <div class="sound-toggle" id="soundToggle">🔊</div>
-            </div>
-        </div>
-        
-        <div class="game-stats">
-            <div class="stat-item">
-                <span class="stat-label">LEVEL</span>
-                <span class="stat-value" id="level">1</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">TARGETS</span>
-                <span class="stat-value" id="targets">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">TIME</span>
-                <span class="stat-value" id="time">60</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">LIVES</span>
-                <div class="lives-container">
-                    <div class="life"></div>
-                    <div class="life"></div>
-                    <div class="life"></div>
+                
+                <div class="bonus slowdown">
+                    <i class="fas fa-clock"></i>
+                    <h3>Замедление</h3>
+                    <p>Замедляет время на 5 секунд</p>
+                </div>
+                
+                <div class="bonus life">
+                    <i class="fas fa-heart"></i>
+                    <h3>Жизнь</h3>
+                    <p>Добавляет одну дополнительную жизнь</p>
                 </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">MULTIPLIER</span>
-                <span class="stat-value" id="multiplier">1x</span>
-            </div>
-        </div>
-        
-        <div class="game-area" id="gameArea">
-            <div class="slow-time-effect" id="slowTimeEffect"></div>
-            <div class="game-message" id="gameMessage">CLICK PLAY TO START</div>
-            <div class="combo-display" id="comboDisplay"></div>
-            <div class="active-bonus" id="activeBonus"></div>
-            <div class="telegram-watermark">SAID Game</div>
-            <div class="multiplayer-indicator" id="multiplayerIndicator">🔴 Offline</div>
-        </div>
-        
-        <div class="instructions">
-            Кликайте на цветные круги до того, как они исчезнут! Избегайте черных бомбочек!<br>
-            Бонусы: ⭐ - множитель, 💎 - замедление, 💖 - жизнь
-        </div>
-        
-        <div class="game-controls">
-            <button class="control-btn play-btn" id="playBtn">
-                ▶️
-            </button>
-            <button class="control-btn pause-btn" id="pauseBtn">
-                ⏸️
-            </button>
-            <button class="control-btn restart-btn" id="restartBtn">
-                🔄
-            </button>
-        </div>
-        
-        <button class="multiplayer-btn" id="multiplayerBtn">Мультиплеер</button>
-    </div>
-    
-    <!-- Мультиплеерное меню -->
-    <div class="multiplayer-container" id="multiplayerContainer">
-        <div class="close-multiplayer" id="closeMultiplayer">✕</div>
-        <h2 class="multiplayer-title">МУЛЬТИПЛЕЕР</h2>
-        <div class="multiplayer-buttons">
-            <button class="mp-btn" id="createRoomBtn">Создать комнату</button>
-            <button class="mp-btn" id="joinRoomBtn">Присоединиться</button>
-            <button class="mp-btn leaderboard" id="leaderboardBtn">Таблица лидеров</button>
-            <button class="mp-btn challenge" id="challengeBtn">Вызвать друга</button>
-            <button class="mp-btn share" id="shareBtn">Поделиться результатом</button>
         </div>
     </div>
-    
-    <!-- Таблица лидеров -->
-    <div class="leaderboard-container" id="leaderboardContainer">
-        <div class="close-leaderboard" id="closeLeaderboard">✕</div>
-        <h2 class="leaderboard-title">ТАБЛИЦА ЛИДЕРОВ</h2>
-        <div class="leaderboard-list" id="leaderboardList">
-            <!-- Список игроков будет генерироваться динамически -->
-        </div>
-    </div>
-    
+
     <script>
-        // Инициализация игры только после взаимодействия с пользователем
-        let gameInitialized = false;
-        let tg = null;
-        let isTelegramWebApp = false;
+        // Управление модальным окном
+        const aboutBtn = document.querySelector('.about-btn');
+        const modal = document.getElementById('about-modal');
+        const closeModal = document.querySelector('.modal-close');
+        const closeGame = document.querySelector('.close-btn');
         
-        // Проверяем, запущена ли игра в Telegram WebApp
-        if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-            tg = Telegram.WebApp;
-            isTelegramWebApp = true;
-            tg.expand();
-            tg.enableClosingConfirmation();
-        }
+        aboutBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
         
-        // Функция для инициализации игры
-        function initGame() {
-            if (gameInitialized) return;
-            gameInitialized = true;
-            
-            // Обновляем индикатор мультиплеера
-            const multiplayerIndicator = document.getElementById('multiplayerIndicator');
-            if (isTelegramWebApp) {
-                multiplayerIndicator.textContent = '🟢 Online';
-                multiplayerIndicator.style.background = 'rgba(76, 175, 80, 0.3)';
-            } else {
-                multiplayerIndicator.textContent = '🔴 Offline';
-                multiplayerIndicator.style.background = 'rgba(244, 67, 54, 0.3)';
-            }
-            
-            // Элементы DOM
-            const gameArea = document.getElementById('gameArea');
-            const scoreDisplay = document.getElementById('score');
-            const levelDisplay = document.getElementById('level');
-            const targetsDisplay = document.getElementById('targets');
-            const timeDisplay = document.getElementById('time');
-            const gameMessage = document.getElementById('gameMessage');
-            const playBtn = document.getElementById('playBtn');
-            const pauseBtn = document.getElementById('pauseBtn');
-            const restartBtn = document.getElementById('restartBtn');
-            const soundToggle = document.getElementById('soundToggle');
-            const comboDisplay = document.getElementById('comboDisplay');
-            const activeBonus = document.getElementById('activeBonus');
-            const slowTimeEffect = document.getElementById('slowTimeEffect');
-            const multiplierDisplay = document.getElementById('multiplier');
-            const livesContainer = document.querySelector('.lives-container');
-            const lives = livesContainer.querySelectorAll('.life');
-            const multiplayerBtn = document.getElementById('multiplayerBtn');
-            const multiplayerContainer = document.getElementById('multiplayerContainer');
-            const closeMultiplayer = document.getElementById('closeMultiplayer');
-            const leaderboardBtn = document.getElementById('leaderboardBtn');
-            const leaderboardContainer = document.getElementById('leaderboardContainer');
-            const closeLeaderboard = document.getElementById('closeLeaderboard');
-            const leaderboardList = document.getElementById('leaderboardList');
-            const createRoomBtn = document.getElementById('createRoomBtn');
-            const joinRoomBtn = document.getElementById('joinRoomBtn');
-            const challengeBtn = document.getElementById('challengeBtn');
-            const shareBtn = document.getElementById('shareBtn');
-            
-            // Игровые переменные
-            let score = 0;
-            let level = 1;
-            let targetsClicked = 0;
-            let gameActive = false;
-            let gameSpeed = 1500; // интервал появления мишеней (мс)
-            let gameTime = 60; // время игры в секундах
-            let targetTimer;
-            let gameTimer;
-            let timeTimer;
-            let targets = [];
-            let nextLevelThreshold = 15; // Порог для следующего уровня
-            let soundEnabled = true;
-            let combo = 0;
-            let multiplier = 1;
-            let currentLives = 3;
-            let isSlowed = false;
-            let slowEndTime = 0;
-            let bonusActive = false;
-            let bonusEndTime = 0;
-            
-            // Цветные мишени
-            const colors = [
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF5252)', icon: '❤️'},    // Красный
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF4081)', icon: '⭐'},    // Розовый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #E040FB)', icon: '💎'},     // Фиолетовый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #7C4DFF)', icon: '🌙'},    // Индиго
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #448AFF)', icon: '☁️'},   // Голубой
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #18FFFF)', icon: '❄️'},// Бирюзовый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #64FFDA)', icon: '🍃'},    // Зеленый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #69F0AE)', icon: '🍎'},// Светло-зеленый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #B2FF59)', icon: '🍋'},   // Лаймовый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #EEFF41)', icon: '☀️'},     // Желтый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFFF00)', icon: '⚡'},    // Ярко-желтый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFD740)', icon: '🔥'},    // Оранжевый
-                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFAB40)', icon: '🥕'}   // Темно-оранжевый
-            ];
-            
-            // Бонусы
-            const starBonus = {
-                bg: 'radial-gradient(circle at 30% 30%, #fff, #FFD700)',
-                icon: '⭐',
-                type: 'bonus'
-            };
-            
-            const diamondBonus = {
-                bg: 'radial-gradient(circle at 30% 30%, #fff, #00BFFF)',
-                icon: '💎',
-                type: 'slow'
-            };
-            
-            const heartBonus = {
-                bg: 'radial-gradient(circle at 30% 30%, #fff, #FF1493)',
-                icon: '💖',
-                type: 'life'
-            };
-            
-            // Бомба
-            const bomb = {
-                bg: 'radial-gradient(circle at 30% 30%, #fff, #212121)',
-                icon: '💣',
-                type: 'bomb'
-            };
-            
-            // Звуки
-            const popSound = new Audio();
-            popSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/zvyk.mp3';
-            popSound.preload = 'auto';
-            popSound.volume = 0.4;
-            
-            const bombSound = new Audio();
-            bombSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/explosion.mp3';
-            bombSound.preload = 'auto';
-            bombSound.volume = 0.6;
-            
-            const bonusSound = new Audio();
-            bonusSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3';
-            bonusSound.preload = 'auto';
-            bonusSound.volume = 0.5;
-            
-            const lifeSound = new Audio();
-            lifeSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3';
-            lifeSound.preload = 'auto';
-            lifeSound.volume = 0.5;
-            
-            // Инициализация игры
-            function initGameSession() {
-                score = 0;
-                level = 1;
-                targetsClicked = 0;
-                combo = 0;
-                multiplier = 1;
-                currentLives = 3;
-                isSlowed = false;
-                bonusActive = false;
-                nextLevelThreshold = 15;
-                gameTime = 60;
-                scoreDisplay.textContent = score;
-                levelDisplay.textContent = level;
-                targetsDisplay.textContent = targetsClicked;
-                timeDisplay.textContent = gameTime;
-                multiplierDisplay.textContent = multiplier + 'x';
-                gameActive = true;
-                gameMessage.style.display = 'none';
-                activeBonus.style.opacity = '0';
-                slowTimeEffect.classList.remove('slow-time-active');
-                
-                // Обновление жизней
-                lives.forEach((life, index) => {
-                    if (index < currentLives) {
-                        life.classList.remove('lost');
-                    } else {
-                        life.classList.add('lost');
-                    }
-                });
-                
-                // Очистка игровой области
-                gameArea.querySelectorAll('.target').forEach(t => t.remove());
-                targets = [];
-                
-                // Запуск таймеров
-                startGameTimers();
-            }
-            
-            // Запуск игровых таймеров
-            function startGameTimers() {
-                // Таймер создания мишеней
-                targetTimer = setInterval(createTarget, gameSpeed);
-                
-                // Таймер времени игры
-                timeTimer = setInterval(() => {
-                    if (!gameActive) return;
-                    
-                    gameTime--;
-                    timeDisplay.textContent = gameTime;
-                    
-                    // Проверка активных бонусов
-                    checkActiveBonuses();
-                    
-                    if (gameTime <= 0) {
-                        endGame('time');
-                    }
-                }, 1000);
-            }
-            
-            // Проверка активных бонусов
-            function checkActiveBonuses() {
-                const currentTime = Date.now();
-                
-                // Проверка замедления
-                if (isSlowed && currentTime > slowEndTime) {
-                    isSlowed = false;
-                    slowTimeEffect.classList.remove('slow-time-active');
-                    activeBonus.style.opacity = '0';
-                    
-                    // Восстанавливаем нормальную скорость
-                    clearInterval(targetTimer);
-                    targetTimer = setInterval(createTarget, gameSpeed);
-                }
-                
-                // Проверка бонуса множителя
-                if (bonusActive && currentTime > bonusEndTime) {
-                    bonusActive = false;
-                    multiplier = 1;
-                    multiplierDisplay.textContent = multiplier + 'x';
-                    activeBonus.style.opacity = '0';
-                }
-            }
-            
-            // Создание мишени (или бомбочки)
-            function createTarget() {
-                if (!gameActive) return;
-                
-                const target = document.createElement('div');
-                target.className = 'target';
-                target.dataset.clicked = 'false';
-                
-                // Случайный размер (от 60 до 90 пикселей)
-                const size = Math.floor(Math.random() * 30) + 60;
-                target.style.width = `${size}px`;
-                target.style.height = `${size}px`;
-                
-                // Случайная позиция в пределах игрового поля
-                const maxX = gameArea.offsetWidth - size;
-                const maxY = gameArea.offsetHeight - size;
-                const x = Math.floor(Math.random() * maxX);
-                const y = Math.floor(Math.random() * maxY);
-                target.style.left = `${x}px`;
-                target.style.top = `${y}px`;
-                
-                // Определяем тип объекта
-                let targetType;
-                const rand = Math.random();
-                
-                if (rand < 0.08) { // 8% шанс бомбы
-                    targetType = bomb;
-                    target.classList.add('bomb');
-                } else if (rand < 0.12) { // 4% шанс звезды (бонус)
-                    targetType = starBonus;
-                    target.classList.add('bonus', 'star');
-                } else if (rand < 0.15) { // 3% шанс алмаза (замедление)
-                    targetType = diamondBonus;
-                    target.classList.add('bonus', 'diamond');
-                } else if (rand < 0.18) { // 3% шанс сердца (жизнь)
-                    targetType = heartBonus;
-                    target.classList.add('bonus', 'heart');
-                } else { // 74% шанс обычной мишени
-                    targetType = colors[Math.floor(Math.random() * colors.length)];
-                }
-                
-                target.style.background = targetType.bg;
-                target.innerHTML = targetType.icon;
-                
-                // Время жизни мишени (от 1.5 до 3 секунд в зависимости от уровня)
-                const lifeTime = Math.max(500, 3000 - (level * 150));
-                
-                // Добавляем мишень в игровую область
-                gameArea.appendChild(target);
-                targets.push(target);
-                
-                // Удаление мишени через время жизни
-                setTimeout(() => {
-                    if (target.parentNode && gameActive) {
-                        // Сбрасываем комбо при пропуске мишени
-                        if (!target.classList.contains('bomb') && !target.classList.contains('bonus')) {
-                            combo = 0;
-                        }
-                        
-                        animateDisappearance(target);
-                        gameArea.removeChild(target);
-                        targets = targets.filter(t => t !== target);
-                    }
-                }, lifeTime);
-                
-                // Обработчик клика
-                target.addEventListener('click', () => {
-                    if (!gameActive || target.dataset.clicked === 'true') return;
-                    
-                    // Помечаем мишень как обработанную
-                    target.dataset.clicked = 'true';
-                    
-                    // Проверяем, бомбочка ли это
-                    if (target.classList.contains('bomb')) {
-                        // Воспроизводим звук взрыва
-                        if (soundEnabled) {
-                            bombSound.currentTime = 0;
-                            bombSound.play().catch(e => console.log("Bomb sound error:", e));
-                        }
-                        
-                        // Создаем эффект взрыва
-                        createExplosion(target);
-                        
-                        // Уменьшаем жизнь
-                        loseLife();
-                        return;
-                    }
-                    
-                    // Проверяем, бонус ли это
-                    if (target.classList.contains('bonus')) {
-                        handleBonus(target, targetType);
-                        return;
-                    }
-                    
-                    // Обработка обычной мишени
-                    handleRegularTarget(target);
-                }, { once: true }); // Гарантирует однократное выполнение
-            }
-            
-            // Обработка обычной мишени
-            function handleRegularTarget(target) {
-                // Увеличиваем счет
-                score += level * multiplier;
-                targetsClicked++;
-                combo++;
-                
-                // Обновляем отображение
-                scoreDisplay.textContent = score;
-                targetsDisplay.textContent = targetsClicked;
-                
-                // Показываем комбо
-                if (combo >= 3) {
-                    showCombo();
-                }
-                
-                // Проверка повышения уровня
-                if (score >= nextLevelThreshold) {
-                    increaseLevel();
-                    nextLevelThreshold += 15; // Увеличиваем порог для следующего уровня
-                }
-                
-                // Воспроизводим звук
-                if (soundEnabled) {
-                    popSound.currentTime = 0;
-                    popSound.play().catch(e => console.log("Audio play error:", e));
-                }
-                
-                // Создаем эффект частиц
-                createParticles(target);
-                
-                // Анимация при клике
-                target.style.transform = 'scale(1.2)';
-                target.style.opacity = '0.7';
-                
-                // Удаляем мишень
-                setTimeout(() => {
-                    if (target.parentNode) {
-                        gameArea.removeChild(target);
-                        targets = targets.filter(t => t !== target);
-                    }
-                }, 300);
-            }
-            
-            // Обработка бонусов
-            function handleBonus(target, bonusType) {
-                // Воспроизводим звук бонуса
-                if (soundEnabled) {
-                    bonusSound.currentTime = 0;
-                    bonusSound.play().catch(e => console.log("Bonus sound error:", e));
-                }
-                
-                // Обработка в зависимости от типа бонуса
-                if (bonusType === starBonus) {
-                    // Активируем бонус множителя
-                    bonusActive = true;
-                    multiplier = 2;
-                    bonusEndTime = Date.now() + 10000; // 10 секунд
-                    multiplierDisplay.textContent = multiplier + 'x';
-                    
-                    // Показываем активный бонус
-                    activeBonus.innerHTML = '⭐ 2x SCORE!';
-                    activeBonus.style.opacity = '1';
-                } 
-                else if (bonusType === diamondBonus) {
-                    // Активируем замедление времени
-                    isSlowed = true;
-                    slowEndTime = Date.now() + 5000; // 5 секунд
-                    
-                    // Применяем замедление
-                    clearInterval(targetTimer);
-                    targetTimer = setInterval(createTarget, gameSpeed * 2); // Удваиваем интервал
-                    slowTimeEffect.classList.add('slow-time-active');
-                    
-                    // Показываем активный бонус
-                    activeBonus.innerHTML = '💎 SLOW TIME!';
-                    activeBonus.style.opacity = '1';
-                } 
-                else if (bonusType === heartBonus) {
-                    // Добавляем жизнь
-                    if (currentLives < 3) {
-                        currentLives++;
-                        lives[currentLives - 1].classList.remove('lost');
-                        
-                        // Воспроизводим звук
-                        if (soundEnabled) {
-                            lifeSound.currentTime = 0;
-                            lifeSound.play().catch(e => console.log("Life sound error:", e));
-                        }
-                    }
-                }
-                
-                // Создаем эффект частиц
-                createParticles(target);
-                
-                // Удаляем мишень
-                target.style.transform = 'scale(1.2)';
-                target.style.opacity = '0.7';
-                setTimeout(() => {
-                    if (target.parentNode) {
-                        gameArea.removeChild(target);
-                        targets = targets.filter(t => t !== target);
-                    }
-                }, 300);
-            }
-            
-            // Потеря жизни
-            function loseLife() {
-                currentLives--;
-                combo = 0;
-                multiplier = 1;
-                multiplierDisplay.textContent = multiplier + 'x';
-                
-                // Обновляем отображение жизней
-                if (currentLives >= 0) {
-                    lives[currentLives].classList.add('lost');
-                }
-                
-                // Проверяем окончание игры
-                if (currentLives <= 0) {
-                    endGame('bomb');
-                }
-            }
-            
-            // Показ комбо
-            function showCombo() {
-                comboDisplay.textContent = combo + ' COMBO!';
-                comboDisplay.style.opacity = '1';
-                comboDisplay.style.transform = 'translate(-50%, -50%) scale(1)';
-                
-                // Анимация исчезновения комбо
-                setTimeout(() => {
-                    comboDisplay.style.opacity = '0';
-                    comboDisplay.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                }, 1500);
-            }
-            
-            // Создание эффекта частиц
-            function createParticles(target) {
-                const rect = target.getBoundingClientRect();
-                const gameAreaRect = gameArea.getBoundingClientRect();
-                
-                // Правильное вычисление позиции относительно игровой области
-                const centerX = rect.left - gameAreaRect.left + rect.width / 2;
-                const centerY = rect.top - gameAreaRect.top + rect.height / 2;
-                const color = window.getComputedStyle(target).background;
-                
-                // Создаем 10 частиц
-                for (let i = 0; i < 10; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    
-                    // Размер частицы
-                    const size = Math.random() * 12 + 4;
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    
-                    // Цвет частицы
-                    particle.style.background = color;
-                    
-                    // Начальная позиция
-                    particle.style.left = `${centerX}px`;
-                    particle.style.top = `${centerY}px`;
-                    
-                    // Добавляем частицу в игровую область
-                    gameArea.appendChild(particle);
-                    
-                    // Случайное направление и расстояние
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = Math.random() * 80 + 40;
-                    const tx = Math.cos(angle) * distance;
-                    const ty = Math.sin(angle) * distance;
-                    
-                    // Используем CSS анимацию
-                    particle.style.setProperty('--tx', `${tx}px`);
-                    particle.style.setProperty('--ty', `${ty}px`);
-                    
-                    // Удаляем частицу после анимации
-                    setTimeout(() => {
-                        particle.remove();
-                    }, 800);
-                }
-            }
-            
-            // Создание эффекта взрыва для бомбочки
-            function createExplosion(target) {
-                const rect = target.getBoundingClientRect();
-                const gameAreaRect = gameArea.getBoundingClientRect();
-                
-                const centerX = rect.left - gameAreaRect.left + rect.width / 2;
-                const centerY = rect.top - gameAreaRect.top + rect.height / 2;
-                
-                // Создаем 20 частиц взрыва
-                for (let i = 0; i < 20; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'explosion-particle';
-                    
-                    // Размер частицы
-                    const size = Math.random() * 20 + 10;
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    
-                    // Цвета взрыва: черный, красный, оранжевый
-                    const explosionColors = ['#212121', '#ff0000', '#ff7700', '#ffaa00'];
-                    particle.style.background = explosionColors[Math.floor(Math.random() * explosionColors.length)];
-                    
-                    // Начальная позиция
-                    particle.style.left = `${centerX}px`;
-                    particle.style.top = `${centerY}px`;
-                    
-                    // Добавляем частицу в игровую область
-                    gameArea.appendChild(particle);
-                    
-                    // Удаляем частицу после анимации
-                    setTimeout(() => {
-                        particle.remove();
-                    }, 800);
-                }
-            }
-            
-            // Анимация исчезновения мишени
-            function animateDisappearance(target) {
-                target.style.transform = 'scale(0)';
-                target.style.opacity = '0';
-                target.style.transition = 'all 0.3s ease-out';
-            }
-            
-            // Увеличение уровня
-            function increaseLevel() {
-                level++;
-                levelDisplay.textContent = level;
-                
-                // Увеличиваем скорость игры
-                clearInterval(targetTimer);
-                gameSpeed = Math.max(400, 1500 - (level * 100));
-                targetTimer = setInterval(createTarget, gameSpeed);
-                
-                // Эффект при увеличении уровня
-                gameArea.style.boxShadow = 'inset 0 0 30px gold, 0 0 30px gold';
-                setTimeout(() => {
-                    gameArea.style.boxShadow = '';
-                }, 800);
-            }
-            
-            // Конец игры
-            function endGame(reason) {
-                gameActive = false;
-                clearInterval(targetTimer);
-                if (timeTimer) clearInterval(timeTimer);
-                
-                // Удаляем все мишени с анимацией
-                targets.forEach(target => {
-                    animateDisappearance(target);
-                    setTimeout(() => {
-                        if (target.parentNode) {
-                            gameArea.removeChild(target);
-                        }
-                    }, 300);
-                });
-                targets = [];
-                
-                // Показываем сообщение
-                if (reason === 'bomb') {
-                    gameMessage.textContent = `BOOM! GAME OVER\nSCORE: ${score}`;
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        
+        closeGame.addEventListener('click', () => {
+            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#1a1a2e;color:white;font-size:24px;">Игра закрыта</div>';
+        });
+        
+        // Клики по целям
+        const targets = document.querySelectorAll('.target, .bomb');
+        targets.forEach(target => {
+            target.addEventListener('click', function() {
+                if(this.classList.contains('bomb')) {
+                    this.style.transform = 'scale(1.5)';
+                    this.style.opacity = '0';
+                    setTimeout(() => this.remove(), 300);
                 } else {
-                    gameMessage.textContent = `GAME OVER!\nSCORE: ${score}`;
-                }
-                gameMessage.style.display = 'block';
-                
-                // Сохраняем результат
-                saveScore();
-            }
-            
-            // Мультиплеерные функции
-            function saveScore() {
-                if (!isTelegramWebApp) return;
-                
-                try {
-                    // Сохраняем текущий результат
-                    tg.CloudStorage.setItem('lastScore', score.toString());
+                    this.style.transform = 'scale(0)';
+                    this.style.opacity = '0';
+                    setTimeout(() => this.remove(), 300);
                     
-                    // Проверяем, является ли результат рекордным
-                    tg.CloudStorage.getItem('highScore', (err, value) => {
-                        if (!err) {
-                            const highScore = value ? parseInt(value) : 0;
-                            if (score > highScore) {
-                                tg.CloudStorage.setItem('highScore', score.toString());
-                            }
-                        }
-                    });
-                } catch (e) {
-                    console.error("Ошибка сохранения результата:", e);
-                }
-            }
-            
-            function showLeaderboard() {
-                // Заглушка с тестовыми данными
-                const testData = [
-                    { id: 1, name: "Алексей", score: 2450, avatar: "👤" },
-                    { id: 2, name: "Мария", score: 1980, avatar: "👩" },
-                    { id: 3, name: "Иван", score: 1750, avatar: "👨" },
-                    { id: 4, name: "Ольга", score: 1620, avatar: "👩" },
-                    { id: 5, name: "Дмитрий", score: 1480, avatar: "👤" },
-                    { id: 6, name: "Вы", score: score, avatar: "👤", isYou: true },
-                    { id: 7, name: "Сергей", score: 1250, avatar: "👤" },
-                    { id: 8, name: "Анна", score: 1120, avatar: "👩" },
-                    { id: 9, name: "Павел", score: 980, avatar: "👤" },
-                    { id: 10, name: "Екатерина", score: 850, avatar: "👩" }
-                ];
-                
-                // Сортируем по убыванию счета
-                testData.sort((a, b) => b.score - a.score);
-                
-                // Отображаем данные
-                leaderboardList.innerHTML = '';
-                testData.forEach((player, index) => {
-                    const playerEl = document.createElement('div');
-                    playerEl.className = `leaderboard-item ${player.isYou ? 'you' : ''}`;
-                    playerEl.innerHTML = `
-                        <div class="player-info">
-                            <div class="player-avatar">${player.avatar}</div>
-                            <div class="player-name">${player.name}</div>
-                        </div>
-                        <div class="player-score">${player.score}</div>
-                    `;
-                    leaderboardList.appendChild(playerEl);
-                });
-                
-                leaderboardContainer.style.display = 'flex';
-            }
-            
-            function createRoom() {
-                if (!isTelegramWebApp) {
-                    alert("Функция доступна только в Telegram");
-                    return;
-                }
-                
-                // В реальном приложении здесь будет вызов API для создания комнаты
-                const roomId = Math.floor(Math.random() * 9000) + 1000;
-                tg.showPopup({
-                    title: "Комната создана",
-                    message: `ID комнаты: #${roomId}\nПригласите друзей!`,
-                    buttons: [{ type: 'default', text: "OK", id: 'ok' }]
-                });
-            }
-            
-            function joinRoom() {
-                if (!isTelegramWebApp) {
-                    alert("Функция доступна только в Telegram");
-                    return;
-                }
-                
-                tg.showPopup({
-                    title: "Присоединиться к комнате",
-                    message: "Введите ID комнаты:",
-                    buttons: [
-                        { type: 'default', text: "Присоединиться", id: 'join' },
-                        { type: 'cancel', text: "Отмена" }
-                    ]
-                }, (btnId) => {
-                    if (btnId === 'join') {
-                        // В реальном приложении здесь будет запрос на присоединение
-                        tg.showAlert("Вы присоединились к комнате!");
-                    }
-                });
-            }
-            
-            function challengeFriend() {
-                if (!isTelegramWebApp) {
-                    alert("Функция доступна только в Telegram");
-                    return;
-                }
-                
-                // Отправляем вызов через Telegram
-                const challengeText = `Я набрал ${score} очков в Color Burst! Сможешь побить мой рекорд?`;
-                tg.showPopup({
-                    title: "Вызов другу",
-                    message: challengeText,
-                    buttons: [
-                        { type: 'default', text: "Отправить", id: 'send' },
-                        { type: 'cancel', text: "Отмена" }
-                    ]
-                }, (btnId) => {
-                    if (btnId === 'send') {
-                        // Отправляем сообщение
-                        tg.sendData(JSON.stringify({
-                            action: "challenge",
-                            score: score
-                        }));
-                        tg.showAlert("Вызов отправлен!");
-                    }
-                });
-            }
-            
-            function shareResult() {
-                if (!isTelegramWebApp) {
-                    alert("Функция доступна только в Telegram");
-                    return;
-                }
-                
-                const shareText = `Я набрал ${score} очков в Color Burst! Попробуй побить мой рекорд!`;
-                tg.showPopup({
-                    title: "Поделиться результатом",
-                    message: shareText,
-                    buttons: [
-                        { type: 'default', text: "Поделиться", id: 'share' },
-                        { type: 'cancel', text: "Отмена" }
-                    ]
-                }, (btnId) => {
-                    if (btnId === 'share') {
-                        // Отправляем сообщение
-                        tg.sendData(JSON.stringify({
-                            action: "share",
-                            score: score
-                        }));
-                        tg.showAlert("Результат отправлен!");
-                    }
-                });
-            }
-            
-            // Обработчики кнопок
-            playBtn.addEventListener('click', () => {
-                if (!gameActive) {
-                    initGameSession();
+                    // Обновляем счет
+                    const scoreEl = document.querySelector('.score span');
+                    let score = parseInt(scoreEl.textContent);
+                    score += 5;
+                    scoreEl.textContent = score;
+                    
+                    // Обновляем комбо
+                    const comboBtn = document.querySelector('.combo-btn');
+                    const comboText = comboBtn.textContent.split('!');
+                    let combo = parseInt(comboText[0]);
+                    combo++;
+                    comboBtn.textContent = combo + ' КОМБО! ' + (combo * 5);
                 }
             });
-            
-            pauseBtn.addEventListener('click', () => {
-                if (gameActive) {
-                    gameActive = false;
-                    clearInterval(targetTimer);
-                    if (timeTimer) clearInterval(timeTimer);
-                    gameMessage.textContent = 'PAUSED';
-                    gameMessage.style.display = 'block';
-                } else {
-                    gameActive = true;
-                    gameMessage.style.display = 'none';
-                    startGameTimers();
-                }
-            });
-            
-            restartBtn.addEventListener('click', () => {
-                if (gameActive) {
-                    endGame();
-                }
-                setTimeout(initGameSession, 500);
-            });
-            
-            // Переключатель звука
-            soundToggle.addEventListener('click', () => {
-                soundEnabled = !soundEnabled;
-                soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
-                soundToggle.style.background = soundEnabled ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 50, 50, 0.4)';
-            });
-            
-            // Мультиплеерные обработчики
-            multiplayerBtn.addEventListener('click', () => {
-                multiplayerContainer.style.display = 'flex';
-            });
-            
-            closeMultiplayer.addEventListener('click', () => {
-                multiplayerContainer.style.display = 'none';
-            });
-            
-            leaderboardBtn.addEventListener('click', () => {
-                multiplayerContainer.style.display = 'none';
-                showLeaderboard();
-            });
-            
-            closeLeaderboard.addEventListener('click', () => {
-                leaderboardContainer.style.display = 'none';
-            });
-            
-            createRoomBtn.addEventListener('click', createRoom);
-            joinRoomBtn.addEventListener('click', joinRoom);
-            challengeBtn.addEventListener('click', challengeFriend);
-            shareBtn.addEventListener('click', shareResult);
-            
-            // Начальное состояние
-            gameMessage.textContent = 'CLICK PLAY TO START';
-            gameMessage.style.display = 'block';
-        }
+        });
         
-        // Инициализация при первом взаимодействии
-        document.body.addEventListener('touchstart', initGame, {once: true});
-        document.body.addEventListener('mousedown', initGame, {once: true});
-        document.body.addEventListener('click', initGame, {once: true});
+        // Таймер обратного отсчета
+        let time = 44;
+        const timer = setInterval(() => {
+            time--;
+            document.querySelector('.time').textContent = time;
+            
+            if(time <= 0) {
+                clearInterval(timer);
+                document.querySelector('.game-board').innerHTML = `
+                    <div style="text-align:center;padding:20px;">
+                        <h2 style="color:#feca57;margin-bottom:20px;">ИГРА ОКОНЧЕНА!</h2>
+                        <p style="font-size:24px;color:#48dbfb;">Ваш счет: ${document.querySelector('.score span').textContent}</p>
+                        <button class="about-btn" style="margin-top:20px;" onclick="location.reload()">Играть снова</button>
+                    </div>
+                `;
+            }
+        }, 1000);
     </script>
 </body>
 </html>
