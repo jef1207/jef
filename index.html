@@ -366,7 +366,7 @@
         
         <div class="game-area" id="gameArea">
             <div class="game-message" id="gameMessage">CLICK PLAY TO START</div>
-            <div class="telegram-watermark">Telegram Game</div>
+            <div class="telegram-watermark">SAID Game</div>
         </div>
         
         <div class="instructions">
@@ -436,9 +436,9 @@
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFAB40)', icon: '🥕'}   // Темно-оранжевый
             ];
             
-            // Создаем звуковой элемент
+            // Создаем звуковой элемент с вашим файлом из GitHub
             const popSound = new Audio();
-            popSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-balloon-pop-splash-2897.mp3';
+            popSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/zvyk.mp3';
             popSound.preload = 'auto';
             popSound.volume = 0.4;
             
@@ -544,7 +544,7 @@
                     scoreDisplay.textContent = score;
                     targetsDisplay.textContent = targetsClicked;
                     
-                    // Воспроизводим звук лопания
+                    // Воспроизводим ваш звук лопания
                     if (soundEnabled) {
                         popSound.currentTime = 0;
                         popSound.play().catch(e => console.log("Audio play error:", e));
