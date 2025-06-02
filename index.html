@@ -52,6 +52,13 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
         .game-title {
@@ -301,20 +308,16 @@
         }
         
         .sound-toggle {
-            position: absolute;
-            top: 15px;
-            right: 15px;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.3);
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
             font-size: 22px;
             cursor: pointer;
-            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
@@ -331,6 +334,12 @@
             .game-title {
                 font-size: 20px;
             }
+            
+            .sound-toggle {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -341,13 +350,14 @@
                 <div class="title-icon">⚡</div>
                 <span>COLOR BURST</span>
             </div>
-            <div class="score-container">
-                <span class="score-label">SCORE:</span>
-                <div class="score-value" id="score">0</div>
+            <div class="header-right">
+                <div class="score-container">
+                    <span class="score-label">SCORE:</span>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="sound-toggle" id="soundToggle">🔊</div>
             </div>
         </div>
-        
-        <div class="sound-toggle" id="soundToggle">🔊</div>
         
         <div class="game-stats">
             <div class="stat-item">
@@ -534,9 +544,13 @@
                     }
                 }, lifeTime);
                 
+                // Флаг для отслеживания кликов
+                let clicked = false;
+                
                 // Обработчик клика
                 target.addEventListener('click', () => {
-                    if (!gameActive) return;
+                    if (!gameActive || clicked) return;
+                    clicked = true;
                     
                     // Увеличиваем счет
                     score += level;
@@ -563,7 +577,7 @@
                             gameArea.removeChild(target);
                             targets = targets.filter(t => t !== target);
                         }
-                    }, 200);
+                    }, 300);
                 });
             }
             
