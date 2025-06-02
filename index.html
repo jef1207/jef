@@ -135,7 +135,7 @@
             transition: transform 0.2s;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
                         inset 0 0 10px rgba(255, 255, 255, 0.8);
-            animation: targetAppear 0.3s ease-out;
+            animation: targetAppear 0.3s ease-out, pulse 1.5s infinite;
             font-size: 28px;
             text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
         }
@@ -150,9 +150,37 @@
                         inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
         }
         
+        .bonus {
+            animation: bonusAppear 0.4s ease-out, pulse 1.5s infinite;
+        }
+        
+        .star {
+            background: radial-gradient(circle at 30% 30%, #fff, #FFD700) !important;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8),
+                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .diamond {
+            background: radial-gradient(circle at 30% 30%, #fff, #00BFFF) !important;
+            box-shadow: 0 0 25px rgba(0, 191, 255, 0.8),
+                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .heart {
+            background: radial-gradient(circle at 30% 30%, #fff, #FF1493) !important;
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.8),
+                        inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
+        }
+        
         @keyframes targetAppear {
             0% { transform: scale(0); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes bonusAppear {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(20deg); }
+            100% { transform: scale(1) rotate(0deg); }
         }
         
         .game-controls {
@@ -179,6 +207,10 @@
             border: none;
             position: relative;
             overflow: hidden;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
         }
         
         .control-btn::after {
@@ -351,6 +383,66 @@
             cursor: pointer;
             background: rgba(0, 0, 0, 0.3);
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+        
+        .sound-toggle:active {
+            transform: scale(0.9);
+        }
+        
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+        }
+        
+        .active-bonus {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .bonus-active {
+            opacity: 1;
+        }
+        
+        .lives-container {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+        
+        .life {
+            width: 20px;
+            height: 20px;
+            background: #ff4081;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(255, 64, 129, 0.8);
+        }
+        
+        .life.lost {
+            background: #555;
+            box-shadow: none;
         }
         
         @media (max-width: 400px) {
@@ -372,6 +464,23 @@
                 height: 36px;
                 font-size: 18px;
             }
+        }
+        
+        .slow-time-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 191, 255, 0.2);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 4;
+        }
+        
+        .slow-time-active {
+            opacity: 1;
         }
     </style>
 </head>
@@ -404,15 +513,31 @@
                 <span class="stat-label">TIME</span>
                 <span class="stat-value" id="time">60</span>
             </div>
+            <div class="stat-item">
+                <span class="stat-label">LIVES</span>
+                <div class="lives-container">
+                    <div class="life"></div>
+                    <div class="life"></div>
+                    <div class="life"></div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">MULTIPLIER</span>
+                <span class="stat-value" id="multiplier">1x</span>
+            </div>
         </div>
         
         <div class="game-area" id="gameArea">
+            <div class="slow-time-effect" id="slowTimeEffect"></div>
             <div class="game-message" id="gameMessage">CLICK PLAY TO START</div>
+            <div class="combo-display" id="comboDisplay"></div>
+            <div class="active-bonus" id="activeBonus"></div>
             <div class="telegram-watermark">SAID Game</div>
         </div>
         
         <div class="instructions">
-            Кликайте на цветные круги до того, как они исчезнут! Избегайте черных бомбочек - они заканчивают игру!
+            Кликайте на цветные круги до того, как они исчезнут! Избегайте черных бомбочек!<br>
+            Бонусы: ⭐ - множитель, 💎 - замедление, 💖 - жизнь
         </div>
         
         <div class="game-controls">
@@ -448,6 +573,12 @@
             const pauseBtn = document.getElementById('pauseBtn');
             const restartBtn = document.getElementById('restartBtn');
             const soundToggle = document.getElementById('soundToggle');
+            const comboDisplay = document.getElementById('comboDisplay');
+            const activeBonus = document.getElementById('activeBonus');
+            const slowTimeEffect = document.getElementById('slowTimeEffect');
+            const multiplierDisplay = document.getElementById('multiplier');
+            const livesContainer = document.querySelector('.lives-container');
+            const lives = livesContainer.querySelectorAll('.life');
             
             // Игровые переменные
             let score = 0;
@@ -462,6 +593,15 @@
             let targets = [];
             let nextLevelThreshold = 15; // Порог для следующего уровня
             let soundEnabled = true;
+            let combo = 0;
+            let multiplier = 1;
+            let currentLives = 3;
+            let isSlowed = false;
+            let slowEndTime = 0;
+            let bonusActive = false;
+            let bonusEndTime = 0;
+            
+            // Цветные мишени
             const colors = [
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF5252)', icon: '❤️'},    // Красный
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF4081)', icon: '⭐'},    // Розовый
@@ -478,7 +618,26 @@
                 {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFAB40)', icon: '🥕'}   // Темно-оранжевый
             ];
             
-            // Специальный объект для бомбочки
+            // Бонусы
+            const starBonus = {
+                bg: 'radial-gradient(circle at 30% 30%, #fff, #FFD700)',
+                icon: '⭐',
+                type: 'bonus'
+            };
+            
+            const diamondBonus = {
+                bg: 'radial-gradient(circle at 30% 30%, #fff, #00BFFF)',
+                icon: '💎',
+                type: 'slow'
+            };
+            
+            const heartBonus = {
+                bg: 'radial-gradient(circle at 30% 30%, #fff, #FF1493)',
+                icon: '💖',
+                type: 'life'
+            };
+            
+            // Бомба
             const bomb = {
                 bg: 'radial-gradient(circle at 30% 30%, #fff, #212121)',
                 icon: '💣',
@@ -496,19 +655,46 @@
             bombSound.preload = 'auto';
             bombSound.volume = 0.6;
             
+            const bonusSound = new Audio();
+            bonusSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3';
+            bonusSound.preload = 'auto';
+            bonusSound.volume = 0.5;
+            
+            const lifeSound = new Audio();
+            lifeSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3';
+            lifeSound.preload = 'auto';
+            lifeSound.volume = 0.5;
+            
             // Инициализация игры
             function initGameSession() {
                 score = 0;
                 level = 1;
                 targetsClicked = 0;
+                combo = 0;
+                multiplier = 1;
+                currentLives = 3;
+                isSlowed = false;
+                bonusActive = false;
                 nextLevelThreshold = 15;
                 gameTime = 60;
                 scoreDisplay.textContent = score;
                 levelDisplay.textContent = level;
                 targetsDisplay.textContent = targetsClicked;
                 timeDisplay.textContent = gameTime;
+                multiplierDisplay.textContent = multiplier + 'x';
                 gameActive = true;
                 gameMessage.style.display = 'none';
+                activeBonus.style.opacity = '0';
+                slowTimeEffect.classList.remove('slow-time-active');
+                
+                // Обновление жизней
+                lives.forEach((life, index) => {
+                    if (index < currentLives) {
+                        life.classList.remove('lost');
+                    } else {
+                        life.classList.add('lost');
+                    }
+                });
                 
                 // Очистка игровой области
                 gameArea.querySelectorAll('.target').forEach(t => t.remove());
@@ -530,10 +716,37 @@
                     gameTime--;
                     timeDisplay.textContent = gameTime;
                     
+                    // Проверка активных бонусов
+                    checkActiveBonuses();
+                    
                     if (gameTime <= 0) {
                         endGame('time');
                     }
                 }, 1000);
+            }
+            
+            // Проверка активных бонусов
+            function checkActiveBonuses() {
+                const currentTime = Date.now();
+                
+                // Проверка замедления
+                if (isSlowed && currentTime > slowEndTime) {
+                    isSlowed = false;
+                    slowTimeEffect.classList.remove('slow-time-active');
+                    activeBonus.style.opacity = '0';
+                    
+                    // Восстанавливаем нормальную скорость
+                    clearInterval(targetTimer);
+                    targetTimer = setInterval(createTarget, gameSpeed);
+                }
+                
+                // Проверка бонуса множителя
+                if (bonusActive && currentTime > bonusEndTime) {
+                    bonusActive = false;
+                    multiplier = 1;
+                    multiplierDisplay.textContent = multiplier + 'x';
+                    activeBonus.style.opacity = '0';
+                }
             }
             
             // Создание мишени (или бомбочки)
@@ -557,12 +770,23 @@
                 target.style.left = `${x}px`;
                 target.style.top = `${y}px`;
                 
-                // Определяем тип объекта: мишень или бомбочка (10% вероятность бомбочки)
+                // Определяем тип объекта
                 let targetType;
-                if (Math.random() < 0.1) { // 10% шанс появления бомбочки
+                const rand = Math.random();
+                
+                if (rand < 0.08) { // 8% шанс бомбы
                     targetType = bomb;
-                    target.classList.add('bomb'); // Добавляем специальный класс для бомбочки
-                } else {
+                    target.classList.add('bomb');
+                } else if (rand < 0.12) { // 4% шанс звезды (бонус)
+                    targetType = starBonus;
+                    target.classList.add('bonus', 'star');
+                } else if (rand < 0.15) { // 3% шанс алмаза (замедление)
+                    targetType = diamondBonus;
+                    target.classList.add('bonus', 'diamond');
+                } else if (rand < 0.18) { // 3% шанс сердца (жизнь)
+                    targetType = heartBonus;
+                    target.classList.add('bonus', 'heart');
+                } else { // 74% шанс обычной мишени
                     targetType = colors[Math.floor(Math.random() * colors.length)];
                 }
                 
@@ -579,6 +803,11 @@
                 // Удаление мишени через время жизни
                 setTimeout(() => {
                     if (target.parentNode && gameActive) {
+                        // Сбрасываем комбо при пропуске мишени
+                        if (!target.classList.contains('bomb') && !target.classList.contains('bonus')) {
+                            combo = 0;
+                        }
+                        
                         animateDisappearance(target);
                         gameArea.removeChild(target);
                         targets = targets.filter(t => t !== target);
@@ -603,44 +832,157 @@
                         // Создаем эффект взрыва
                         createExplosion(target);
                         
-                        // Завершаем игру
-                        endGame('bomb');
+                        // Уменьшаем жизнь
+                        loseLife();
                         return;
                     }
                     
-                    // Увеличиваем счет
-                    score += level;
-                    targetsClicked++;
-                    scoreDisplay.textContent = score;
-                    targetsDisplay.textContent = targetsClicked;
-                    
-                    // Проверка повышения уровня
-                    if (score >= nextLevelThreshold) {
-                        increaseLevel();
-                        nextLevelThreshold += 15; // Увеличиваем порог для следующего уровня
+                    // Проверяем, бонус ли это
+                    if (target.classList.contains('bonus')) {
+                        handleBonus(target, targetType);
+                        return;
                     }
                     
-                    // Воспроизводим звук
-                    if (soundEnabled) {
-                        popSound.currentTime = 0;
-                        popSound.play().catch(e => console.log("Audio play error:", e));
-                    }
-                    
-                    // Создаем эффект частиц
-                    createParticles(target);
-                    
-                    // Анимация при клике
-                    target.style.transform = 'scale(1.2)';
-                    target.style.opacity = '0.7';
-                    
-                    // Удаляем мишень
-                    setTimeout(() => {
-                        if (target.parentNode) {
-                            gameArea.removeChild(target);
-                            targets = targets.filter(t => t !== target);
-                        }
-                    }, 300);
+                    // Обработка обычной мишени
+                    handleRegularTarget(target);
                 }, { once: true }); // Гарантирует однократное выполнение
+            }
+            
+            // Обработка обычной мишени
+            function handleRegularTarget(target) {
+                // Увеличиваем счет
+                score += level * multiplier;
+                targetsClicked++;
+                combo++;
+                
+                // Обновляем отображение
+                scoreDisplay.textContent = score;
+                targetsDisplay.textContent = targetsClicked;
+                
+                // Показываем комбо
+                if (combo >= 3) {
+                    showCombo();
+                }
+                
+                // Проверка повышения уровня
+                if (score >= nextLevelThreshold) {
+                    increaseLevel();
+                    nextLevelThreshold += 15; // Увеличиваем порог для следующего уровня
+                }
+                
+                // Воспроизводим звук
+                if (soundEnabled) {
+                    popSound.currentTime = 0;
+                    popSound.play().catch(e => console.log("Audio play error:", e));
+                }
+                
+                // Создаем эффект частиц
+                createParticles(target);
+                
+                // Анимация при клике
+                target.style.transform = 'scale(1.2)';
+                target.style.opacity = '0.7';
+                
+                // Удаляем мишень
+                setTimeout(() => {
+                    if (target.parentNode) {
+                        gameArea.removeChild(target);
+                        targets = targets.filter(t => t !== target);
+                    }
+                }, 300);
+            }
+            
+            // Обработка бонусов
+            function handleBonus(target, bonusType) {
+                // Воспроизводим звук бонуса
+                if (soundEnabled) {
+                    bonusSound.currentTime = 0;
+                    bonusSound.play().catch(e => console.log("Bonus sound error:", e));
+                }
+                
+                // Обработка в зависимости от типа бонуса
+                if (bonusType === starBonus) {
+                    // Активируем бонус множителя
+                    bonusActive = true;
+                    multiplier = 2;
+                    bonusEndTime = Date.now() + 10000; // 10 секунд
+                    multiplierDisplay.textContent = multiplier + 'x';
+                    
+                    // Показываем активный бонус
+                    activeBonus.innerHTML = '⭐ 2x SCORE!';
+                    activeBonus.style.opacity = '1';
+                } 
+                else if (bonusType === diamondBonus) {
+                    // Активируем замедление времени
+                    isSlowed = true;
+                    slowEndTime = Date.now() + 5000; // 5 секунд
+                    
+                    // Применяем замедление
+                    clearInterval(targetTimer);
+                    targetTimer = setInterval(createTarget, gameSpeed * 2); // Удваиваем интервал
+                    slowTimeEffect.classList.add('slow-time-active');
+                    
+                    // Показываем активный бонус
+                    activeBonus.innerHTML = '💎 SLOW TIME!';
+                    activeBonus.style.opacity = '1';
+                } 
+                else if (bonusType === heartBonus) {
+                    // Добавляем жизнь
+                    if (currentLives < 3) {
+                        currentLives++;
+                        lives[currentLives - 1].classList.remove('lost');
+                        
+                        // Воспроизводим звук
+                        if (soundEnabled) {
+                            lifeSound.currentTime = 0;
+                            lifeSound.play().catch(e => console.log("Life sound error:", e));
+                        }
+                    }
+                }
+                
+                // Создаем эффект частиц
+                createParticles(target);
+                
+                // Удаляем мишень
+                target.style.transform = 'scale(1.2)';
+                target.style.opacity = '0.7';
+                setTimeout(() => {
+                    if (target.parentNode) {
+                        gameArea.removeChild(target);
+                        targets = targets.filter(t => t !== target);
+                    }
+                }, 300);
+            }
+            
+            // Потеря жизни
+            function loseLife() {
+                currentLives--;
+                combo = 0;
+                multiplier = 1;
+                multiplierDisplay.textContent = multiplier + 'x';
+                
+                // Обновляем отображение жизней
+                if (currentLives >= 0) {
+                    lives[currentLives].classList.add('lost');
+                }
+                
+                // Проверяем окончание игры
+                if (currentLives <= 0) {
+                    endGame('bomb');
+                }
+            }
+            
+            // Показ комбо
+            function showCombo() {
+                comboDisplay.textContent = combo + ' COMBO!';
+                comboDisplay.style.opacity = '1';
+                comboDisplay.style.transform = 'translate(-50%, -50%) scale(1)';
+                
+                // Анимация исчезновения комбо
+                setTimeout(() => {
+                    comboDisplay.style.opacity = '0';
+                    comboDisplay.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                }, 1500);
             }
             
             // Создание эффекта частиц
