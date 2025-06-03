@@ -1,34 +1,146 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cube Quest - 3D Game</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Cube Quest - Простая версия</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+    </style>
 </head>
 <body>
-    <!-- Интерфейс игры -->
-    <div id="game-ui">
-        <div id="score">Счёт: 0</div>
-        <div id="timer">Время: 60</div>
-    </div>
-    
-    <!-- Стартовый экран -->
-    <div id="start-screen">
-        <h1>CUBE QUEST</h1>
-        <button id="start-btn">ИГРАТЬ</button>
-    </div>
-    
-    <!-- Экран завершения -->
-    <div id="end-screen" class="hidden">
-        <h2>Игра завершена!</h2>
-        <p>Ваш счёт: <span id="final-score">0</span></p>
-        <button id="restart-btn">Играть снова</button>
-    </div>
+    <div id="info">Счет: 0 | Время: 60</div>
+    <script>
+        // 1. Создаем базовые элементы Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    <script src="game.js"></script>
+        // 2. Создаем игрока - ЗЕЛЕНЫЙ КУБ
+        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const player = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        player.position.y = 1;
+        scene.add(player);
+
+        // 3. Создаем кристаллы - КРАСНЫЕ ТРЕУГОЛЬНИКИ (пирамидки)
+        const crystals = [];
+        function createCrystal() {
+            const geometry = new THREE.ConeGeometry(0.5, 1, 3); // Треугольная пирамида
+            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const crystal = new THREE.Mesh(geometry, material);
+            
+            // Случайная позиция
+            crystal.position.x = (Math.random() - 0.5) * 15;
+            crystal.position.z = (Math.random() - 0.5) * 15;
+            crystal.position.y = 1;
+            
+            scene.add(crystal);
+            crystals.push(crystal);
+        }
+
+        // Создаем 5 кристаллов
+        for(let i = 0; i < 5; i++) {
+            createCrystal();
+        }
+
+        // 4. Создаем пол - СЕРЫЙ ПЛОСКИЙ КВАДРАТ
+        const floorGeometry = new THREE.PlaneGeometry(20, 20);
+        const floorMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x888888, 
+            side: THREE.DoubleSide 
+        });
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = Math.PI / 2; // Поворачиваем горизонтально
+        scene.add(floor);
+
+        // 5. Настраиваем камеру
+        camera.position.set(0, 5, 10);
+        camera.lookAt(0, 0, 0);
+
+        // 6. Переменные игры
+        let score = 0;
+        let gameTime = 60;
+        let gameActive = true;
+
+        // 7. Управление (клавиатура для ПК)
+        const playerSpeed = 0.2;
+        document.addEventListener('keydown', (event) => {
+            if(!gameActive) return;
+            
+            switch(event.key) {
+                case 'ArrowUp': player.position.z -= playerSpeed; break;
+                case 'ArrowDown': player.position.z += playerSpeed; break;
+                case 'ArrowLeft': player.position.x -= playerSpeed; break;
+                case 'ArrowRight': player.position.x += playerSpeed; break;
+            }
+        });
+
+        // 8. Игровая логика
+        function updateGame() {
+            if(!gameActive) return;
+            
+            // Проверяем столкновения с кристаллами
+            crystals.forEach((crystal, index) => {
+                // Вращаем кристалл
+                crystal.rotation.y += 0.03;
+                
+                // Проверка расстояния между игроком и кристаллом
+                const distance = Math.sqrt(
+                    Math.pow(player.position.x - crystal.position.x, 2) +
+                    Math.pow(player.position.z - crystal.position.z, 2)
+                );
+                
+                // Если игрок рядом с кристаллом
+                if(distance < 1.5) {
+                    scene.remove(crystal);
+                    crystals.splice(index, 1);
+                    score += 10;
+                    document.getElementById('info').textContent = `Счет: ${score} | Время: ${Math.ceil(gameTime)}`;
+                    createCrystal(); // Создаем новый кристалл
+                }
+            });
+            
+            // Обновляем таймер
+            gameTime -= 0.016; // Примерно 60fps
+            document.getElementById('info').textContent = `Счет: ${score} | Время: ${Math.ceil(gameTime)}`;
+            
+            // Конец игры
+            if(gameTime <= 0) {
+                gameActive = false;
+                document.getElementById('info').textContent = `Игра окончена! Счет: ${score}`;
+            }
+        }
+
+        // 9. Игровой цикл
+        function animate() {
+            requestAnimationFrame(animate);
+            updateGame();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 10. Адаптация под размер экрана
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
