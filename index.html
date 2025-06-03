@@ -3,177 +3,734 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cube Collector MVP</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style> 
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            font-family: Arial, sans-serif;
-        } 
+    <title>Minecraft-like Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+        
         #gameContainer {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            max-width: 1000px;
+            height: 90vh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
         }
-        #gameCanvas { 
-            display: block; 
+        
+        #gameCanvas {
+            display: block;
             width: 100%;
             height: 100%;
-            background: #000;
         }
+        
         #uiContainer {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            color: white;
-            text-shadow: 1px 1px 2px black;
+            padding: 20px;
             z-index: 10;
+            display: flex;
+            justify-content: space-between;
         }
-        .debug-info {
+        
+        .panel {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        #playerInfo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        #playerInfo h2 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+            color: #ffcc00;
+            text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+        }
+        
+        #stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stat {
+            background: rgba(50, 50, 70, 0.8);
+            padding: 8px 15px;
+            border-radius: 8px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4dff4d;
+        }
+        
+        #inventory {
+            display: flex;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             position: absolute;
-            bottom: 10px;
-            left: 10px;
-            color: white;
-            font-size: 12px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .inventory-slot {
+            width: 60px;
+            height: 60px;
+            background: rgba(100, 100, 120, 0.5);
+            border: 2px solid rgba(200, 200, 220, 0.3);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .inventory-slot:hover {
+            transform: scale(1.1);
+            border-color: #ffcc00;
+        }
+        
+        .inventory-slot.active {
+            border: 3px solid #ffcc00;
+            background: rgba(150, 150, 170, 0.7);
+            transform: scale(1.15);
+        }
+        
+        .block-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+        }
+        
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .crosshair-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .crosshair-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        #instructions {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 90%;
+        }
+        
+        #instructions h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .key {
+            display: inline-block;
+            background: rgba(50, 50, 70, 0.9);
+            padding: 3px 10px;
+            border-radius: 5px;
+            margin: 0 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-family: monospace;
+        }
+        
+        @media (max-width: 768px) {
+            #gameContainer {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .stat {
+                min-width: 80px;
+                padding: 6px 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .inventory-slot {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .block-preview {
+                width: 35px;
+                height: 35px;
+            }
+            
+            #instructions {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
+        
         <div id="uiContainer">
-            <div id="userName"></div>
-            <div id="scoreBoard">Счет: 0</div>
-            <div id="timer">30</div>
+            <div id="playerInfo" class="panel">
+                <h2>MINECRAFT-LIKE</h2>
+                <div id="stats">
+                    <div class="stat">
+                        <div>Блоки</div>
+                        <div id="blocksCount" class="stat-value">0</div>
+                    </div>
+                    <div class="stat">
+                        <div>Выбрано</div>
+                        <div id="selectedBlock" class="stat-value">Трава</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="debug-info">DEBUG: Инициализация...</div>
+        
+        <div id="crosshair">
+            <div class="crosshair-dot"></div>
+            <div class="crosshair-line" style="width: 15px; height: 2px; left: -15px; top: 50%;"></div>
+            <div class="crosshair-line" style="width: 15px; height: 2px; right: -15px; top: 50%;"></div>
+            <div class="crosshair-line" style="width: 2px; height: 15px; left: 50%; top: -15px;"></div>
+            <div class="crosshair-line" style="width: 2px; height: 15px; left: 50%; bottom: -15px;"></div>
+        </div>
+        
+        <div id="inventory">
+            <div class="inventory-slot active" data-block="grass">
+                <div class="block-preview" style="background: linear-gradient(135deg, #7cfc00, #5cb800);"></div>
+            </div>
+            <div class="inventory-slot" data-block="dirt">
+                <div class="block-preview" style="background: linear-gradient(135deg, #8b4513, #5d2e0c);"></div>
+            </div>
+            <div class="inventory-slot" data-block="stone">
+                <div class="block-preview" style="background: linear-gradient(135deg, #a9a9a9, #7a7a7a);"></div>
+            </div>
+            <div class="inventory-slot" data-block="wood">
+                <div class="block-preview" style="background: linear-gradient(135deg, #d2b48c, #a07850);"></div>
+            </div>
+            <div class="inventory-slot" data-block="sand">
+                <div class="block-preview" style="background: linear-gradient(135deg, #f0e68c, #d8c560);"></div>
+            </div>
+        </div>
+        
+        <div id="instructions" class="panel">
+            <h3>Управление</h3>
+            <p>Движение: <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span></p>
+            <p>Прыжок: <span class="key">ПРОБЕЛ</span> | Разрушить блок: <span class="key">ЛКМ</span> | Построить блок: <span class="key">ПКМ</span></p>
+        </div>
     </div>
-    <!-- Используем CDN вместо модулей для простоты -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <script>
-        // 1. Проверка загрузки Three.js
-        if(!window.THREE) {
-            document.querySelector('.debug-info').textContent = 'Ошибка: Three.js не загружен!';
+        // Проверка загрузки Three.js
+        if (!window.THREE) {
+            alert('Ошибка: Three.js не загружен!');
             throw new Error("Three.js not loaded");
         }
 
-        // 2. Инициализация Telegram Web App
-        const tg = window.Telegram && Telegram.WebApp;
-        if(!tg) {
-            document.querySelector('.debug-info').textContent = 'Ошибка: Telegram API не загружен!';
-        } else {
-            tg.ready();
-        }
-
-        // Элементы DOM
-        const userNameEl = document.getElementById('userName');
-        const scoreBoardEl = document.getElementById('scoreBoard');
-        const timerEl = document.getElementById('timer');
-        const canvas = document.getElementById('gameCanvas');
-        const debugInfo = document.querySelector('.debug-info');
-
-        // Проверка элементов
-        if(!canvas) {
-            debugInfo.textContent = 'Ошибка: Canvas не найден!';
-            throw new Error("Canvas element not found");
-        }
-
-        // 3. Покажем имя пользователя
-        if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            userNameEl.textContent = `Игрок: ${user.first_name || 'Аноним'}`;
-        } else {
-            userNameEl.textContent = 'Игрок: Демо-режим';
-        }
-
-        // 4. Настройка Three.js
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x222222);
+        // Основные переменные
+        let scene, camera, renderer;
+        let world = {};
+        let blocksCount = 0;
+        let selectedBlockType = 'grass';
+        let clock = new THREE.Clock();
+        let playerVelocity = new THREE.Vector3();
+        let playerDirection = new THREE.Vector3();
+        let moveForward = false;
+        let moveBackward = false;
+        let moveLeft = false;
+        let moveRight = false;
+        let canJump = true;
+        let prevTime = performance.now();
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let selectedBlock = null;
         
-        // Камера с хорошим обзором
-        const camera = new THREE.PerspectiveCamera(
-            60, 
-            window.innerWidth / window.innerHeight, 
-            0.1, 
-            1000
-        );
-        camera.position.set(0, 5, 10);
-        camera.lookAt(0, 0, 0);
-
-        const renderer = new THREE.WebGLRenderer({ 
-            canvas: canvas,
-            antialias: true,
-            alpha: false
-        });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        debugInfo.textContent = `WebGL: ${renderer.capabilities.isWebGL ? 'Да' : 'Нет'}, Three.js v${THREE.REVISION}`;
-
-        // 5. Освещение
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
+        // Материалы блоков
+        const blockMaterials = {
+            grass: new THREE.MeshLambertMaterial({ color: 0x7cfc00 }),
+            dirt: new THREE.MeshLambertMaterial({ color: 0x8b4513 }),
+            stone: new THREE.MeshLambertMaterial({ color: 0xa9a9a9 }),
+            wood: new THREE.MeshLambertMaterial({ color: 0xd2b48c }),
+            sand: new THREE.MeshLambertMaterial({ color: 0xf0e68c })
+        };
         
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(3, 10, 5);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
-
-        // 6. Пол
-        const floorGeometry = new THREE.PlaneGeometry(20, 20);
-        const floorMaterial = new THREE.MeshPhongMaterial({ 
-            color: 0x336633,
-            shininess: 30
-        });
-        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.rotation.x = -Math.PI / 2;
-        floor.position.y = -0.5;
-        scene.add(floor);
-
-        // 7. Добавим тестовый куб сразу
-        const testCubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const testCubeMaterial = new THREE.MeshPhongMaterial({ 
-            color: 0xff0000,
-            wireframe: false
-        });
-        const testCube = new THREE.Mesh(testCubeGeometry, testCubeMaterial);
-        testCube.position.set(0, 0.5, 0);
-        scene.add(testCube);
-        debugInfo.textContent += ' | Тестовый куб добавлен';
-
-        // 8. Игровые переменные
-        let score = 0;
-        let timeLeft = 30;
-        let gameActive = false;
-        const cubes = [];
-        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-
-        // 9. Функция анимации
-        function animate() {
-            requestAnimationFrame(animate);
+        // Инициализация сцены
+        function init() {
+            // Создание сцены
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
             
-            // Анимация тестового куба
-            testCube.rotation.x += 0.01;
-            testCube.rotation.y += 0.01;
+            // Создание камеры
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 0);
             
-            renderer.render(scene, camera);
+            // Создание рендерера
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('gameCanvas'),
+                antialias: true,
+                alpha: false
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            
+            // Освещение
+            const ambientLight = new THREE.AmbientLight(0x606060, 1.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 0.5).normalize();
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            // Создание мира
+            createWorld();
+            
+            // Обработчики событий
+            setupEventListeners();
+            
+            // Начало анимации
+            animate();
         }
-        animate();
-
-        // 10. Обработка ресайза
+        
+        // Создание игрового мира
+        function createWorld() {
+            // Создание земли
+            const groundSize = 30;
+            const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize);
+            const groundMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x3d8b3d,
+                side: THREE.DoubleSide
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -0.5;
+            ground.receiveShadow = true;
+            scene.add(ground);
+            
+            // Генерация случайного ландшафта
+            for (let x = -10; x <= 10; x++) {
+                for (let z = -10; z <= 10; z++) {
+                    // Основной слой земли
+                    if (Math.abs(x) < 8 && Math.abs(z) < 8) {
+                        addBlock(x, 0, z, 'dirt');
+                        
+                        // Слой травы сверху
+                        if (Math.random() > 0.3) {
+                            addBlock(x, 1, z, 'grass');
+                        }
+                        
+                        // Случайные деревья
+                        if (Math.random() > 0.95) {
+                            addTree(x, 2, z);
+                        }
+                        
+                        // Случайные камни
+                        if (Math.random() > 0.9) {
+                            addBlock(x, 1, z, 'stone');
+                        }
+                    }
+                    
+                    // Горы по краям
+                    if (Math.abs(x) > 7 || Math.abs(z) > 7) {
+                        const height = Math.floor(Math.random() * 3) + 1;
+                        for (let y = 0; y < height; y++) {
+                            addBlock(x, y, z, 'stone');
+                        }
+                    }
+                }
+            }
+            
+            // Добавление песка в центре
+            for (let x = -2; x <= 2; x++) {
+                for (let z = -2; z <= 2; z++) {
+                    if (getBlock(x, 1, z) && getBlock(x, 1, z).type !== 'stone') {
+                        removeBlock(x, 1, z);
+                        addBlock(x, 1, z, 'sand');
+                    }
+                }
+            }
+        }
+        
+        // Добавление блока
+        function addBlock(x, y, z, type) {
+            const key = `${x},${y},${z}`;
+            
+            // Проверка, существует ли уже блок на этой позиции
+            if (world[key]) return;
+            
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = blockMaterials[type];
+            const block = new THREE.Mesh(geometry, material);
+            
+            block.position.set(x, y, z);
+            block.castShadow = true;
+            block.receiveShadow = true;
+            block.type = type;
+            
+            scene.add(block);
+            world[key] = block;
+            blocksCount++;
+            
+            updateBlocksCount();
+        }
+        
+        // Удаление блока
+        function removeBlock(x, y, z) {
+            const key = `${x},${y},${z}`;
+            const block = world[key];
+            
+            if (block) {
+                scene.remove(block);
+                delete world[key];
+                blocksCount--;
+                
+                updateBlocksCount();
+            }
+        }
+        
+        // Получение блока по координатам
+        function getBlock(x, y, z) {
+            const key = `${x},${y},${z}`;
+            return world[key];
+        }
+        
+        // Добавление дерева
+        function addTree(x, y, z) {
+            // Ствол
+            for (let i = 0; i < 4; i++) {
+                addBlock(x, y + i, z, 'wood');
+            }
+            
+            // Листья (простая крона)
+            for (let dx = -2; dx <= 2; dx++) {
+                for (let dz = -2; dz <= 2; dz++) {
+                    for (let dy = 0; dy < 3; dy++) {
+                        // Пропустить углы для более круглой формы
+                        if (Math.abs(dx) === 2 && Math.abs(dz) === 2 && dy !== 1) continue;
+                        
+                        addBlock(x + dx, y + 3 + dy, z + dz, 'grass');
+                    }
+                }
+            }
+        }
+        
+        // Обновление счетчика блоков
+        function updateBlocksCount() {
+            document.getElementById('blocksCount').textContent = blocksCount;
+        }
+        
+        // Обновление выбранного блока
+        function updateSelectedBlock(type) {
+            document.getElementById('selectedBlock').textContent = getBlockName(type);
+        }
+        
+        // Получение имени блока
+        function getBlockName(type) {
+            const names = {
+                'grass': 'Трава',
+                'dirt': 'Земля',
+                'stone': 'Камень',
+                'wood': 'Дерево',
+                'sand': 'Песок'
+            };
+            return names[type] || type;
+        }
+        
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Управление клавиатурой
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+            
+            // Управление мышью
+            document.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mousemove', onMouseMove);
+            
+            // Выбор блока в инвентаре
+            const slots = document.querySelectorAll('.inventory-slot');
+            slots.forEach(slot => {
+                slot.addEventListener('click', () => {
+                    // Убрать активный класс со всех слотов
+                    slots.forEach(s => s.classList.remove('active'));
+                    // Добавить активный класс к выбранному слоту
+                    slot.classList.add('active');
+                    // Обновить выбранный тип блока
+                    selectedBlockType = slot.dataset.block;
+                    updateSelectedBlock(selectedBlockType);
+                });
+            });
+            
+            // Обработка изменения размера окна
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        // Обработка нажатия клавиш
+        function onKeyDown(event) {
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = true;
+                    break;
+                case 'KeyA':
+                    moveLeft = true;
+                    break;
+                case 'KeyS':
+                    moveBackward = true;
+                    break;
+                case 'KeyD':
+                    moveRight = true;
+                    break;
+                case 'Space':
+                    if (canJump) {
+                        playerVelocity.y = 0.15;
+                        canJump = false;
+                    }
+                    break;
+            }
+        }
+        
+        // Обработка отпускания клавиш
+        function onKeyUp(event) {
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = false;
+                    break;
+                case 'KeyA':
+                    moveLeft = false;
+                    break;
+                case 'KeyS':
+                    moveBackward = false;
+                    break;
+                case 'KeyD':
+                    moveRight = false;
+                    break;
+            }
+        }
+        
+        // Обработка движения мыши
+        function onMouseMove(event) {
+            // Обновление позиции мыши для raycasting
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+        
+        // Обработка кликов мыши
+        function onMouseDown(event) {
+            // Левый клик - разрушение блока
+            if (event.button === 0) {
+                destroyBlock();
+            }
+            // Правый клик - размещение блока
+            else if (event.button === 2) {
+                placeBlock();
+            }
+        }
+        
+        // Разрушение блока
+        function destroyBlock() {
+            // Настройка raycast
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(Object.values(world));
+            
+            if (intersects.length > 0) {
+                const block = intersects[0].object;
+                const position = block.position;
+                
+                removeBlock(position.x, position.y, position.z);
+            }
+        }
+        
+        // Размещение блока
+        function placeBlock() {
+            // Настройка raycast
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(Object.values(world));
+            
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                const normal = intersects[0].face.normal;
+                
+                // Вычисление позиции для нового блока
+                const newX = Math.round(point.x + normal.x * 0.5);
+                const newY = Math.round(point.y + normal.y * 0.5);
+                const newZ = Math.round(point.z + normal.z * 0.5);
+                
+                // Проверка, не занята ли позиция
+                if (!getBlock(newX, newY, newZ)) {
+                    addBlock(newX, newY, newZ, selectedBlockType);
+                }
+            }
+        }
+        
+        // Обработка изменения размера окна
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
-        window.addEventListener('resize', onWindowResize);
-
-        // 11. Отладка
-        console.log("Three.js initialized:", THREE);
-        console.log("Scene objects:", scene.children);
+        
+        // Обновление игрока
+        function updatePlayer(delta) {
+            // Гравитация
+            playerVelocity.y -= 0.01 * delta;
+            
+            // Движение игрока
+            const speed = 0.1 * delta;
+            playerDirection.z = Number(moveForward) - Number(moveBackward);
+            playerDirection.x = Number(moveRight) - Number(moveLeft);
+            playerDirection.normalize();
+            
+            if (moveForward || moveBackward) {
+                playerVelocity.z = playerDirection.z * speed;
+            }
+            if (moveLeft || moveRight) {
+                playerVelocity.x = playerDirection.x * speed;
+            }
+            
+            // Проверка коллизий
+            const newPos = new THREE.Vector3(
+                camera.position.x + playerVelocity.x,
+                camera.position.y + playerVelocity.y,
+                camera.position.z + playerVelocity.z
+            );
+            
+            // Проверка коллизий по вертикали
+            if (playerVelocity.y < 0) {
+                const floorY = Math.floor(newPos.y);
+                if (getBlock(Math.floor(newPos.x), floorY, Math.floor(newPos.z))) {
+                    playerVelocity.y = 0;
+                    newPos.y = floorY + 1;
+                    canJump = true;
+                }
+            }
+            
+            // Проверка коллизий по горизонтали
+            if (playerVelocity.x !== 0) {
+                const checkX = Math.floor(newPos.x + (playerVelocity.x > 0 ? 0.4 : -0.4));
+                if (getBlock(checkX, Math.floor(newPos.y), Math.floor(newPos.z)) ||
+                    getBlock(checkX, Math.floor(newPos.y) - 1, Math.floor(newPos.z))) {
+                    playerVelocity.x = 0;
+                }
+            }
+            
+            if (playerVelocity.z !== 0) {
+                const checkZ = Math.floor(newPos.z + (playerVelocity.z > 0 ? 0.4 : -0.4));
+                if (getBlock(Math.floor(newPos.x), Math.floor(newPos.y), checkZ) ||
+                    getBlock(Math.floor(newPos.x), Math.floor(newPos.y) - 1, checkZ)) {
+                    playerVelocity.z = 0;
+                }
+            }
+            
+            // Обновление позиции камеры
+            camera.position.add(playerVelocity);
+            
+            // Затухание скорости
+            playerVelocity.x *= 0.9;
+            playerVelocity.z *= 0.9;
+            
+            // Ограничение игрока в пределах мира
+            camera.position.x = Math.max(-14, Math.min(14, camera.position.x));
+            camera.position.z = Math.max(-14, Math.min(14, camera.position.z));
+        }
+        
+        // Анимация
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = Math.min(clock.getDelta(), 0.1) * 60;
+            
+            // Обновление позиции игрока
+            updatePlayer(delta);
+            
+            // Обновление raycast
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(Object.values(world));
+            
+            // Подсветка выбранного блока
+            if (selectedBlock) {
+                selectedBlock.material.emissive.setHex(0x000000);
+            }
+            
+            if (intersects.length > 0) {
+                selectedBlock = intersects[0].object;
+                selectedBlock.material.emissive.setHex(0x333333);
+            } else {
+                selectedBlock = null;
+            }
+            
+            // Вращение солнца
+            const time = Date.now() * 0.0001;
+            const light = scene.children.find(obj => obj instanceof THREE.DirectionalLight);
+            if (light) {
+                light.position.x = Math.sin(time) * 10;
+                light.position.y = Math.cos(time) * 10;
+                light.position.z = Math.cos(time) * 10;
+            }
+            
+            // Рендер сцены
+            renderer.render(scene, camera);
+        }
+        
+        // Инициализация игры при загрузке
+        window.addEventListener('load', () => {
+            init();
+            updateSelectedBlock(selectedBlockType);
+            
+            // Предотвращение контекстного меню
+            document.addEventListener('contextmenu', event => event.preventDefault());
+        });
     </script>
 </body>
 </html>
