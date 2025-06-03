@@ -247,7 +247,6 @@
         let obstacleFrequency = 120; // кадры между препятствиями
         let frameCount = 0;
         let playerState = 'running'; // running, jumping, sliding
-        let textures = {};
         
         // Инициализация Three.js
         function init() {
@@ -269,9 +268,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.shadowMap.enabled = true;
-            
-            // Загружаем текстуры
-            loadTextures();
             
             // Добавляем освещение
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -296,72 +292,6 @@
             
             // Начинаем игровой цикл
             animate();
-        }
-        
-        // Загрузка текстур
-        function loadTextures() {
-            const textureLoader = new THREE.TextureLoader();
-            
-            // Создаем простые текстуры с помощью Canvas
-            textures.grass = createGrassTexture();
-            textures.asphalt = createAsphaltTexture();
-            textures.wood = createWoodTexture();
-            textures.metal = createMetalTexture();
-        }
-        
-        function createGrassTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 256;
-            canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            
-            // Основа - зеленый
-            ctx.fillStyle = '#2E8B57';
-            ctx.fillRect(0, 0, 256, 256);
-            
-            // Травинки
-            ctx.strokeStyle = '#3CB371';
-            ctx.lineWidth = 2;
-            for(let i = 0; i < 100; i++) {
-                ctx.beginPath();
-                const x = Math.random() * 256;
-                const y = Math.random() * 256;
-                ctx.moveTo(x, y);
-                ctx.lineTo(x + (Math.random()-0.5)*10, y + 10 + Math.random()*20);
-                ctx.stroke();
-            }
-            
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(20, 2);
-            return texture;
-        }
-        
-        function createAsphaltTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 256;
-            canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            
-            // Серый фон
-            ctx.fillStyle = '#555555';
-            ctx.fillRect(0, 0, 256, 256);
-            
-            // Камни/зернистость
-            ctx.fillStyle = '#444444';
-            for(let i = 0; i < 500; i++) {
-                const x = Math.random() * 256;
-                const y = Math.random() * 256;
-                const size = 1 + Math.random()*3;
-                ctx.fillRect(x, y, size, size);
-            }
-            
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(10, 1);
-            return texture;
         }
         
         // Создание игрока
@@ -398,7 +328,7 @@
             // Основная земля (трава)
             const groundGeometry = new THREE.PlaneGeometry(100, 20);
             const groundMaterial = new THREE.MeshPhongMaterial({ 
-                map: textures.grass,
+                color: 0x2E8B57,
                 side: THREE.DoubleSide
             });
             const ground = new THREE.Mesh(groundGeometry, groundMaterial);
@@ -412,7 +342,7 @@
             // Дорожка (асфальт)
             const roadGeometry = new THREE.PlaneGeometry(4, 100);
             const roadMaterial = new THREE.MeshPhongMaterial({ 
-                map: textures.asphalt,
+                color: 0x555555,
                 side: THREE.DoubleSide
             });
             const road = new THREE.Mesh(roadGeometry, roadMaterial);
