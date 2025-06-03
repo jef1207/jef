@@ -1,214 +1,1300 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VideoSender MiniApp</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    
-    .shape-container {
-      display: flex;
-      gap: 30px;
-      margin: 30px 0;
-    }
-    
-    .shape-btn {
-      width: 80px;
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    
-    .shape-btn:hover {
-      transform: scale(1.1);
-    }
-    
-    .circle {
-      border-radius: 50%;
-      background: #FF5252;
-    }
-    
-    .triangle {
-      width: 0;
-      height: 0;
-      border-left: 40px solid transparent;
-      border-right: 40px solid transparent;
-      border-bottom: 70px solid #4CAF50;
-    }
-    
-    .square {
-      background: #FFC107;
-    }
-    
-    #videoPreview {
-      width: 100%;
-      max-width: 400px;
-      background: black;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-    
-    .timer {
-      font-size: 24px;
-      margin: 15px 0;
-    }
-    
-    .send-btn {
-      background: #7c4dff;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 25px;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Color Burst - Улучшенная Telegram Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 15px;
+            perspective: 1000px;
+            position: relative;
+        }
+        
+        .background-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle-bg {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(20px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(25, 25, 50, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            transform-style: preserve-3d;
+            animation: containerAppear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: background 1s ease;
+        }
+        
+        @keyframes containerAppear {
+            0% { transform: translateY(50px) rotateX(20deg); opacity: 0; }
+            100% { transform: translateY(0) rotateX(0); opacity: 1; }
+        }
+        
+        .game-header {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+        
+        .title-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 200, 255, 0.8);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 200, 255, 0.6); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 200, 255, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 200, 255, 0.6); }
+        }
+        
+        .score-container {
+            background: linear-gradient(45deg, #ff4081, #e040fb);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px rgba(224, 64, 251, 0.5);
+        }
+        
+        .score-label {
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .score-value {
+            background: white;
+            color: #ff4081;
+            font-weight: bold;
+            font-size: 22px;
+            width: 50px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-area {
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .target {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6),
+                        inset 0 0 15px rgba(255, 255, 255, 0.9);
+            animation: targetAppear 0.3s ease-out;
+            font-size: 32px;
+            text-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+        }
+        
+        .target[data-clicked="true"] {
+            pointer-events: none !important;
+        }
+        
+        .bomb {
+            background: radial-gradient(circle at 30% 30%, #fff, #212121) !important;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.8),
+                        inset 0 0 15px rgba(255, 255, 255, 0.9) !important;
+            animation: bombPulse 1.5s infinite;
+        }
+        
+        @keyframes bombPulse {
+            0% { transform: scale(1); box-shadow: 0 0 25px rgba(255, 0, 0, 0.8); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 0, 0, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 25px rgba(255, 0, 0, 0.8); }
+        }
+        
+        .bonus {
+            animation: bonusGlow 2s infinite;
+        }
+        
+        @keyframes bonusGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.7); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 1); }
+            100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.7); }
+        }
+        
+        @keyframes targetAppear {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .game-controls {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .control-btn:active::after {
+            opacity: 1;
+        }
+        
+        .play-btn {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.5);
+        }
+        
+        .pause-btn {
+            background: linear-gradient(45deg, #ff9800, #ffc107);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.5);
+        }
+        
+        .restart-btn {
+            background: linear-gradient(45deg, #f44336, #e91e63);
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.5);
+        }
+        
+        .instructions {
+            padding: 15px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.5;
+            font-size: 15px;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.8;
+            z-index: 5;
+            animation: particleAnimation 0.8s forwards;
+        }
+        
+        @keyframes particleAnimation {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+            }
+        }
+        
+        .explosion-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+            animation: explosionAnimation 0.8s forwards;
+        }
+        
+        @keyframes explosionAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+        
+        .game-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 25px 45px;
+            border-radius: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 15;
+            display: none;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            animation: messageAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            min-width: 300px;
+        }
+        
+        @keyframes messageAppear {
+            0% { transform: translate(-50%, -30%); opacity: 0; }
+            100% { transform: translate(-50%, -50%); opacity: 1; }
+        }
+        
+        .level-indicator {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        .telegram-watermark {
+            position: absolute;
+            bottom: 12px;
+            right: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            z-index: 5;
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            position: relative;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .sound-toggle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        
+        .lives-container {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        
+        .life {
+            width: 28px;
+            height: 28px;
+            color: #ff4081;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+        
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            z-index: 12;
+            opacity: 0;
+            pointer-events: none;
+            animation: comboPulse 1s ease-out;
+        }
+        
+        @keyframes comboPulse {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+        
+        .achievement {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateX(120%);
+            transition: transform 0.5s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        
+        .achievement.show {
+            transform: translateX(0);
+        }
+        
+        .powerup-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .powerup {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .powerup::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 255, 0, 0.5);
+            transform: translateY(100%);
+            transition: transform linear;
+        }
+        
+        .combo-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 10;
+        }
+        
+        .combo-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ff00, #ffd700);
+            transition: width 0.3s ease;
+        }
+        
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .mode-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+        
+        @media (max-width: 450px) {
+            .game-area {
+                height: 350px;
+            }
+            
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            
+            .game-title {
+                font-size: 20px;
+            }
+            
+            .sound-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .stat-value {
+                font-size: 18px;
+            }
+            
+            .game-message {
+                font-size: 24px;
+                padding: 20px 30px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Геометрический видеосендер</h1>
-  
-  <div class="shape-container">
-    <div class="shape-btn circle" id="circleBtn">●</div>
-    <div class="shape-btn triangle" id="triangleBtn"></div>
-    <div class="shape-btn square" id="squareBtn">◼</div>
-  </div>
-  
-  <video id="videoPreview" muted playsinline></video>
-  
-  <div class="timer" id="timer">00:00</div>
-  
-  <button class="send-btn" id="sendBtn" disabled>Отправить видео</button>
+    <div class="background-particles" id="bgParticles"></div>
+    
+    <div class="game-container">
+        <div class="combo-bar">
+            <div class="combo-fill" id="comboFill"></div>
+        </div>
+        
+        <div class="game-header">
+            <div class="game-title">
+                <div class="title-icon">⚡</div>
+                <span>COLOR BURST PRO</span>
+            </div>
+            <div class="header-right">
+                <div class="score-container">
+                    <span class="score-label">SCORE:</span>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="sound-toggle" id="soundToggle">🔊</div>
+            </div>
+        </div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="classic">Классический</button>
+            <button class="mode-btn" data-mode="survival">Выживание</button>
+            <button class="mode-btn" data-mode="time">На время</button>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-label">УРОВЕНЬ</span>
+                <span class="stat-value" id="level">1</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">МИШЕНИ</span>
+                <span class="stat-value" id="targets">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">ВРЕМЯ</span>
+                <span class="stat-value" id="time">60</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">КОМБО</span>
+                <span class="stat-value" id="combo">1x</span>
+            </div>
+        </div>
+        
+        <div class="lives-container" id="livesContainer">
+            <div class="life">❤️</div>
+            <div class="life">❤️</div>
+            <div class="life">❤️</div>
+        </div>
+        
+        <div class="powerup-indicator" id="powerupIndicator"></div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="game-message" id="gameMessage">НАЖМИТЕ ИГРАТЬ ДЛЯ СТАРТА</div>
+            <div class="telegram-watermark">Telegram Game</div>
+            <div class="combo-display" id="comboDisplay"></div>
+        </div>
+        
+        <div class="instructions">
+            Кликайте на цветные круги! Избегайте бомб 💣. Собирайте бонусы: 💎 (+10 очков), ❤️ (+жизнь), ⏱️ (+время)
+        </div>
+        
+        <div class="game-controls">
+            <button class="control-btn play-btn" id="playBtn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="control-btn pause-btn" id="pauseBtn">
+                <i class="fas fa-pause"></i>
+            </button>
+            <button class="control-btn restart-btn" id="restartBtn">
+                <i class="fas fa-redo"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="achievement" id="achievement">
+        <i class="fas fa-trophy"></i>
+        <span id="achievementText">Достижение получено!</span>
+    </div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    
-    const videoElement = document.getElementById('videoPreview');
-    const timerElement = document.getElementById('timer');
-    const sendBtn = document.getElementById('sendBtn');
-    
-    let mediaRecorder;
-    let recordedChunks = [];
-    let timerInterval;
-    let seconds = 0;
-    
-    // Доступ к камере
-    async function initCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: true, 
-          audio: true 
-        });
-        videoElement.srcObject = stream;
-      } catch (err) {
-        console.error("Camera error:", err);
-        tg.showPopup({ title: "Ошибка", message: "Доступ к камере запрещен" });
-      }
-    }
-    
-    // Начать запись
-    function startRecording(shape) {
-      if (!videoElement.srcObject) return;
-      
-      recordedChunks = [];
-      seconds = 0;
-      updateTimer();
-      
-      mediaRecorder = new MediaRecorder(videoElement.srcObject);
-      
-      mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) recordedChunks.push(e.data);
-      };
-      
-      mediaRecorder.onstop = () => {
-        sendBtn.disabled = false;
-      };
-      
-      mediaRecorder.start();
-      
-      // Таймер
-      timerInterval = setInterval(() => {
-        seconds++;
-        updateTimer();
-      }, 1000);
-      
-      // Визуальный эффект
-      document.body.style.background = shape === 'circle' 
-        ? 'linear-gradient(135deg, #ff5252 0%, #ff7675 100%)'
-        : shape === 'triangle'
-          ? 'linear-gradient(135deg, #4CAF50 0%, #81C784 100%)'
-          : 'linear-gradient(135deg, #FFC107 0%, #FFD54F 100%)';
-    }
-    
-    // Остановить запись
-    function stopRecording() {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-        clearInterval(timerInterval);
-      }
-    }
-    
-    // Обновить таймер
-    function updateTimer() {
-      const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-      const secs = (seconds % 60).toString().padStart(2, '0');
-      timerElement.textContent = `${mins}:${secs}`;
-    }
-    
-    // Отправить видео
-    async function sendVideo() {
-      tg.showPopup({ 
-        title: "Отправка", 
-        message: "Видео отправляется..." 
-      }, () => {});
-      
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
-      
-      // Создаем временную ссылку
-      const url = URL.createObjectURL(blob);
-      
-      // Отправляем через Telegram API
-      tg.sendData(JSON.stringify({
-        type: 'video',
-        content: url,
-        timestamp: Date.now()
-      }));
-      
-      // Очищаем ресурсы
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-        tg.close();
-      }, 3000);
-    }
-    
-    // Инициализация
-    initCamera();
-    
-    // Назначение обработчиков
-    document.getElementById('circleBtn').addEventListener('click', () => startRecording('circle'));
-    document.getElementById('triangleBtn').addEventListener('click', () => startRecording('triangle'));
-    document.getElementById('squareBtn').addEventListener('click', () => startRecording('square'));
-    
-    document.addEventListener('mouseup', stopRecording);
-    document.addEventListener('touchend', stopRecording);
-    
-    sendBtn.addEventListener('click', sendVideo);
-  </script>
+    <script>
+        // Инициализация игры только после взаимодействия с пользователем
+        let gameInitialized = false;
+        
+        // Функция для инициализации игры
+        function initGame() {
+            if (gameInitialized) return;
+            gameInitialized = true;
+            
+            // Создание фоновых частиц
+            createBackgroundParticles();
+            
+            // Элементы DOM
+            const gameArea = document.getElementById('gameArea');
+            const scoreDisplay = document.getElementById('score');
+            const levelDisplay = document.getElementById('level');
+            const targetsDisplay = document.getElementById('targets');
+            const timeDisplay = document.getElementById('time');
+            const comboDisplay = document.getElementById('combo');
+            const comboValue = document.getElementById('comboDisplay');
+            const comboFill = document.getElementById('comboFill');
+            const gameMessage = document.getElementById('gameMessage');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            const soundToggle = document.getElementById('soundToggle');
+            const livesContainer = document.getElementById('livesContainer');
+            const achievement = document.getElementById('achievement');
+            const achievementText = document.getElementById('achievementText');
+            const powerupIndicator = document.getElementById('powerupIndicator');
+            const bgParticles = document.getElementById('bgParticles');
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            
+            // Игровые переменные
+            let score = 0;
+            let level = 1;
+            let targetsClicked = 0;
+            let gameActive = false;
+            let gameSpeed = 1500;
+            let gameTime = 60;
+            let targetTimer;
+            let gameTimer;
+            let timeTimer;
+            let targets = [];
+            let nextLevelThreshold = 15;
+            let soundEnabled = true;
+            let lives = 3;
+            let comboCount = 0;
+            let comboMultiplier = 1;
+            let comboTimeout;
+            let slowMotionActive = false;
+            let doublePointsActive = false;
+            let gameMode = 'classic';
+            let achievements = {
+                firstBlood: false,
+                bombSurvivor: false,
+                comboMaster: false,
+                levelUp: false,
+                bonusCollector: false
+            };
+            
+            const colors = [
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF5252)', icon: '❤️', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF4081)', icon: '⭐', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #E040FB)', icon: '💎', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #7C4DFF)', icon: '🌙', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #448AFF)', icon: '☁️', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #18FFFF)', icon: '❄️', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #64FFDA)', icon: '🍃', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #69F0AE)', icon: '🍎', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #B2FF59)', icon: '🍋', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #EEFF41)', icon: '☀️', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFFF00)', icon: '⚡', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFD740)', icon: '🔥', type: 'normal'},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFAB40)', icon: '🥕', type: 'normal'}
+            ];
+            
+            // Бонусы
+            const bonuses = [
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FFD700)', icon: '💎', type: 'diamond', points: 10},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #FF4081)', icon: '❤️', type: 'heart', points: 0},
+                {bg: 'radial-gradient(circle at 30% 30%, #fff, #00BFFF)', icon: '⏱️', type: 'time', points: 5}
+            ];
+            
+            // Бомбочка
+            const bomb = {
+                bg: 'radial-gradient(circle at 30% 30%, #fff, #212121)',
+                icon: '💣',
+                type: 'bomb'
+            };
+            
+            // Звуки
+            const popSound = new Audio();
+            popSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/zvyk.mp3';
+            popSound.preload = 'auto';
+            popSound.volume = 0.4;
+            
+            const bombSound = new Audio();
+            bombSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/explosion.mp3';
+            bombSound.preload = 'auto';
+            bombSound.volume = 0.6;
+            
+            const bonusSound = new Audio();
+            bonusSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/bonus.mp3';
+            bonusSound.preload = 'auto';
+            bonusSound.volume = 0.5;
+            
+            const levelUpSound = new Audio();
+            levelUpSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/levelup.mp3';
+            levelUpSound.preload = 'auto';
+            levelUpSound.volume = 0.5;
+            
+            // Инициализация игры
+            function initGameSession() {
+                score = 0;
+                level = 1;
+                targetsClicked = 0;
+                nextLevelThreshold = 15;
+                gameTime = 60;
+                lives = 3;
+                comboCount = 0;
+                comboMultiplier = 1;
+                slowMotionActive = false;
+                doublePointsActive = false;
+                
+                scoreDisplay.textContent = score;
+                levelDisplay.textContent = level;
+                targetsDisplay.textContent = targetsClicked;
+                timeDisplay.textContent = gameTime;
+                comboDisplay.textContent = comboMultiplier.toFixed(1) + 'x';
+                comboFill.style.width = '0%';
+                gameActive = true;
+                gameMessage.style.display = 'none';
+                
+                // Обновление жизней
+                updateLives();
+                
+                // Очистка игровой области
+                gameArea.querySelectorAll('.target').forEach(t => t.remove());
+                targets = [];
+                
+                // Очистка индикаторов бонусов
+                powerupIndicator.innerHTML = '';
+                
+                // Запуск таймеров
+                startGameTimers();
+                
+                // Обновление фона
+                updateBackground();
+            }
+            
+            // Создание фоновых частиц
+            function createBackgroundParticles() {
+                const container = bgParticles;
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle-bg';
+                    
+                    const size = Math.random() * 20 + 5;
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    const delay = Math.random() * 15;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    particle.style.opacity = Math.random() * 0.3 + 0.1;
+                    particle.style.animationDelay = `${delay}s`;
+                    
+                    container.appendChild(particle);
+                }
+            }
+            
+            // Обновление фона в зависимости от счета
+            function updateBackground() {
+                const hue = (score * 0.1) % 360;
+                document.body.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 15%), hsl(${hue + 60}, 70%, 20%), hsl(${hue + 120}, 70%, 25%))`;
+            }
+            
+            // Запуск игровых таймеров
+            function startGameTimers() {
+                // Таймер создания мишеней
+                targetTimer = setInterval(createTarget, gameSpeed);
+                
+                // Таймер времени игры
+                timeTimer = setInterval(() => {
+                    if (!gameActive) return;
+                    
+                    gameTime--;
+                    timeDisplay.textContent = gameTime;
+                    
+                    if (gameTime <= 0) {
+                        endGame('time');
+                    }
+                }, 1000);
+            }
+            
+            // Создание мишени (или бомбочки)
+            function createTarget() {
+                if (!gameActive) return;
+                
+                const target = document.createElement('div');
+                target.className = 'target';
+                target.dataset.clicked = 'false';
+                
+                // Случайный размер (от 60 до 90 пикселей)
+                const size = Math.floor(Math.random() * 30) + 60;
+                target.style.width = `${size}px`;
+                target.style.height = `${size}px`;
+                
+                // Случайная позиция в пределах игрового поля
+                const maxX = gameArea.offsetWidth - size;
+                const maxY = gameArea.offsetHeight - size;
+                const x = Math.floor(Math.random() * maxX);
+                const y = Math.floor(Math.random() * maxY);
+                target.style.left = `${x}px`;
+                target.style.top = `${y}px`;
+                
+                // Определяем тип объекта
+                let targetType;
+                const rand = Math.random();
+                
+                if (rand < 0.08) { // 8% бомбочка
+                    targetType = bomb;
+                    target.classList.add('bomb');
+                } else if (rand < 0.15) { // 7% бонус
+                    targetType = bonuses[Math.floor(Math.random() * bonuses.length)];
+                    target.classList.add('bonus');
+                } else { // 85% обычная мишень
+                    targetType = colors[Math.floor(Math.random() * colors.length)];
+                }
+                
+                target.style.background = targetType.bg;
+                target.innerHTML = targetType.icon;
+                target.dataset.type = targetType.type;
+                
+                // Время жизни мишени
+                let lifeTime = Math.max(500, 3000 - (level * 150));
+                if (slowMotionActive) lifeTime *= 1.5;
+                
+                // Добавляем мишень в игровую область
+                gameArea.appendChild(target);
+                targets.push(target);
+                
+                // Удаление мишени через время жизни
+                setTimeout(() => {
+                    if (target.parentNode && gameActive) {
+                        animateDisappearance(target);
+                        gameArea.removeChild(target);
+                        targets = targets.filter(t => t !== target);
+                    }
+                }, lifeTime);
+                
+                // Обработчик клика
+                target.addEventListener('click', () => {
+                    if (!gameActive || target.dataset.clicked === 'true') return;
+                    
+                    // Помечаем мишень как обработанную
+                    target.dataset.clicked = 'true';
+                    
+                    // Проверяем тип мишени
+                    const type = target.dataset.type;
+                    
+                    // Бомбочка
+                    if (type === 'bomb') {
+                        if (soundEnabled) {
+                            bombSound.currentTime = 0;
+                            bombSound.play().catch(e => console.log("Bomb sound error:", e));
+                        }
+                        
+                        createExplosion(target);
+                        gameArea.classList.add('shake');
+                        setTimeout(() => gameArea.classList.remove('shake'), 500);
+                        
+                        lives--;
+                        updateLives();
+                        
+                        if (lives <= 0) {
+                            endGame('bomb');
+                        }
+                        
+                        // Достижение: Уничтожение бомбы
+                        if (!achievements.bombSurvivor) {
+                            achievements.bombSurvivor = true;
+                            showAchievement("Бомбоубежище!", "Избежали 5 бомб");
+                        }
+                        
+                        return;
+                    }
+                    
+                    // Бонусы
+                    if (type === 'diamond' || type === 'heart' || type === 'time') {
+                        if (soundEnabled) {
+                            bonusSound.currentTime = 0;
+                            bonusSound.play().catch(e => console.log("Bonus sound error:", e));
+                        }
+                        
+                        // Обработка бонусов
+                        if (type === 'diamond') {
+                            score += 10;
+                            // Достижение: Коллектор бонусов
+                            if (!achievements.bonusCollector) {
+                                achievements.bonusCollector = true;
+                                showAchievement("Коллектор!", "Собрали 5 бонусов");
+                            }
+                        } else if (type === 'heart' && lives < 3) {
+                            lives++;
+                            updateLives();
+                        } else if (type === 'time') {
+                            gameTime += 5;
+                        }
+                        
+                        createParticles(target, true);
+                        scoreDisplay.textContent = score;
+                        
+                        setTimeout(() => {
+                            if (target.parentNode) {
+                                gameArea.removeChild(target);
+                                targets = targets.filter(t => t !== target);
+                            }
+                        }, 300);
+                        
+                        return;
+                    }
+                    
+                    // Обычная мишень
+                    
+                    // Увеличиваем счет
+                    let points = level;
+                    if (doublePointsActive) points *= 2;
+                    
+                    score += points * comboMultiplier;
+                    targetsClicked++;
+                    scoreDisplay.textContent = score;
+                    targetsDisplay.textContent = targetsClicked;
+                    
+                    // Обновляем фон
+                    updateBackground();
+                    
+                    // Проверка повышения уровня
+                    if (score >= nextLevelThreshold) {
+                        increaseLevel();
+                        nextLevelThreshold += 15;
+                    }
+                    
+                    // Система комбо
+                    comboCount++;
+                    clearTimeout(comboTimeout);
+                    comboFill.style.width = `${Math.min(100, comboCount * 10)}%`;
+                    
+                    comboTimeout = setTimeout(() => {
+                        comboCount = 0;
+                        comboMultiplier = 1;
+                        comboDisplay.textContent = comboMultiplier.toFixed(1) + 'x';
+                        comboFill.style.width = '0%';
+                    }, 2000);
+                    
+                    if (comboCount >= 5) {
+                        comboMultiplier = Math.min(5, comboMultiplier + 0.5);
+                        comboCount = 0;
+                        showCombo();
+                        
+                        // Достижение: Мастер комбо
+                        if (comboMultiplier >= 3 && !achievements.comboMaster) {
+                            achievements.comboMaster = true;
+                            showAchievement("Комбомастер!", "Достигли комбо 3x");
+                        }
+                    }
+                    
+                    comboDisplay.textContent = comboMultiplier.toFixed(1) + 'x';
+                    
+                    // Достижение: Первая кровь
+                    if (!achievements.firstBlood) {
+                        achievements.firstBlood = true;
+                        showAchievement("Первая кровь!", "Ваша первая мишень");
+                    }
+                    
+                    // Воспроизводим звук
+                    if (soundEnabled) {
+                        popSound.currentTime = 0;
+                        popSound.play().catch(e => console.log("Audio play error:", e));
+                    }
+                    
+                    // Создаем эффект частиц
+                    createParticles(target);
+                    
+                    // Анимация при клике
+                    target.style.transform = 'scale(1.2)';
+                    target.style.opacity = '0.7';
+                    
+                    // Удаляем мишень
+                    setTimeout(() => {
+                        if (target.parentNode) {
+                            gameArea.removeChild(target);
+                            targets = targets.filter(t => t !== target);
+                        }
+                    }, 300);
+                }, { once: true });
+            }
+            
+            // Создание эффекта частиц
+            function createParticles(target, isBonus = false) {
+                const rect = target.getBoundingClientRect();
+                const gameAreaRect = gameArea.getBoundingClientRect();
+                
+                const centerX = rect.left - gameAreaRect.left + rect.width / 2;
+                const centerY = rect.top - gameAreaRect.top + rect.height / 2;
+                const color = window.getComputedStyle(target).background;
+                
+                // Количество частиц
+                const count = isBonus ? 15 : 10;
+                
+                for (let i = 0; i < count; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const size = Math.random() * 12 + 4;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    particle.style.background = color;
+                    
+                    particle.style.left = `${centerX}px`;
+                    particle.style.top = `${centerY}px`;
+                    
+                    gameArea.appendChild(particle);
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 80 + 40;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    particle.style.setProperty('--tx', `${tx}px`);
+                    particle.style.setProperty('--ty', `${ty}px`);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 800);
+                }
+            }
+            
+            // Создание эффекта взрыва для бомбочки
+            function createExplosion(target) {
+                const rect = target.getBoundingClientRect();
+                const gameAreaRect = gameArea.getBoundingClientRect();
+                
+                const centerX = rect.left - gameAreaRect.left + rect.width / 2;
+                const centerY = rect.top - gameAreaRect.top + rect.height / 2;
+                
+                for (let i = 0; i < 25; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'explosion-particle';
+                    
+                    const size = Math.random() * 20 + 10;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    const explosionColors = ['#212121', '#ff0000', '#ff7700', '#ffaa00'];
+                    particle.style.background = explosionColors[Math.floor(Math.random() * explosionColors.length)];
+                    
+                    particle.style.left = `${centerX}px`;
+                    particle.style.top = `${centerY}px`;
+                    
+                    gameArea.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 800);
+                }
+            }
+            
+            // Анимация исчезновения мишени
+            function animateDisappearance(target) {
+                target.style.transform = 'scale(0)';
+                target.style.opacity = '0';
+                target.style.transition = 'all 0.3s ease-out';
+            }
+            
+            // Обновление отображения жизней
+            function updateLives() {
+                const livesEl = livesContainer.querySelectorAll('.life');
+                livesEl.forEach((life, index) => {
+                    if (index < lives) {
+                        life.style.display = 'flex';
+                    } else {
+                        life.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Показать комбо
+            function showCombo() {
+                comboValue.textContent = comboMultiplier.toFixed(1) + 'x COMBO!';
+                comboValue.style.opacity = '1';
+                comboValue.style.animation = 'none';
+                void comboValue.offsetWidth; // Trigger reflow
+                comboValue.style.animation = 'comboPulse 1s ease-out';
+            }
+            
+            // Показать достижение
+            function showAchievement(title, text) {
+                achievementText.textContent = title;
+                achievement.querySelector('span:last-child').textContent = text;
+                achievement.classList.add('show');
+                
+                setTimeout(() => {
+                    achievement.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Увеличение уровня
+            function increaseLevel() {
+                level++;
+                levelDisplay.textContent = level;
+                
+                // Эффект
+                if (soundEnabled) {
+                    levelUpSound.currentTime = 0;
+                    levelUpSound.play();
+                }
+                
+                // Достижение: Повышение уровня
+                if (level >= 3 && !achievements.levelUp) {
+                    achievements.levelUp = true;
+                    showAchievement("Повышение!", "Достигли 3 уровня");
+                }
+                
+                // Увеличиваем скорость игры
+                clearInterval(targetTimer);
+                gameSpeed = Math.max(400, 1500 - (level * 100));
+                targetTimer = setInterval(createTarget, gameSpeed);
+                
+                // Визуальный эффект
+                gameArea.style.boxShadow = 'inset 0 0 50px gold, 0 0 50px gold';
+                setTimeout(() => {
+                    gameArea.style.boxShadow = '';
+                }, 1000);
+            }
+            
+            // Конец игры
+            function endGame(reason) {
+                gameActive = false;
+                clearInterval(targetTimer);
+                if (timeTimer) clearInterval(timeTimer);
+                
+                // Удаляем все мишени с анимацией
+                targets.forEach(target => {
+                    animateDisappearance(target);
+                    setTimeout(() => {
+                        if (target.parentNode) {
+                            gameArea.removeChild(target);
+                        }
+                    }, 300);
+                });
+                targets = [];
+                
+                // Показываем сообщение
+                if (reason === 'bomb') {
+                    gameMessage.innerHTML = `БОМБА! ИГРА ОКОНЧЕНА<br>СЧЕТ: ${score}`;
+                } else {
+                    gameMessage.innerHTML = `ВРЕМЯ ВЫШЛО!<br>СЧЕТ: ${score}`;
+                }
+                gameMessage.style.display = 'block';
+            }
+            
+            // Обработчики кнопок
+            playBtn.addEventListener('click', () => {
+                if (!gameActive) {
+                    initGameSession();
+                }
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                if (gameActive) {
+                    gameActive = false;
+                    clearInterval(targetTimer);
+                    if (timeTimer) clearInterval(timeTimer);
+                    gameMessage.textContent = 'ПАУЗА';
+                    gameMessage.style.display = 'block';
+                } else {
+                    gameActive = true;
+                    gameMessage.style.display = 'none';
+                    startGameTimers();
+                }
+            });
+            
+            restartBtn.addEventListener('click', () => {
+                if (gameActive) {
+                    endGame();
+                }
+                setTimeout(initGameSession, 500);
+            });
+            
+            // Переключатель звука
+            soundToggle.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+                soundToggle.style.background = soundEnabled ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 50, 50, 0.6)';
+            });
+            
+            // Переключение режимов игры
+            modeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    modeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    gameMode = btn.dataset.mode;
+                    
+                    // Здесь можно добавить логику для разных режимов
+                    gameMessage.textContent = `РЕЖИМ: ${btn.textContent.toUpperCase()}`;
+                    setTimeout(() => {
+                        if (!gameActive) gameMessage.textContent = 'НАЖМИТЕ ИГРАТЬ ДЛЯ СТАРТА';
+                    }, 2000);
+                });
+            });
+            
+            // Начальное состояние
+            gameMessage.textContent = 'НАЖМИТЕ ИГРАТЬ ДЛЯ СТАРТА';
+            gameMessage.style.display = 'block';
+            updateLives();
+        }
+        
+        // Инициализация при первом взаимодействии
+        document.body.addEventListener('touchstart', initGame, {once: true});
+        document.body.addEventListener('mousedown', initGame, {once: true});
+        document.body.addEventListener('click', initGame, {once: true});
+    </script>
 </body>
 </html>
