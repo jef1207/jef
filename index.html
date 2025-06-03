@@ -703,18 +703,15 @@
             let gameActive = false;
             let gameSpeed = 1500;
             let gameTime = 60;
-            let targetTimer;
-            let gameTimer;
-            let timeTimer;
+            let targetTimer = null;
+            let timeTimer = null;
             let targets = [];
             let nextLevelThreshold = 15;
             let soundEnabled = true;
             let lives = 3;
             let comboCount = 0;
             let comboMultiplier = 1;
-            let comboTimeout;
-            let slowMotionActive = false;
-            let doublePointsActive = false;
+            let comboTimeout = null;
             let gameMode = 'classic';
             let achievements = {
                 firstBlood: false,
@@ -764,8 +761,6 @@
                 lives = 3;
                 comboCount = 0;
                 comboMultiplier = 1;
-                slowMotionActive = false;
-                doublePointsActive = false;
                 
                 scoreDisplay.textContent = score;
                 levelDisplay.textContent = level;
@@ -783,9 +778,6 @@
                 gameArea.querySelectorAll('.target').forEach(t => t.remove());
                 targets = [];
                 
-                // Очистка индикаторов бонусов
-                powerupIndicator.innerHTML = '';
-                
                 // Запуск таймеров
                 startGameTimers();
                 
@@ -796,6 +788,7 @@
             // Создание фоновых частиц
             function createBackgroundParticles() {
                 const container = bgParticles;
+                container.innerHTML = '';
                 for (let i = 0; i < 30; i++) {
                     const particle = document.createElement('div');
                     particle.className = 'particle-bg';
@@ -824,6 +817,10 @@
             
             // Запуск игровых таймеров
             function startGameTimers() {
+                // Очистка предыдущих таймеров
+                clearInterval(targetTimer);
+                clearInterval(timeTimer);
+                
                 // Таймер создания мишеней
                 targetTimer = setInterval(createTarget, gameSpeed);
                 
@@ -881,7 +878,6 @@
                 
                 // Время жизни мишени
                 let lifeTime = Math.max(500, 3000 - (level * 150));
-                if (slowMotionActive) lifeTime *= 1.5;
                 
                 // Добавляем мишень в игровую область
                 gameArea.appendChild(target);
@@ -889,10 +885,14 @@
                 
                 // Удаление мишени через время жизни
                 setTimeout(() => {
-                    if (target.parentNode && gameActive) {
+                    if (target.parentNode && target.dataset.clicked === 'false' && gameActive) {
                         animateDisappearance(target);
-                        gameArea.removeChild(target);
-                        targets = targets.filter(t => t !== target);
+                        setTimeout(() => {
+                            if (target.parentNode) {
+                                gameArea.removeChild(target);
+                                targets = targets.filter(t => t !== target);
+                            }
+                        }, 300);
                     }
                 }, lifeTime);
                 
@@ -908,6 +908,7 @@
                     
                     // Бомбочка
                     if (type === 'bomb') {
+                        createExplosion(target);
                         gameArea.classList.add('shake');
                         setTimeout(() => gameArea.classList.remove('shake'), 500);
                         
@@ -961,8 +962,6 @@
                     
                     // Увеличиваем счет
                     let points = level;
-                    if (doublePointsActive) points *= 2;
-                    
                     score += points * comboMultiplier;
                     targetsClicked++;
                     scoreDisplay.textContent = score;
@@ -1023,7 +1022,7 @@
                             targets = targets.filter(t => t !== target);
                         }
                     }, 300);
-                }, { once: true });
+                });
             }
             
             // Создание эффекта частиц
@@ -1107,13 +1106,13 @@
             // Обновление отображения жизней
             function updateLives() {
                 const livesEl = livesContainer.querySelectorAll('.life');
-                livesEl.forEach((life, index) => {
-                    if (index < lives) {
-                        life.style.display = 'flex';
+                for (let i = 0; i < 3; i++) {
+                    if (i < lives) {
+                        livesEl[i].style.display = 'flex';
                     } else {
-                        life.style.display = 'none';
+                        livesEl[i].style.display = 'none';
                     }
-                });
+                }
             }
             
             // Показать комбо
@@ -1163,7 +1162,7 @@
             function endGame(reason) {
                 gameActive = false;
                 clearInterval(targetTimer);
-                if (timeTimer) clearInterval(timeTimer);
+                clearInterval(timeTimer);
                 
                 // Удаляем все мишени с анимацией
                 targets.forEach(target => {
@@ -1196,7 +1195,7 @@
                 if (gameActive) {
                     gameActive = false;
                     clearInterval(targetTimer);
-                    if (timeTimer) clearInterval(timeTimer);
+                    clearInterval(timeTimer);
                     gameMessage.textContent = 'ПАУЗА';
                     gameMessage.style.display = 'block';
                 } else {
@@ -1238,6 +1237,7 @@
             gameMessage.textContent = 'НАЖМИТЕ ИГРАТЬ ДЛЯ СТАРТА';
             gameMessage.style.display = 'block';
             updateLives();
+            createBackgroundParticles();
         });
     </script>
 </body>
