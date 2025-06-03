@@ -1,772 +1,214 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IdeaMatrix - Генератор идей нового поколения</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --tg-bg: #0f1b26;
-            --tg-card: #1a2a3a;
-            --tg-primary: #4e7fff;
-            --tg-secondary: #7d4eff;
-            --tg-accent: #00c9ff;
-            --tg-text: #e6f7ff;
-            --tg-success: #2dd4bf;
-            --tg-warning: #f59e0b;
-            --tg-gradient: linear-gradient(135deg, var(--tg-primary), var(--tg-secondary));
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-        
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--tg-bg);
-            color: var(--tg-text);
-            line-height: 1.6;
-            overflow-x: hidden;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            position: relative;
-        }
-        
-        .logo {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
-            position: relative;
-            background: var(--tg-gradient);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 30px rgba(78, 127, 255, 0.4);
-        }
-        
-        .logo i {
-            font-size: 50px;
-            color: white;
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, var(--tg-primary), var(--tg-accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(0, 201, 255, 0.2);
-        }
-        
-        .tagline {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 20px;
-            opacity: 0.9;
-        }
-        
-        .card {
-            background: rgba(26, 42, 58, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(78, 127, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--tg-gradient);
-        }
-        
-        .card-title {
-            font-size: 1.6rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--tg-accent);
-        }
-        
-        .card-title i {
-            font-size: 1.8rem;
-        }
-        
-        .idea-matrix {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            height: 400px;
-        }
-        
-        .idea-visualization {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        #ideaCanvas {
-            width: 100%;
-            height: 100%;
-        }
-        
-        .idea-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .idea-display {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 14px;
-            padding: 20px;
-            min-height: 180px;
-            font-size: 1.3rem;
-            font-weight: 500;
-            line-height: 1.5;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .idea-display::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--tg-gradient);
-        }
-        
-        .idea-controls {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            padding: 16px 10px;
-            border-radius: 14px;
-            border: none;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--tg-text);
-            text-align: center;
-        }
-        
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
-        
-        .btn:active {
-            transform: translateY(2px);
-        }
-        
-        .btn i {
-            font-size: 1.6rem;
-        }
-        
-        .btn-primary {
-            background: var(--tg-gradient);
-            color: white;
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--tg-success), #0d9488);
-            color: white;
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, var(--tg-warning), #d97706);
-            color: white;
-        }
-        
-        .matrix-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .matrix-item {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(78, 127, 255, 0.1);
-        }
-        
-        .matrix-item h3 {
-            color: var(--tg-accent);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .matrix-item p {
-            font-size: 0.95rem;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .matrix-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--tg-gradient);
-        }
-        
-        .saved-ideas {
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-        
-        .saved-ideas::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .saved-ideas::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        
-        .saved-ideas::-webkit-scrollbar-thumb {
-            background: var(--tg-primary);
-            border-radius: 4px;
-        }
-        
-        .idea-item {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            position: relative;
-            border-left: 3px solid var(--tg-accent);
-        }
-        
-        .idea-item h4 {
-            margin-bottom: 5px;
-            color: var(--tg-accent);
-        }
-        
-        .idea-item p {
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-        
-        .idea-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        .idea-actions button {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: none;
-            font-size: 0.85rem;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--tg-text);
-        }
-        
-        .idea-actions button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(78, 127, 255, 0.6); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(78, 127, 255, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(78, 127, 255, 0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @media (max-width: 768px) {
-            .idea-matrix {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-            
-            .idea-visualization {
-                height: 300px;
-            }
-            
-            .idea-controls {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VideoSender MiniApp</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    
+    .shape-container {
+      display: flex;
+      gap: 30px;
+      margin: 30px 0;
+    }
+    
+    .shape-btn {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .shape-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .circle {
+      border-radius: 50%;
+      background: #FF5252;
+    }
+    
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-bottom: 70px solid #4CAF50;
+    }
+    
+    .square {
+      background: #FFC107;
+    }
+    
+    #videoPreview {
+      width: 100%;
+      max-width: 400px;
+      background: black;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    
+    .timer {
+      font-size: 24px;
+      margin: 15px 0;
+    }
+    
+    .send-btn {
+      background: #7c4dff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo pulse">
-                <i class="fas fa-brain"></i>
-            </div>
-            <h1>IdeaMatrix</h1>
-            <p class="tagline">Интеллектуальный генератор идей с 3D-визуализацией концепций</p>
-            <p>Первое в мире приложение, использующее нейросетевые алгоритмы для создания инновационных идей</p>
-        </header>
-        
-        <div class="card fade-in">
-            <h2 class="card-title"><i class="fas fa-cube"></i> Матрица идей</h2>
-            <div class="idea-matrix">
-                <div class="idea-visualization">
-                    <canvas id="ideaCanvas"></canvas>
-                </div>
-                <div class="idea-content">
-                    <div class="idea-display" id="ideaDisplay">
-                        Инициализация нейросети... Готово! Нажмите "Сгенерировать идею", чтобы создать уникальную концепцию.
-                    </div>
-                    <div class="idea-controls">
-                        <button class="btn btn-primary" id="generateBtn">
-                            <i class="fas fa-bolt"></i>
-                            <span>Сгенерировать идею</span>
-                        </button>
-                        <button class="btn btn-success" id="saveBtn">
-                            <i class="fas fa-atom"></i>
-                            <span>Эволюционировать</span>
-                        </button>
-                        <button class="btn btn-warning" id="matrixBtn">
-                            <i class="fas fa-save"></i>
-                            <span>Сохранить в матрицу</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card fade-in">
-            <h2 class="card-title"><i class="fas fa-infinity"></i> Нейросетевые возможности</h2>
-            <div class="matrix-grid">
-                <div class="matrix-item">
-                    <h3><i class="fas fa-robot"></i> Глубинное обучение</h3>
-                    <p>Система обучается на ваших предпочтениях, улучшая качество генерируемых идей с каждой сессией</p>
-                </div>
-                <div class="matrix-item">
-                    <h3><i class="fas fa-project-diagram"></i> Кросс-доменные связи</h3>
-                    <p>Анализирует взаимосвязи между различными отраслями для создания инноваций на стыке технологий</p>
-                </div>
-                <div class="matrix-item">
-                    <h3><i class="fas fa-chart-network"></i> Трехмерное представление</h3>
-                    <p>Визуализирует идеи в 3D-пространстве, показывая связи между концепциями</p>
-                </div>
-                <div class="matrix-item">
-                    <h3><i class="fas fa-sync-alt"></i> Адаптивная эволюция</h3>
-                    <p>Развивает идеи по принципам генетических алгоритмов, создавая улучшенные версии</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card fade-in">
-            <h2 class="card-title"><i class="fas fa-stars"></i> Матрица сохраненных идей</h2>
-            <div class="saved-ideas" id="savedIdeas">
-                <!-- Saved ideas will appear here -->
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>IdeaMatrix v1.0 | Эксклюзивно для Telegram Mini Apps</p>
-            <p>© 2023 Инновационная разработка без аналогов</p>
-        </div>
-    </div>
+  <h1>Геометрический видеосендер</h1>
+  
+  <div class="shape-container">
+    <div class="shape-btn circle" id="circleBtn">●</div>
+    <div class="shape-btn triangle" id="triangleBtn"></div>
+    <div class="shape-btn square" id="squareBtn">◼</div>
+  </div>
+  
+  <video id="videoPreview" muted playsinline></video>
+  
+  <div class="timer" id="timer">00:00</div>
+  
+  <button class="send-btn" id="sendBtn" disabled>Отправить видео</button>
 
-    <script>
-        // Инициализация Three.js для 3D-визуализации
-        let scene, camera, renderer, particles, particleSystem;
-        
-        function initThreeJS() {
-            // Создание сцены
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0f1b26);
-            
-            // Создание камеры
-            camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-            camera.position.z = 30;
-            
-            // Создание рендерера
-            const canvas = document.getElementById('ideaCanvas');
-            renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            
-            // Создание частиц
-            const particleCount = 200;
-            particles = new THREE.Geometry();
-            
-            for (let i = 0; i < particleCount; i++) {
-                const x = (Math.random() - 0.5) * 100;
-                const y = (Math.random() - 0.5) * 100;
-                const z = (Math.random() - 0.5) * 100;
-                
-                particles.vertices.push(new THREE.Vector3(x, y, z));
-            }
-            
-            const particleMaterial = new THREE.PointsMaterial({
-                color: 0x4e7fff,
-                size: 2,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending
-            });
-            
-            particleSystem = new THREE.Points(particles, particleMaterial);
-            scene.add(particleSystem);
-            
-            // Добавление света
-            const ambientLight = new THREE.AmbientLight(0x444444);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0x00ccff, 1);
-            directionalLight.position.set(1, 1, 1);
-            scene.add(directionalLight);
-            
-            const pointLight = new THREE.PointLight(0x7d4eff, 1, 100);
-            pointLight.position.set(-10, -10, -10);
-            scene.add(pointLight);
-            
-            // Обработка изменения размера
-            window.addEventListener('resize', () => {
-                camera.aspect = canvas.clientWidth / canvas.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-            });
-            
-            // Запуск анимации
-            animate();
-        }
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            // Анимация частиц
-            particles.vertices.forEach(vertex => {
-                vertex.x += (Math.random() - 0.5) * 0.2;
-                vertex.y += (Math.random() - 0.5) * 0.2;
-                vertex.z += (Math.random() - 0.5) * 0.2;
-                
-                // Возврат частиц в центр
-                if (vertex.length() > 50) {
-                    vertex.x = (Math.random() - 0.5) * 20;
-                    vertex.y = (Math.random() - 0.5) * 20;
-                    vertex.z = (Math.random() - 0.5) * 20;
-                }
-            });
-            
-            particles.verticesNeedUpdate = true;
-            
-            // Вращение сцены
-            particleSystem.rotation.x += 0.001;
-            particleSystem.rotation.y += 0.002;
-            
-            renderer.render(scene, camera);
-        }
-        
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', () => {
-            initThreeJS();
-            loadSavedIdeas();
-            
-            // Инициализация Telegram Mini Apps
-            window.Telegram = window.Telegram || {};
-            window.Telegram.WebApp = window.Telegram.WebApp || {
-                ready: () => console.log('WebApp ready simulated'),
-                expand: () => console.log('WebApp expand simulated'),
-                sendData: (data) => console.log('Data sent to bot:', data)
-            };
-            
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            
-            // Настройка обработчиков событий
-            document.getElementById('generateBtn').addEventListener('click', generateIdea);
-            document.getElementById('saveBtn').addEventListener('click', evolveIdea);
-            document.getElementById('matrixBtn').addEventListener('click', saveIdea);
-            
-            // Генерация начальной идеи
-            setTimeout(generateIdea, 2000);
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    
+    const videoElement = document.getElementById('videoPreview');
+    const timerElement = document.getElementById('timer');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    let mediaRecorder;
+    let recordedChunks = [];
+    let timerInterval;
+    let seconds = 0;
+    
+    // Доступ к камере
+    async function initCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: true 
         });
-        
-        // Компоненты для генерации идей
-        const industries = [
-            'Космические технологии', 'Нейроинтерфейсы', 'Биотехнологии', 
-            'Квантовые вычисления', 'Искусственный интеллект', 'Умные города'
-        ];
-        
-        const applications = [
-            'для персонализированной медицины', 'для устойчивого развития', 
-            'для образования нового поколения', 'для автоматизации бизнеса', 
-            'для улучшения качества жизни', 'для исследования океана'
-        ];
-        
-        const technologies = [
-            'с использованием блокчейна', 'с применением ИИ', 
-            'с нейросетевыми алгоритмами', 'с технологией AR/VR', 
-            'с квантовыми вычислениями', 'с биометрической аутентификацией'
-        ];
-        
-        let currentIdea = '';
-        
-        // Генерация идеи
-        function generateIdea() {
-            const industry = getRandomElement(industries);
-            const application = getRandomElement(applications);
-            const tech = getRandomElement(technologies);
-            
-            const ideaTemplates = [
-                `Платформа ${industry} ${application} ${tech}`,
-                `Интегрированная система ${industry} ${application} ${tech}`,
-                `Революционная технология ${industry} ${application} ${tech}`,
-                `Глобальное решение ${industry} ${application} ${tech}`,
-                `Инновационная платформа ${industry} ${application} ${tech}`
-            ];
-            
-            currentIdea = getRandomElement(ideaTemplates);
-            
-            // Обновление отображения
-            const display = document.getElementById('ideaDisplay');
-            display.textContent = currentIdea;
-            display.classList.add('fade-in');
-            
-            setTimeout(() => {
-                display.classList.remove('fade-in');
-            }, 500);
-            
-            // Анимация 3D-сцены
-            animateIdeaVisualization();
-        }
-        
-        // Эволюция идеи
-        function evolveIdea() {
-            if (!currentIdea) return;
-            
-            const enhancements = [
-                'с адаптивным обучением', 'с децентрализованной архитектурой',
-                'с интеграцией IoT', 'с нейроморфными процессорами',
-                'с квантовой защитой', 'с бионическим интерфейсом',
-                'с генеративными моделями'
-            ];
-            
-            const newFeature = getRandomElement(enhancements);
-            currentIdea += ' ' + newFeature;
-            
-            const display = document.getElementById('ideaDisplay');
-            display.textContent = currentIdea;
-            display.classList.add('pulse');
-            
-            setTimeout(() => {
-                display.classList.remove('pulse');
-            }, 1000);
-            
-            animateIdeaVisualization();
-        }
-        
-        // Анимация визуализации
-        function animateIdeaVisualization() {
-            // Изменение цвета частиц
-            const colors = [0x4e7fff, 0x7d4eff, 0x00c9ff, 0x2dd4bf, 0xf59e0b];
-            particleSystem.material.color = new THREE.Color(getRandomElement(colors));
-            
-            // Добавление новых частиц
-            for (let i = 0; i < 20; i++) {
-                const x = (Math.random() - 0.5) * 50;
-                const y = (Math.random() - 0.5) * 50;
-                const z = (Math.random() - 0.5) * 50;
-                particles.vertices.push(new THREE.Vector3(x, y, z));
-            }
-            
-            particles.verticesNeedUpdate = true;
-        }
-        
-        // Сохранение идеи
-        function saveIdea() {
-            if (!currentIdea) return;
-            
-            // Сохранение в localStorage
-            const savedIdeas = JSON.parse(localStorage.getItem('savedIdeas') || '[]');
-            savedIdeas.push({
-                id: Date.now(),
-                text: currentIdea,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('savedIdeas', JSON.stringify(savedIdeas));
-            
-            // Показать уведомление
-            showNotification('Идея сохранена в матрицу!');
-            
-            // Обновить список
-            loadSavedIdeas();
-        }
-        
-        // Загрузка сохраненных идей
-        function loadSavedIdeas() {
-            const savedIdeas = JSON.parse(localStorage.getItem('savedIdeas') || '[]');
-            const container = document.getElementById('savedIdeas');
-            container.innerHTML = '';
-            
-            if (savedIdeas.length === 0) {
-                container.innerHTML = '<div class="idea-item"><p>Ваша матрица идей пуста. Сохраните первую идею!</p></div>';
-                return;
-            }
-            
-            savedIdeas.slice().reverse().forEach((idea, index) => {
-                const ideaElement = document.createElement('div');
-                ideaElement.className = 'idea-item fade-in';
-                ideaElement.style.animationDelay = `${index * 0.1}s`;
-                ideaElement.innerHTML = `
-                    <h4>Идея #${savedIdeas.length - index}</h4>
-                    <p>${idea.text}</p>
-                    <div class="idea-actions">
-                        <button onclick="shareIdea(${idea.id})"><i class="fas fa-share-alt"></i> Поделиться</button>
-                        <button onclick="evolveSavedIdea(${idea.id})"><i class="fas fa-atom"></i> Эволюционировать</button>
-                        <button onclick="deleteIdea(${idea.id})"><i class="fas fa-trash"></i> Удалить</button>
-                    </div>
-                `;
-                container.appendChild(ideaElement);
-            });
-        }
-        
-        // Поделиться идеей
-        function shareIdea(id) {
-            const savedIdeas = JSON.parse(localStorage.getItem('savedIdeas') || '[]');
-            const idea = savedIdeas.find(i => i.id === id);
-            
-            if (idea) {
-                Telegram.WebApp.sendData(JSON.stringify({
-                    action: 'share_idea',
-                    idea: idea.text
-                }));
-                showNotification('Идея отправлена в Telegram!');
-            }
-        }
-        
-        // Эволюция сохраненной идеи
-        function evolveSavedIdea(id) {
-            const savedIdeas = JSON.parse(localStorage.getItem('savedIdeas') || '[]');
-            const index = savedIdeas.findIndex(i => i.id === id);
-            
-            if (index !== -1) {
-                const enhancements = [
-                    ' | Улучшено нейросетью', ' | Версия 2.0', ' | Прототип', 
-                    ' | MVP', ' | С интеграцией ИИ', ' | Квантовый апгрейд'
-                ];
-                
-                savedIdeas[index].text += getRandomElement(enhancements);
-                localStorage.setItem('savedIdeas', JSON.stringify(savedIdeas));
-                loadSavedIdeas();
-                showNotification('Идея эволюционировала!');
-            }
-        }
-        
-        // Удаление идеи
-        function deleteIdea(id) {
-            let savedIdeas = JSON.parse(localStorage.getItem('savedIdeas') || '[]');
-            savedIdeas = savedIdeas.filter(i => i.id !== id);
-            localStorage.setItem('savedIdeas', JSON.stringify(savedIdeas));
-            loadSavedIdeas();
-            showNotification('Идея удалена из матрицы');
-        }
-        
-        // Вспомогательные функции
-        function getRandomElement(array) {
-            return array[Math.floor(Math.random() * array.length)];
-        }
-        
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.position = 'fixed';
-            notification.style.bottom = '20px';
-            notification.style.left = '50%';
-            notification.style.transform = 'translateX(-50%)';
-            notification.style.backgroundColor = 'var(--tg-primary)';
-            notification.style.color = 'white';
-            notification.style.padding = '12px 25px';
-            notification.style.borderRadius = '12px';
-            notification.style.zIndex = '1000';
-            notification.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(-50%) translateY(20px)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-        
-        // Глобальные функции для обработчиков событий
-        window.shareIdea = shareIdea;
-        window.evolveSavedIdea = evolveSavedIdea;
-        window.deleteIdea = deleteIdea;
-    </script>
+        videoElement.srcObject = stream;
+      } catch (err) {
+        console.error("Camera error:", err);
+        tg.showPopup({ title: "Ошибка", message: "Доступ к камере запрещен" });
+      }
+    }
+    
+    // Начать запись
+    function startRecording(shape) {
+      if (!videoElement.srcObject) return;
+      
+      recordedChunks = [];
+      seconds = 0;
+      updateTimer();
+      
+      mediaRecorder = new MediaRecorder(videoElement.srcObject);
+      
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+      
+      mediaRecorder.onstop = () => {
+        sendBtn.disabled = false;
+      };
+      
+      mediaRecorder.start();
+      
+      // Таймер
+      timerInterval = setInterval(() => {
+        seconds++;
+        updateTimer();
+      }, 1000);
+      
+      // Визуальный эффект
+      document.body.style.background = shape === 'circle' 
+        ? 'linear-gradient(135deg, #ff5252 0%, #ff7675 100%)'
+        : shape === 'triangle'
+          ? 'linear-gradient(135deg, #4CAF50 0%, #81C784 100%)'
+          : 'linear-gradient(135deg, #FFC107 0%, #FFD54F 100%)';
+    }
+    
+    // Остановить запись
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        clearInterval(timerInterval);
+      }
+    }
+    
+    // Обновить таймер
+    function updateTimer() {
+      const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const secs = (seconds % 60).toString().padStart(2, '0');
+      timerElement.textContent = `${mins}:${secs}`;
+    }
+    
+    // Отправить видео
+    async function sendVideo() {
+      tg.showPopup({ 
+        title: "Отправка", 
+        message: "Видео отправляется..." 
+      }, () => {});
+      
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      
+      // Создаем временную ссылку
+      const url = URL.createObjectURL(blob);
+      
+      // Отправляем через Telegram API
+      tg.sendData(JSON.stringify({
+        type: 'video',
+        content: url,
+        timestamp: Date.now()
+      }));
+      
+      // Очищаем ресурсы
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        tg.close();
+      }, 3000);
+    }
+    
+    // Инициализация
+    initCamera();
+    
+    // Назначение обработчиков
+    document.getElementById('circleBtn').addEventListener('click', () => startRecording('circle'));
+    document.getElementById('triangleBtn').addEventListener('click', () => startRecording('triangle'));
+    document.getElementById('squareBtn').addEventListener('click', () => startRecording('square'));
+    
+    document.addEventListener('mouseup', stopRecording);
+    document.addEventListener('touchend', stopRecording);
+    
+    sendBtn.addEventListener('click', sendVideo);
+  </script>
 </body>
 </html>
