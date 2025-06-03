@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Minecraft-like Game</title>
+    <title>Minecraft для Telegram</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            touch-action: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -17,19 +21,13 @@
             overflow: hidden;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             color: #fff;
         }
         
         #gameContainer {
             position: relative;
             width: 100%;
-            max-width: 1000px;
-            height: 90vh;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
+            height: 100vh;
             overflow: hidden;
         }
         
@@ -44,7 +42,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 20px;
+            padding: 15px;
             z-index: 10;
             display: flex;
             justify-content: space-between;
@@ -52,84 +50,82 @@
         
         .panel {
             background: rgba(0, 0, 0, 0.7);
-            padding: 15px 20px;
+            padding: 12px 15px;
             border-radius: 10px;
             border: 2px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(5px);
+            font-size: 14px;
         }
         
         #playerInfo {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         
         #playerInfo h2 {
-            font-size: 1.4rem;
-            margin-bottom: 5px;
+            font-size: 1.2rem;
+            margin-bottom: 3px;
             color: #ffcc00;
             text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
         }
         
         #stats {
             display: flex;
-            gap: 15px;
+            gap: 10px;
         }
         
         .stat {
             background: rgba(50, 50, 70, 0.8);
-            padding: 8px 15px;
-            border-radius: 8px;
-            min-width: 100px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            min-width: 80px;
         }
         
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: #4dff4d;
         }
         
         #inventory {
             display: flex;
-            gap: 12px;
-            padding: 15px;
+            gap: 8px;
+            padding: 10px;
             background: rgba(0, 0, 0, 0.6);
             border-radius: 10px;
             border: 2px solid rgba(255, 255, 255, 0.2);
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
+            max-width: 95%;
+            overflow-x: auto;
         }
         
         .inventory-slot {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: rgba(100, 100, 120, 0.5);
             border: 2px solid rgba(200, 200, 220, 0.3);
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
+            flex-shrink: 0;
             transition: all 0.2s;
-        }
-        
-        .inventory-slot:hover {
-            transform: scale(1.1);
-            border-color: #ffcc00;
         }
         
         .inventory-slot.active {
             border: 3px solid #ffcc00;
             background: rgba(150, 150, 170, 0.7);
-            transform: scale(1.15);
+            transform: scale(1.1);
         }
         
         .block-preview {
-            width: 40px;
-            height: 40px;
-            border-radius: 5px;
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
         }
         
         #crosshair {
@@ -137,16 +133,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             pointer-events: none;
             z-index: 5;
         }
         
         .crosshair-dot {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 3px;
+            height: 3px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             top: 50%;
@@ -159,62 +155,137 @@
             background: rgba(255, 255, 255, 0.8);
         }
         
+        #controls {
+            position: absolute;
+            bottom: 80px;
+            left: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            touch-action: manipulation;
+        }
+        
+        .joystick-container {
+            position: absolute;
+            bottom: 80px;
+            right: 15px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+        
+        .joystick {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            position: absolute;
+            touch-action: none;
+        }
+        
+        #jumpBtn {
+            background: rgba(76, 175, 80, 0.7);
+        }
+        
+        #destroyBtn {
+            background: rgba(244, 67, 54, 0.7);
+        }
+        
+        #placeBtn {
+            background: rgba(33, 150, 243, 0.7);
+        }
+        
         #instructions {
             position: absolute;
-            bottom: 100px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px 25px;
-            border-radius: 10px;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
             text-align: center;
             max-width: 90%;
+            z-index: 20;
+            border: 2px solid #ffcc00;
         }
         
-        #instructions h3 {
+        #instructions h2 {
             color: #ffcc00;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         
-        .key {
-            display: inline-block;
-            background: rgba(50, 50, 70, 0.9);
-            padding: 3px 10px;
-            border-radius: 5px;
-            margin: 0 5px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            font-family: monospace;
+        #instructions p {
+            margin: 10px 0;
+            line-height: 1.5;
         }
         
-        @media (max-width: 768px) {
-            #gameContainer {
-                height: 100vh;
-                border-radius: 0;
-            }
-            
-            .stat {
-                min-width: 80px;
-                padding: 6px 10px;
-            }
-            
-            .stat-value {
-                font-size: 1.4rem;
-            }
-            
-            .inventory-slot {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .block-preview {
-                width: 35px;
-                height: 35px;
-            }
-            
-            #instructions {
-                font-size: 0.9rem;
-                padding: 10px 15px;
-            }
+        #startBtn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #333;
+            border-top: 5px solid #ffcc00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -222,9 +293,14 @@
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         
+        <div id="loading">
+            <div class="loader"></div>
+            <div>Загрузка игры...</div>
+        </div>
+        
         <div id="uiContainer">
             <div id="playerInfo" class="panel">
-                <h2>MINECRAFT-LIKE</h2>
+                <h2>MINECRAFT</h2>
                 <div id="stats">
                     <div class="stat">
                         <div>Блоки</div>
@@ -240,10 +316,10 @@
         
         <div id="crosshair">
             <div class="crosshair-dot"></div>
-            <div class="crosshair-line" style="width: 15px; height: 2px; left: -15px; top: 50%;"></div>
-            <div class="crosshair-line" style="width: 15px; height: 2px; right: -15px; top: 50%;"></div>
-            <div class="crosshair-line" style="width: 2px; height: 15px; left: 50%; top: -15px;"></div>
-            <div class="crosshair-line" style="width: 2px; height: 15px; left: 50%; bottom: -15px;"></div>
+            <div class="crosshair-line" style="width: 12px; height: 2px; left: -12px; top: 50%;"></div>
+            <div class="crosshair-line" style="width: 12px; height: 2px; right: -12px; top: 50%;"></div>
+            <div class="crosshair-line" style="width: 2px; height: 12px; left: 50%; top: -12px;"></div>
+            <div class="crosshair-line" style="width: 2px; height: 12px; left: 50%; bottom: -12px;"></div>
         </div>
         
         <div id="inventory">
@@ -264,20 +340,33 @@
             </div>
         </div>
         
-        <div id="instructions" class="panel">
-            <h3>Управление</h3>
-            <p>Движение: <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span></p>
-            <p>Прыжок: <span class="key">ПРОБЕЛ</span> | Разрушить блок: <span class="key">ЛКМ</span> | Построить блок: <span class="key">ПКМ</span></p>
+        <div id="controls">
+            <div class="control-group">
+                <div id="jumpBtn" class="control-btn">↑</div>
+            </div>
+            <div class="control-group">
+                <div id="destroyBtn" class="control-btn">✖</div>
+                <div id="placeBtn" class="control-btn">+</div>
+            </div>
+        </div>
+        
+        <div class="joystick-container">
+            <div class="joystick"></div>
+        </div>
+        
+        <div id="instructions">
+            <h2>ДОБРО ПОЖАЛОВАТЬ В MINECRAFT!</h2>
+            <p>🕹️ <strong>Движение:</strong> Перемещайте джойстик</p>
+            <p>🔼 <strong>Прыжок:</strong> Нажмите кнопку со стрелкой</p>
+            <p>✖ <strong>Разрушить блок:</strong> Нажмите кнопку "✖"</p>
+            <p>➕ <strong>Построить блок:</strong> Нажмите кнопку "+"</p>
+            <p>🧱 <strong>Выбор блока:</strong> Нажмите на блок в инвентаре</p>
+            <p>👀 <strong>Вращение камеры:</strong> Перемещайте палец по экрану</p>
+            <button id="startBtn">ИГРАТЬ</button>
         </div>
     </div>
 
     <script>
-        // Проверка загрузки Three.js
-        if (!window.THREE) {
-            alert('Ошибка: Three.js не загружен!');
-            throw new Error("Three.js not loaded");
-        }
-
         // Основные переменные
         let scene, camera, renderer;
         let world = {};
@@ -286,15 +375,20 @@
         let clock = new THREE.Clock();
         let playerVelocity = new THREE.Vector3();
         let playerDirection = new THREE.Vector3();
-        let moveForward = false;
-        let moveBackward = false;
-        let moveLeft = false;
-        let moveRight = false;
         let canJump = true;
-        let prevTime = performance.now();
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
         let selectedBlock = null;
+        let joystickActive = false;
+        let joystickPosition = new THREE.Vector2();
+        let joystickAngle = 0;
+        let joystickDistance = 0;
+        let maxJoystickDistance = 40;
+        let isDraggingCamera = false;
+        let prevTouchX, prevTouchY;
+        let rotationSpeed = 0.02;
+        let gameStarted = false;
+        let tg;
         
         // Материалы блоков
         const blockMaterials = {
@@ -305,8 +399,25 @@
             sand: new THREE.MeshLambertMaterial({ color: 0xf0e68c })
         };
         
-        // Инициализация сцены
+        // Инициализация игры
         function init() {
+            // Проверка загрузки Three.js
+            if (!window.THREE) {
+                document.getElementById('loading').innerHTML = '<div>Ошибка: Three.js не загружен!</div>';
+                return;
+            }
+            
+            // Инициализация Telegram WebApp
+            tg = window.Telegram && Telegram.WebApp;
+            if(tg) {
+                tg.ready();
+                tg.expand();
+                if(tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    const user = tg.initDataUnsafe.user;
+                    document.querySelector('#playerInfo h2').textContent = `${user.first_name || 'Игрок'} в MINECRAFT`;
+                }
+            }
+            
             // Создание сцены
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87CEEB);
@@ -323,7 +434,7 @@
                 alpha: false
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
             
             // Освещение
@@ -343,6 +454,11 @@
             
             // Начало анимации
             animate();
+            
+            // Скрыть загрузку
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 1000);
         }
         
         // Создание игрового мира
@@ -491,14 +607,6 @@
         
         // Настройка обработчиков событий
         function setupEventListeners() {
-            // Управление клавиатурой
-            document.addEventListener('keydown', onKeyDown);
-            document.addEventListener('keyup', onKeyUp);
-            
-            // Управление мышью
-            document.addEventListener('mousedown', onMouseDown);
-            document.addEventListener('mousemove', onMouseMove);
-            
             // Выбор блока в инвентаре
             const slots = document.querySelectorAll('.inventory-slot');
             slots.forEach(slot => {
@@ -513,75 +621,114 @@
                 });
             });
             
+            // Кнопки управления
+            document.getElementById('jumpBtn').addEventListener('click', () => {
+                if (canJump) {
+                    playerVelocity.y = 0.15;
+                    canJump = false;
+                }
+            });
+            
+            document.getElementById('destroyBtn').addEventListener('click', destroyBlock);
+            document.getElementById('placeBtn').addEventListener('click', placeBlock);
+            
+            // Джойстик
+            const joystickContainer = document.querySelector('.joystick-container');
+            const joystick = document.querySelector('.joystick');
+            
+            joystickContainer.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                joystickActive = true;
+                updateJoystickPosition(e.touches[0]);
+            });
+            
+            joystickContainer.addEventListener('touchmove', (e) => {
+                if (joystickActive) {
+                    e.preventDefault();
+                    updateJoystickPosition(e.touches[0]);
+                }
+            });
+            
+            joystickContainer.addEventListener('touchend', (e) => {
+                joystickActive = false;
+                joystick.style.transform = 'translate(0, 0)';
+                joystickAngle = 0;
+                joystickDistance = 0;
+            });
+            
+            // Управление камерой
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1 && !joystickActive) {
+                    isDraggingCamera = true;
+                    prevTouchX = e.touches[0].clientX;
+                    prevTouchY = e.touches[0].clientY;
+                }
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (isDraggingCamera && e.touches.length === 1) {
+                    const deltaX = e.touches[0].clientX - prevTouchX;
+                    const deltaY = e.touches[0].clientY - prevTouchY;
+                    
+                    // Вращение камеры по горизонтали
+                    camera.rotation.y -= deltaX * rotationSpeed;
+                    
+                    // Ограничение вращения по вертикали
+                    camera.rotation.x = Math.max(-Math.PI/3, Math.min(Math.PI/3, camera.rotation.x - deltaY * rotationSpeed * 0.5));
+                    
+                    prevTouchX = e.touches[0].clientX;
+                    prevTouchY = e.touches[0].clientY;
+                }
+            });
+            
+            document.addEventListener('touchend', () => {
+                isDraggingCamera = false;
+            });
+            
             // Обработка изменения размера окна
             window.addEventListener('resize', onWindowResize);
+            
+            // Кнопка начала игры
+            document.getElementById('startBtn').addEventListener('click', () => {
+                document.getElementById('instructions').classList.add('hidden');
+                gameStarted = true;
+            });
         }
         
-        // Обработка нажатия клавиш
-        function onKeyDown(event) {
-            switch (event.code) {
-                case 'KeyW':
-                    moveForward = true;
-                    break;
-                case 'KeyA':
-                    moveLeft = true;
-                    break;
-                case 'KeyS':
-                    moveBackward = true;
-                    break;
-                case 'KeyD':
-                    moveRight = true;
-                    break;
-                case 'Space':
-                    if (canJump) {
-                        playerVelocity.y = 0.15;
-                        canJump = false;
-                    }
-                    break;
-            }
-        }
-        
-        // Обработка отпускания клавиш
-        function onKeyUp(event) {
-            switch (event.code) {
-                case 'KeyW':
-                    moveForward = false;
-                    break;
-                case 'KeyA':
-                    moveLeft = false;
-                    break;
-                case 'KeyS':
-                    moveBackward = false;
-                    break;
-                case 'KeyD':
-                    moveRight = false;
-                    break;
-            }
-        }
-        
-        // Обработка движения мыши
-        function onMouseMove(event) {
-            // Обновление позиции мыши для raycasting
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        }
-        
-        // Обработка кликов мыши
-        function onMouseDown(event) {
-            // Левый клик - разрушение блока
-            if (event.button === 0) {
-                destroyBlock();
-            }
-            // Правый клик - размещение блока
-            else if (event.button === 2) {
-                placeBlock();
-            }
+        // Обновление позиции джойстика
+        function updateJoystickPosition(touch) {
+            const rect = document.querySelector('.joystick-container').getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const touchX = touch.clientX;
+            const touchY = touch.clientY;
+            
+            // Вычисление позиции относительно центра
+            const deltaX = touchX - centerX;
+            const deltaY = touchY - centerY;
+            
+            // Вычисление расстояния и угла
+            joystickDistance = Math.min(maxJoystickDistance, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+            joystickAngle = Math.atan2(deltaY, deltaX);
+            
+            // Ограничение позиции джойстика
+            const limitedX = Math.cos(joystickAngle) * joystickDistance;
+            const limitedY = Math.sin(joystickAngle) * joystickDistance;
+            
+            // Обновление позиции визуального джойстика
+            const joystick = document.querySelector('.joystick');
+            joystick.style.transform = `translate(${limitedX}px, ${limitedY}px)`;
+            
+            // Обновление направления движения
+            playerDirection.x = Math.cos(joystickAngle) * (joystickDistance / maxJoystickDistance);
+            playerDirection.z = Math.sin(joystickAngle) * (joystickDistance / maxJoystickDistance);
         }
         
         // Разрушение блока
         function destroyBlock() {
             // Настройка raycast
-            raycaster.setFromCamera(mouse, camera);
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
             const intersects = raycaster.intersectObjects(Object.values(world));
             
             if (intersects.length > 0) {
@@ -595,7 +742,7 @@
         // Размещение блока
         function placeBlock() {
             // Настройка raycast
-            raycaster.setFromCamera(mouse, camera);
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
             const intersects = raycaster.intersectObjects(Object.values(world));
             
             if (intersects.length > 0) {
@@ -623,21 +770,26 @@
         
         // Обновление игрока
         function updatePlayer(delta) {
+            if (!gameStarted) return;
+            
             // Гравитация
             playerVelocity.y -= 0.01 * delta;
             
             // Движение игрока
             const speed = 0.1 * delta;
-            playerDirection.z = Number(moveForward) - Number(moveBackward);
-            playerDirection.x = Number(moveRight) - Number(moveLeft);
-            playerDirection.normalize();
             
-            if (moveForward || moveBackward) {
-                playerVelocity.z = playerDirection.z * speed;
-            }
-            if (moveLeft || moveRight) {
-                playerVelocity.x = playerDirection.x * speed;
-            }
+            // Применение направления от джойстика
+            const forwardVector = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+            const rightVector = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+            
+            const moveDirection = new THREE.Vector3();
+            moveDirection.add(forwardVector.multiplyScalar(playerDirection.z * speed));
+            moveDirection.add(rightVector.multiplyScalar(playerDirection.x * speed));
+            
+            moveDirection.y = 0;
+            
+            playerVelocity.x = moveDirection.x;
+            playerVelocity.z = moveDirection.z;
             
             // Проверка коллизий
             const newPos = new THREE.Vector3(
@@ -695,7 +847,7 @@
             updatePlayer(delta);
             
             // Обновление raycast
-            raycaster.setFromCamera(mouse, camera);
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
             const intersects = raycaster.intersectObjects(Object.values(world));
             
             // Подсветка выбранного блока
