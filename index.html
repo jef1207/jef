@@ -132,4 +132,79 @@
       scene.add(capsule);
       
       players[id] = capsule;
-      if(id === myPlayerId) myCube = capsule
+      if(id === myPlayerId) myCube = capsule;
+      
+      // Позиция камеры над игроком
+      camera.position.set(0, 5, 5);
+      camera.lookAt(capsule.position);
+    }
+
+    function updatePlayerCount() {
+      document.getElementById('info').textContent = 
+        `Игроков онлайн: ${Object.keys(players).length}`;
+    }
+
+    // Управление
+    const keys = {};
+    const controlBtns = ['up', 'down', 'left', 'right'];
+    
+    controlBtns.forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      btn.addEventListener('touchstart', () => keys[btnId] = true);
+      btn.addEventListener('touchend', () => keys[btnId] = false);
+      btn.addEventListener('mousedown', () => keys[btnId] = true);
+      btn.addEventListener('mouseup', () => keys[btnId] = false);
+    });
+
+    function updatePosition() {
+      if(!myCube) return;
+      
+      const speed = 0.15;
+      if(keys['up']) myCube.position.z -= speed;
+      if(keys['down']) myCube.position.z += speed;
+      if(keys['left']) myCube.position.x -= speed;
+      if(keys['right']) myCube.position.x += speed;
+      
+      // Ограничение движения по игровому полю
+      myCube.position.x = Math.max(-14, Math.min(14, myCube.position.x));
+      myCube.position.z = Math.max(-14, Math.min(14, myCube.position.z));
+      
+      // Поворот камеры вслед за игроком
+      camera.position.x = myCube.position.x;
+      camera.position.z = myCube.position.z + 5;
+      camera.lookAt(myCube.position.x, 0, myCube.position.z);
+      
+      ws.send(JSON.stringify({
+        type: 'move',
+        position: {
+          x: myCube.position.x,
+          y: myCube.position.y,
+          z: myCube.position.z
+        }
+      }));
+    }
+
+    // Анимация
+    function animate() {
+      requestAnimationFrame(animate);
+      updatePosition();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Адаптивность
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Обработка закрытия Telegram
+    tg.onEvent('viewportChanged', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
