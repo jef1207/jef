@@ -670,14 +670,8 @@
     </div>
 
     <script>
-        // Инициализация игры только после взаимодействия с пользователем
-        let gameInitialized = false;
-        
-        // Функция для инициализации игры
-        function initGame() {
-            if (gameInitialized) return;
-            gameInitialized = true;
-            
+        // Инициализация игры после полной загрузки DOM
+        document.addEventListener('DOMContentLoaded', () => {
             // Создание фоновых частиц
             createBackgroundParticles();
             
@@ -759,27 +753,6 @@
                 icon: '💣',
                 type: 'bomb'
             };
-            
-            // Звуки
-            const popSound = new Audio();
-            popSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/zvyk.mp3';
-            popSound.preload = 'auto';
-            popSound.volume = 0.4;
-            
-            const bombSound = new Audio();
-            bombSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/explosion.mp3';
-            bombSound.preload = 'auto';
-            bombSound.volume = 0.6;
-            
-            const bonusSound = new Audio();
-            bonusSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/bonus.mp3';
-            bonusSound.preload = 'auto';
-            bonusSound.volume = 0.5;
-            
-            const levelUpSound = new Audio();
-            levelUpSound.src = 'https://github.com/jef1207/jef/raw/92f142ca4b052c23b700e2cbecbc580fbf99f222/levelup.mp3';
-            levelUpSound.preload = 'auto';
-            levelUpSound.volume = 0.5;
             
             // Инициализация игры
             function initGameSession() {
@@ -935,12 +908,6 @@
                     
                     // Бомбочка
                     if (type === 'bomb') {
-                        if (soundEnabled) {
-                            bombSound.currentTime = 0;
-                            bombSound.play().catch(e => console.log("Bomb sound error:", e));
-                        }
-                        
-                        createExplosion(target);
                         gameArea.classList.add('shake');
                         setTimeout(() => gameArea.classList.remove('shake'), 500);
                         
@@ -962,11 +929,6 @@
                     
                     // Бонусы
                     if (type === 'diamond' || type === 'heart' || type === 'time') {
-                        if (soundEnabled) {
-                            bonusSound.currentTime = 0;
-                            bonusSound.play().catch(e => console.log("Bonus sound error:", e));
-                        }
-                        
                         // Обработка бонусов
                         if (type === 'diamond') {
                             score += 10;
@@ -1045,12 +1007,6 @@
                     if (!achievements.firstBlood) {
                         achievements.firstBlood = true;
                         showAchievement("Первая кровь!", "Ваша первая мишень");
-                    }
-                    
-                    // Воспроизводим звук
-                    if (soundEnabled) {
-                        popSound.currentTime = 0;
-                        popSound.play().catch(e => console.log("Audio play error:", e));
                     }
                     
                     // Создаем эффект частиц
@@ -1186,10 +1142,10 @@
                 levelDisplay.textContent = level;
                 
                 // Эффект
-                if (soundEnabled) {
-                    levelUpSound.currentTime = 0;
-                    levelUpSound.play();
-                }
+                gameArea.style.boxShadow = 'inset 0 0 50px gold, 0 0 50px gold';
+                setTimeout(() => {
+                    gameArea.style.boxShadow = '';
+                }, 1000);
                 
                 // Достижение: Повышение уровня
                 if (level >= 3 && !achievements.levelUp) {
@@ -1201,12 +1157,6 @@
                 clearInterval(targetTimer);
                 gameSpeed = Math.max(400, 1500 - (level * 100));
                 targetTimer = setInterval(createTarget, gameSpeed);
-                
-                // Визуальный эффект
-                gameArea.style.boxShadow = 'inset 0 0 50px gold, 0 0 50px gold';
-                setTimeout(() => {
-                    gameArea.style.boxShadow = '';
-                }, 1000);
             }
             
             // Конец игры
@@ -1277,7 +1227,6 @@
                     btn.classList.add('active');
                     gameMode = btn.dataset.mode;
                     
-                    // Здесь можно добавить логику для разных режимов
                     gameMessage.textContent = `РЕЖИМ: ${btn.textContent.toUpperCase()}`;
                     setTimeout(() => {
                         if (!gameActive) gameMessage.textContent = 'НАЖМИТЕ ИГРАТЬ ДЛЯ СТАРТА';
@@ -1289,12 +1238,7 @@
             gameMessage.textContent = 'НАЖМИТЕ ИГРАТЬ ДЛЯ СТАРТА';
             gameMessage.style.display = 'block';
             updateLives();
-        }
-        
-        // Инициализация при первом взаимодействии
-        document.body.addEventListener('touchstart', initGame, {once: true});
-        document.body.addEventListener('mousedown', initGame, {once: true});
-        document.body.addEventListener('click', initGame, {once: true});
+        });
     </script>
 </body>
 </html>
