@@ -61,7 +61,6 @@
     </div>
 
     <script>
-        const hideFullScreenButton = "";
         const buildUrl = "Build";
         const loaderUrl = buildUrl + "/runner.loader.js";
         const config = {
@@ -95,163 +94,106 @@
             canvas.focus();
         }
 
-        window.addEventListener('pointerdown', () => FocusGame());
-        window.addEventListener('touchstart', () => FocusGame());
+        window.addEventListener('pointerdown', FocusGame);
+        window.addEventListener('touchstart', FocusGame);
 
-        let StartUnityInstance;
         let myGameInstance = null;
-        let initGame = false;
         let tgWebApp = null;
-        let cloudStorage = {};
-        let userData = null;
 
+        // 1. Исправлена инициализация Unity
         const script = document.createElement("script");
         script.src = loaderUrl;
         script.onload = () => {
-            StartUnityInstance = function () {
-                createUnityInstance(canvas, config, (progress) => {
-                    spinner.style.display = "none";
-                    progressBarEmpty.style.display = "";
-                    progressBarFull.style.width = `${100 * progress}%`;
-                }).then((unityInstance) => {
-                    myGameInstance = unityInstance;
-                    loadingCover.style.display = "none";
-                }).catch((message) => {
-                    console.error(message);
-                });
-            };
-            if (LocalHost()) StartUnityInstance_IfUnloaded();
+            createUnityInstance(canvas, config, (progress) => {
+                spinner.style.display = "none";
+                progressBarEmpty.style.display = "";
+                progressBarFull.style.width = `${100 * progress}%`;
+            }).then((unityInstance) => {
+                myGameInstance = unityInstance;
+                loadingCover.style.display = "none";
+                
+                // 2. Уведомляем Unity, что игра готова
+                myGameInstance.SendMessage('GameController', 'GameReady');
+            }).catch((message) => {
+                console.error('Unity initialization failed:', message);
+            });
         };
+        document.body.appendChild(script);
 
-        function StartUnityInstance_IfUnloaded() {
-            if (spinner.style.display !== "none") StartUnityInstance();
-        }
-
-        function LocalHost() {
-            const host = window.location.hostname;
-            return host === "localhost" || host === "127.0.0.1";
-        }
-
-        // Инициализация Telegram Web App
-        function InitTelegram() {
+        // 3. Правильная инициализация Telegram Web App
+        function initTelegram() {
             try {
-                if (LocalHost()) return;
-
-                console.log('Init Telegram Web App');
-                tgWebApp = window.Telegram.WebApp;
-                
-                // Инициализация данных пользователя
-                userData = InitUserData();
-                
-                // Инициализация облачного хранилища
-                LoadCloudStorage();
-                
-                // Показываем основную кнопку
-                tgWebApp.MainButton.setText("PLAY");
-                tgWebApp.MainButton.show();
-                tgWebApp.MainButton.onClick(() => {
-                    myGameInstance?.SendMessage('GameController', 'StartGame');
-                });
-                
-                // Расширяем на весь экран
-                tgWebApp.expand();
-
-            } catch (e) {
-                console.error('Telegram init error: ', e);
-            }
-
-            StartUnityInstance_IfUnloaded();
-        }
-
-        function InitGame() {
-            console.log('Game initialized');
-            initGame = true;
-        }
-
-        // Работа с облачным хранилищем Telegram
-        function LoadCloudStorage() {
-            if (!tgWebApp) return;
-            
-            tgWebApp.CloudStorage.getItem('gameData', (err, data) => {
-                if (!err && data) {
-                    cloudStorage = JSON.parse(data);
-                    if (myGameInstance) {
-                        myGameInstance.SendMessage('SaveManager', 'LoadData', data);
+                if (window.Telegram && window.Telegram.WebApp) {
+                    tgWebApp = window.Telegram.WebApp;
+                    console.log('Telegram Web App initialized');
+                    
+                    // 4. Расширяем на весь экран
+                    tgWebApp.expand();
+                    
+                    // 5. Настройка кнопки PLAY
+                    tgWebApp.MainButton.setText("PLAY");
+                    tgWebApp.MainButton.show();
+                    tgWebApp.MainButton.onClick(() => {
+                        if (myGameInstance) {
+                            myGameInstance.SendMessage('GameController', 'StartGame');
+                        }
+                    });
+                    
+                    // 6. Инициализация данных пользователя
+                    const user = tgWebApp.initDataUnsafe.user;
+                    if (user && myGameInstance) {
+                        const userData = {
+                            id: user.id,
+                            name: user.first_name || "Player",
+                            username: user.username || "",
+                            photo: user.photo_url || ""
+                        };
+                        myGameInstance.SendMessage('UserManager', 'SetUserData', JSON.stringify(userData));
                     }
                 } else {
-                    console.log('No cloud save data');
+                    console.warn('Telegram Web App SDK not found');
                 }
-            });
-        }
-
-        function SaveToCloud(data) {
-            if (!tgWebApp) return;
-            
-            const jsonData = JSON.stringify(data);
-            tgWebApp.CloudStorage.setItem('gameData', jsonData, (err) => {
-                if (err) {
-                    console.error('Cloud save error:', err);
-                } else {
-                    console.log('Game saved to cloud');
-                }
-            });
-        }
-
-        // Обработка данных пользователя
-        function InitUserData() {
-            if (!tgWebApp) return null;
-            
-            const user = tgWebApp.initDataUnsafe.user;
-            if (!user) return null;
-            
-            const userData = {
-                id: user.id,
-                firstName: user.first_name,
-                lastName: user.last_name,
-                username: user.username,
-                photoUrl: user.photo_url,
-                language: user.language_code
-            };
-            
-            if (myGameInstance) {
-                myGameInstance.SendMessage('UserManager', 'SetUserData', JSON.stringify(userData));
+            } catch (e) {
+                console.error('Telegram initialization error:', e);
             }
-            
-            return userData;
         }
 
-        // Покупки (имитация)
-        function ProcessPurchase(itemId) {
-            console.log(`Purchase request for: ${itemId}`);
+        // 7. Загрузка облачных сохранений
+        function loadCloudStorage() {
+            if (!tgWebApp || !tgWebApp.CloudStorage) return;
             
-            // В реальном приложении здесь должен быть вызов Telegram Payments
-            // Для демо просто отправляем подтверждение
-            
-            setTimeout(() => {
-                if (myGameInstance) {
-                    myGameInstance.SendMessage('ShopManager', 'PurchaseComplete', itemId);
+            tgWebApp.CloudStorage.getItem('gameData', (err, data) => {
+                if (!err && data && myGameInstance) {
+                    myGameInstance.SendMessage('SaveManager', 'LoadData', data);
                 }
-            }, 1500);
+            });
         }
 
-        // Отправка данных в Telegram
-        function ShareScore(score) {
-            if (!tgWebApp) return;
-            
-            const shareData = {
-                score: score,
-                message: `I scored ${score} points! Can you beat me?`
-            };
-            
-            tgWebApp.sendData(JSON.stringify(shareData));
+        // 8. Функция сохранения в облако
+        function saveToCloud(data) {
+            if (tgWebApp && tgWebApp.CloudStorage && data) {
+                tgWebApp.CloudStorage.setItem('gameData', JSON.stringify(data));
+            }
         }
 
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
-            InitTelegram();
+        // 9. Инициализация при полной загрузке страницы
+        window.addEventListener('load', () => {
+            initTelegram();
+            if (tgWebApp) {
+                loadCloudStorage();
+            }
         });
 
-        document.body.appendChild(script);
+        // 10. Экспортируем функции для Unity
+        window.ShareScore = function(score) {
+            if (tgWebApp) {
+                tgWebApp.sendData(JSON.stringify({score: score}));
+            }
+        };
+
+        window.SaveGame = function(data) {
+            saveToCloud(data);
+        };
     </script>
 </body>
 </html>
