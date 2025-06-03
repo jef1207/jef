@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Мультиплеер в Telegram</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #0f0c29; font-family: Arial, sans-serif; }
+    #info { position: absolute; top: 15px; left: 15px; color: white; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; z-index: 10; }
+    #controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 20px; z-index: 10; }
+    .control-btn { width: 60px; height: 60px; background: rgba(255,255,255,0.2); border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; user-select: none; touch-action: manipulation; }
+    #telegram-login { position: absolute; top: 15px; right: 15px; z-index: 10; }
+    #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; z-index: 100; }
+  </style>
+</head>
+<body>
+  <div id="loading">Загрузка игры...</div>
+  <div id="info">Игроков онлайн: 1</div>
+  <div id="telegram-login"></div>
+  
+  <div id="controls" style="display: none;">
+    <div class="control-btn" id="up">↑</div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="control-btn" id="left">←</div>
+      <div class="control-btn" id="down">↓</div>
+      <div class="control-btn" id="right">→</div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Инициализация Telegram WebApp
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.enableClosingConfirmation();
+    
+    // Показать основную кнопку Telegram
+    tg.MainButton.setText('ВЫЙТИ ИЗ ИГРЫ');
+    tg.MainButton.show();
+    tg.MainButton.onClick(() => {
+      tg.close();
+    });
+    
+    // Элементы интерфейса
+    const loadingScreen = document.getElementById('loading');
+    const controls = document.getElementById('controls');
+    const infoPanel = document.getElementById('info');
+    
+    // Инициализация Three.js
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    // Освещение
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(10, 20, 15);
+    scene.add(directionalLight);
+
+    // Игровая площадка
+    const createGameField = () => {
+      // Пол
+      const groundGeometry = new THREE.PlaneGeometry(30, 30);
+      const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x2c3e50,
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      scene.add(ground);
+      
+      // Декорации
+      const gridHelper = new THREE.GridHelper(30, 30, 0xffffff, 0xffffff);
+      gridHelper.position.y = 0.01;
+      scene.add(gridHelper);
+      
+      // Стены
+      const wallGeometry = new THREE.BoxGeometry(30, 5, 1);
+      const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x3498db });
+      
+      const wallPositions = [
+        [0, 2.5, 15],
+        [0, 2.5, -15],
+        [15, 2.5, 0],
+        [-15, 2.5, 0]
+      ];
+      
+      wallPositions.forEach(pos => {
+        const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall.position.set(pos[0], pos[1], pos[2]);
+        
+        if (pos[0] !== 0) {
+          wall.rotation.y = Math.PI / 2;
+        }
+        
+        scene.add(wall);
+      });
+    };
+    
+    createGameField();
+
+    // Игроки
+    const players = {};
+    let myPlayerId, myPlayer;
+    
+    // Подключение к WebSocket
+    const connectWebSocket = () => {
+      const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsHost = window.location.host;
+      const ws = new WebSocket(`${wsScheme}//${wsHost}`);
+      
+      ws.onopen = () => {
+        console.log('WebSocket подключен');
+        loadingScreen.style.display = 'none';
+        controls.style.display = 'flex';
+      };
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket ошибка:', error);
+        loadingScreen.textContent = 'Ошибка подключения. Перезагрузите страницу.';
+      };
+      
+      ws.onclose = () => {
+        console.log('WebSocket отключен');
+        loadingScreen.style.display = 'flex';
+        loadingScreen.textContent = 'Соединение потеряно. Перезагрузите страницу.';
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          switch(data.type) {
+            case 'init':
+              myPlayerId = data.playerId;
+              spawnPlayer(myPlayerId, 0, 0.5, 0);
+              Object.keys(data.players).forEach(id => {
+                if(id !== myPlayerId) spawnPlayer(id, data.players[id]);
+              });
+              updatePlayerCount();
+              break;
+              
+            case 'join':
+              spawnPlayer(data.playerId, 0, 0.5, 0);
+              updatePlayerCount();
+              break;
+              
+            case 'update':
+              if(players[data.playerId]) {
+                players[data.playerId].position.set(
+                  data.position.x,
+                  data.position.y,
+                  data.position.z
+                );
+              }
+              break;
+              
+            case 'leave':
+              if(players[data.playerId]) {
+                scene.remove(players[data.playerId]);
+                delete players[data.playerId];
+                updatePlayerCount();
+              }
+              break;
+          }
+        } catch (e) {
+          console.error('Ошибка обработки сообщения:', e);
+        }
+      };
+      
+      return ws;
+    };
+    
+    let ws = connectWebSocket();
+
+    function spawnPlayer(id, position) {
+      const geometry = new THREE.CapsuleGeometry(0.4, 1, 4, 8);
+      const material = new THREE.MeshPhongMaterial({ 
+        color: id === myPlayerId ? 0x1abc9c : 0xe74c3c 
+      });
+      
+      const capsule = new THREE.Mesh(geometry, material);
+      capsule.position.set(position.x, position.y + 0.5, position.z);
+      scene.add(capsule);
+      
+      players[id] = capsule;
+      if(id === myPlayerId) myPlayer = capsule;
+      
+      // Позиция камеры
+      camera.position.set(0, 5, 5);
+      camera.lookAt(capsule.position);
+    }
+
+    function updatePlayerCount() {
+      infoPanel.textContent = `Игроков: ${Object.keys(players).length}`;
+    }
+
+    // Управление
+    const keys = {};
+    const controlBtns = ['up', 'down', 'left', 'right'];
+    
+    controlBtns.forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      
+      // Для сенсорных устройств
+      btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys[btnId] = true;
+      });
+      
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys[btnId] = false;
+      });
+      
+      // Для десктопов
+      btn.addEventListener('mousedown', () => keys[btnId] = true);
+      btn.addEventListener('mouseup', () => keys[btnId] = false);
+      btn.addEventListener('mouseleave', () => keys[btnId] = false);
+    });
+
+    function updatePosition() {
+      if(!myPlayer) return;
+      
+      const speed = 0.15;
+      if(keys['up']) myPlayer.position.z -= speed;
+      if(keys['down']) myPlayer.position.z += speed;
+      if(keys['left']) myPlayer.position.x -= speed;
+      if(keys['right']) myPlayer.position.x += speed;
+      
+      // Ограничение движения
+      myPlayer.position.x = Math.max(-14, Math.min(14, myPlayer.position.x));
+      myPlayer.position.z = Math.max(-14, Math.min(14, myPlayer.position.z));
+      
+      // Камера следует за игроком
+      camera.position.x = myPlayer.position.x;
+      camera.position.z = myPlayer.position.z + 5;
+      camera.lookAt(myPlayer.position.x, 0, myPlayer.position.z);
+      
+      // Отправка позиции на сервер
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'move',
+          position: {
+            x: myPlayer.position.x,
+            y: myPlayer.position.y,
+            z: myPlayer.position.z
+          }
+        }));
+      }
+    }
+
+    // Анимация
+    function animate() {
+      requestAnimationFrame(animate);
+      updatePosition();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Обработка изменения размера
+    function handleResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    window.addEventListener('resize', handleResize);
+    tg.onEvent('viewportChanged', handleResize);
+
+    // Кнопка авторизации
+    const loginBtn = document.createElement('button');
+    loginBtn.textContent = 'Войти через Telegram';
+    loginBtn.style.background = '#0088cc';
+    loginBtn.style.color = 'white';
+    loginBtn.style.border = 'none';
+    loginBtn.style.padding = '10px 15px';
+    loginBtn.style.borderRadius = '5px';
+    loginBtn.style.cursor = 'pointer';
+    document.getElementById('telegram-login').appendChild(loginBtn);
+    
+    loginBtn.addEventListener('click', () => {
+      tg.openTelegramLink('https://t.me/YOUR_BOT_USERNAME?start=game');
+    });
+  </script>
+</body>
+</html>
