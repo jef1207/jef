@@ -1,705 +1,135 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D Бегун | Telegram Mini App</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            touch-action: none;
-            user-select: none;
-        }
-        
-        body {
-            overflow: hidden;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            color: white;
-        }
-        
-        #gameContainer {
-            position: relative;
-            width: 100%;
-            flex-grow: 1;
-        }
-        
-        #gameCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        #uiOverlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-        
-        #scoreDisplay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        #gameTitle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 32px;
-            text-align: center;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px 40px;
-            border-radius: 20px;
-            width: 80%;
-            max-width: 400px;
-        }
-        
-        #startButton {
-            position: absolute;
-            top: 65%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(to right, #00c6ff, #0072ff);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            padding: 15px 40px;
-            cursor: pointer;
-            pointer-events: auto;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
-        }
-        
-        #startButton:hover {
-            transform: translateX(-50%) scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-        
-        #gameOverScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-        }
-        
-        #finalScore {
-            font-size: 40px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        #restartButton {
-            background: linear-gradient(to right, #00c6ff, #0072ff);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            padding: 15px 40px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            margin-top: 30px;
-        }
-        
-        .instructions {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 18px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-        }
-        
-        .controls {
-            position: absolute;
-            bottom: 80px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 10px;
-        }
-        
-        .control-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            pointer-events: auto;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.1s;
-        }
-        
-        .control-btn.active {
-            transform: scale(0.9);
-            background: rgba(0, 200, 255, 0.4);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        
-        .obstacle-label {
-            position: absolute;
-            background: rgba(255, 50, 50, 0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: bold;
-            white-space: nowrap;
-            pointer-events: none;
-            z-index: 15;
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .control-btn {
-                width: 70px;
-                height: 70px;
-                font-size: 20px;
-            }
-            
-            #scoreDisplay {
-                font-size: 20px;
-                padding: 8px 16px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Мультиплеер в Telegram</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #0f0c29; font-family: Arial, sans-serif; }
+    #info { position: absolute; top: 15px; left: 15px; color: white; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; }
+    #controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 20px; }
+    .control-btn { width: 60px; height: 60px; background: rgba(255,255,255,0.2); border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; user-select: none; }
+    #telegram-login { position: absolute; top: 15px; right: 15px; }
+  </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <canvas id="gameCanvas"></canvas>
-        
-        <div id="uiOverlay">
-            <div id="scoreDisplay">Очки: 0</div>
-            
-            <div id="gameTitle">
-                <h1>3D БЕГУН</h1>
-                <p>Избегай препятствий и набирай очки!</p>
-            </div>
-            
-            <button id="startButton">СТАРТ</button>
-            
-            <div class="instructions">
-                ↑ ПРЫЖОК (над препятствиями) | ↓ ПРИСЕДАНИЕ (под препятствиями)
-            </div>
-            
-            <div class="controls">
-                <div class="control-btn" id="jumpBtn">↑</div>
-                <div class="control-btn" id="slideBtn">↓</div>
-            </div>
-        </div>
-        
-        <div id="gameOverScreen">
-            <h2>ИГРА ОКОНЧЕНА!</h2>
-            <div id="finalScore">Ваш счет: 0</div>
-            <button id="restartButton">Играть снова</button>
-        </div>
-        
-        <div class="obstacle-label" id="obstacleLabel">ПРЕПЯТСТВИЕ!</div>
+  <div id="info">Игроков онлайн: 1</div>
+  <div id="telegram-login"></div>
+  
+  <div id="controls">
+    <div class="control-btn" id="up">↑</div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="control-btn" id="left">←</div>
+      <div class="control-btn" id="down">↓</div>
+      <div class="control-btn" id="right">→</div>
     </div>
+  </div>
 
-    <script>
-        // Основные переменные игры
-        let scene, camera, renderer;
-        let player, obstacles = [];
-        let gameActive = false;
-        let score = 0;
-        let speed = 0.1;
-        let obstacleFrequency = 120; // кадры между препятствиями
-        let frameCount = 0;
-        let playerState = 'running'; // running, jumping, sliding
-        
-        // Инициализация Three.js
-        function init() {
-            // Создаем сцену
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87CEEB);
-            scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
-            
-            // Создаем камеру
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 3, 8);
-            camera.lookAt(0, 1, 0);
-            
-            // Создаем рендерер
-            renderer = new THREE.WebGLRenderer({ 
-                canvas: document.getElementById('gameCanvas'),
-                antialias: true 
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true;
-            
-            // Добавляем освещение
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(10, 20, 15);
-            directionalLight.castShadow = true;
-            scene.add(directionalLight);
-            
-            // Создаем игрока
-            createPlayer();
-            
-            // Создаем землю
-            createGround();
-            
-            // Добавляем элементы окружения
-            createEnvironment();
-            
-            // Обработчики событий
-            setupEventListeners();
-            
-            // Начинаем игровой цикл
-            animate();
-        }
-        
-        // Создание игрока
-        function createPlayer() {
-            const bodyGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
-            const bodyMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0xff4500,
-                shininess: 30
-            });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            body.position.y = 0.5;
-            body.castShadow = true;
-            
-            const headGeometry = new THREE.SphereGeometry(0.3, 16, 16);
-            const headMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0xffd700,
-                shininess: 50
-            });
-            const head = new THREE.Mesh(headGeometry, headMaterial);
-            head.position.y = 1.2;
-            head.castShadow = true;
-            
-            player = new THREE.Group();
-            player.add(body);
-            player.add(head);
-            player.position.y = 1;
-            player.position.z = 0;
-            
-            scene.add(player);
-        }
-        
-        // Создание земли
-        function createGround() {
-            // Основная земля (трава)
-            const groundGeometry = new THREE.PlaneGeometry(100, 20);
-            const groundMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x2E8B57,
-                side: THREE.DoubleSide
-            });
-            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-            ground.rotation.x = Math.PI / 2;
-            ground.position.y = 0;
-            ground.position.z = -50;
-            ground.receiveShadow = true;
-            
-            scene.add(ground);
-            
-            // Дорожка (асфальт)
-            const roadGeometry = new THREE.PlaneGeometry(4, 100);
-            const roadMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x555555,
-                side: THREE.DoubleSide
-            });
-            const road = new THREE.Mesh(roadGeometry, roadMaterial);
-            road.rotation.x = Math.PI / 2;
-            road.position.y = 0.01;
-            road.position.z = -50;
-            road.receiveShadow = true;
-            
-            scene.add(road);
-            
-            // Добавляем дорожные линии
-            for(let i = -10; i < 90; i += 2) {
-                const lineGeometry = new THREE.BoxGeometry(1, 0.05, 0.2);
-                const lineMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFF00 });
-                const line = new THREE.Mesh(lineGeometry, lineMaterial);
-                line.position.z = i - 50;
-                line.position.y = 0.02;
-                scene.add(line);
-            }
-        }
-        
-        // Создание окружения
-        function createEnvironment() {
-            // Добавляем деревья
-            for(let i = -5; i < 100; i += 3) {
-                const treeTrunkGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
-                const treeTrunkMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
-                const treeTrunk = new THREE.Mesh(treeTrunkGeometry, treeTrunkMaterial);
-                treeTrunk.position.set(Math.random() > 0.5 ? -4 : 4, 0.5, i - 50);
-                treeTrunk.castShadow = true;
-                
-                const treeCrownGeometry = new THREE.SphereGeometry(0.5, 8, 8);
-                const treeCrownMaterial = new THREE.MeshPhongMaterial({ color: 0x228B22 });
-                const treeCrown = new THREE.Mesh(treeCrownGeometry, treeCrownMaterial);
-                treeCrown.position.y = 1.5;
-                treeCrown.castShadow = true;
-                
-                const tree = new THREE.Group();
-                tree.add(treeTrunk);
-                tree.add(treeCrown);
-                
-                scene.add(tree);
-            }
-            
-            // Добавляем облака
-            for(let i = 0; i < 20; i++) {
-                const cloudGeometry = new THREE.SphereGeometry(0.5 + Math.random() * 0.3, 8, 8);
-                const cloudMaterial = new THREE.MeshPhongMaterial({ 
-                    color: 0xffffff,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                
-                const cloud = new THREE.Group();
-                
-                for(let j = 0; j < 3; j++) {
-                    const part = new THREE.Mesh(cloudGeometry, cloudMaterial);
-                    part.position.x = (j - 1) * 0.6;
-                    cloud.add(part);
-                }
-                
-                cloud.position.set(
-                    (Math.random() - 0.5) * 20,
-                    8 + Math.random() * 5,
-                    -80 + Math.random() * 160
-                );
-                
-                scene.add(cloud);
-            }
-        }
-        
-        // Создание препятствия
-        function createObstacle() {
-            const obstacleType = Math.floor(Math.random() * 3);
-            let obstacle;
-            
-            if(obstacleType === 0) {
-                // Низкое препятствие (для приседания)
-                const geometry = new THREE.BoxGeometry(1, 0.5, 0.5);
-                const material = new THREE.MeshPhongMaterial({ 
-                    color: 0xff0000,
-                    emissive: 0x440000,
-                    shininess: 90
-                });
-                obstacle = new THREE.Mesh(geometry, material);
-                obstacle.position.y = 0.25;
-                obstacle.userData.type = 'low';
-            } else {
-                // Высокое препятствие (для прыжка)
-                const geometry = new THREE.BoxGeometry(0.8, 1.2, 0.8);
-                const material = new THREE.MeshPhongMaterial({ 
-                    color: 0x0000ff,
-                    emissive: 0x000044,
-                    shininess: 90
-                });
-                obstacle = new THREE.Mesh(geometry, material);
-                obstacle.position.y = 0.6;
-                obstacle.userData.type = 'high';
-            }
-            
-            obstacle.position.z = -20;
-            obstacle.position.x = (Math.random() - 0.5) * 2;
-            obstacle.castShadow = true;
-            scene.add(obstacle);
-            obstacles.push(obstacle);
-            
-            // Подсветка нового препятствия
-            obstacle.userData.highlight = true;
-            setTimeout(() => {
-                if(obstacle.userData) obstacle.userData.highlight = false;
-            }, 1000);
-        }
-        
-        // Обновление игры
-        function updateGame() {
-            if(!gameActive) return;
-            
-            // Обновляем счет
-            score += 1;
-            document.getElementById('scoreDisplay').textContent = `Очки: ${Math.floor(score/10)}`;
-            
-            // Увеличиваем сложность
-            if(score % 500 === 0) {
-                speed += 0.02;
-                if(obstacleFrequency > 60) obstacleFrequency -= 5;
-            }
-            
-            // Создаем препятствия
-            frameCount++;
-            if(frameCount % obstacleFrequency === 0) {
-                createObstacle();
-            }
-            
-            // Обновляем препятствия
-            for(let i = obstacles.length - 1; i >= 0; i--) {
-                const obstacle = obstacles[i];
-                obstacle.position.z += speed;
-                
-                // Анимация подсветки
-                if(obstacle.userData.highlight) {
-                    const intensity = 0.5 + 0.5 * Math.sin(Date.now() * 0.01);
-                    obstacle.material.emissive.r = obstacle.userData.type === 'low' ? intensity * 0.4 : 0;
-                    obstacle.material.emissive.g = 0;
-                    obstacle.material.emissive.b = obstacle.userData.type === 'high' ? intensity * 0.4 : 0;
-                }
-                
-                // Показываем подсказку для ближайшего препятствия
-                if(obstacle.position.z > -5 && obstacle.position.z < 0) {
-                    showObstacleHint(obstacle);
-                }
-                
-                // Проверка столкновения
-                if(checkCollision(player, obstacle)) {
-                    collisionEffect(obstacle);
-                    endGame();
-                    return;
-                }
-                
-                // Удаляем препятствия, которые прошли мимо
-                if(obstacle.position.z > 10) {
-                    scene.remove(obstacle);
-                    obstacles.splice(i, 1);
-                }
-            }
-            
-            // Анимация бега
-            if(playerState === 'running') {
-                player.rotation.z = Math.sin(Date.now() * 0.01) * 0.1;
-            }
-        }
-        
-        // Показать подсказку для препятствия
-        function showObstacleHint(obstacle) {
-            const label = document.getElementById('obstacleLabel');
-            const rect = document.getElementById('gameCanvas').getBoundingClientRect();
-            
-            // Позиция в 2D
-            const vector = new THREE.Vector3(
-                obstacle.position.x,
-                obstacle.position.y + 1,
-                obstacle.position.z
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Инициализация Three.js
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
+
+    // Освещение
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(10, 20, 15);
+    scene.add(directionalLight);
+
+    // Пол (игровая площадка)
+    const groundGeometry = new THREE.PlaneGeometry(30, 30);
+    const groundMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0x2c3e50,
+      roughness: 0.8,
+      metalness: 0.2
+    });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+
+    // Игроки
+    const players = {};
+    let myPlayerId, myCube;
+    
+    // Инициализация Telegram Web App
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.enableClosingConfirmation();
+    
+    // Кнопка авторизации
+    const loginBtn = document.createElement('button');
+    loginBtn.textContent = 'Войти через Telegram';
+    loginBtn.style.background = '#0088cc';
+    loginBtn.style.color = 'white';
+    loginBtn.style.border = 'none';
+    loginBtn.style.padding = '10px 15px';
+    loginBtn.style.borderRadius = '5px';
+    loginBtn.style.cursor = 'pointer';
+    document.getElementById('telegram-login').appendChild(loginBtn);
+    
+    loginBtn.addEventListener('click', () => {
+      tg.openTelegramLink('https://t.me/your_bot?start=game');
+    });
+
+    // Подключение к серверу
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      switch(data.type) {
+        case 'init':
+          myPlayerId = data.playerId;
+          spawnPlayer(myPlayerId, 0, 0.5, 0);
+          Object.keys(data.players).forEach(id => {
+            if(id !== myPlayerId) spawnPlayer(id, data.players[id]);
+          });
+          updatePlayerCount();
+          break;
+          
+        case 'join':
+          spawnPlayer(data.playerId, 0, 0.5, 0);
+          updatePlayerCount();
+          break;
+          
+        case 'update':
+          if(players[data.playerId]) {
+            players[data.playerId].position.set(
+              data.position.x,
+              data.position.y,
+              data.position.z
             );
-            
-            vector.project(camera);
-            
-            const x = (vector.x * 0.5 + 0.5) * rect.width;
-            const y = (-vector.y * 0.5 + 0.5) * rect.height;
-            
-            label.style.display = 'block';
-            label.style.left = (x - label.offsetWidth/2) + 'px';
-            label.style.top = (y - 40) + 'px';
-            
-            if(obstacle.userData.type === 'high') {
-                label.textContent = 'ПРЫГАЙ! ↑';
-                label.style.background = 'rgba(50, 50, 255, 0.8)';
-            } else {
-                label.textContent = 'ПРИСЕДАЙ! ↓';
-                label.style.background = 'rgba(255, 50, 50, 0.8)';
-            }
-        }
-        
-        // Эффект столкновения
-        function collisionEffect(obstacle) {
-            // Визуальный эффект
-            obstacle.material.color.set(0xff0000);
-            obstacle.material.emissive.set(0xff0000);
-            obstacle.scale.set(1.2, 1.2, 1.2);
-            
-            // Звуковой эффект (в реальном приложении)
-            try {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                oscillator.type = 'sawtooth';
-                oscillator.frequency.setValueAtTime(200, context.currentTime);
-                oscillator.frequency.exponentialRampToValueAtTime(50, context.currentTime + 0.5);
-                
-                const gainNode = context.createGain();
-                gainNode.gain.setValueAtTime(0.5, context.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(context.destination);
-                
-                oscillator.start();
-                oscillator.stop(context.currentTime + 0.5);
-            } catch(e) {
-                console.log("Аудио не поддерживается");
-            }
-        }
-        
-        // Проверка столкновений
-        function checkCollision(player, obstacle) {
-            const playerBox = new THREE.Box3().setFromObject(player);
-            const obstacleBox = new THREE.Box3().setFromObject(obstacle);
-            return playerBox.intersectsBox(obstacleBox);
-        }
-        
-        // Прыжок
-        function jump() {
-            if(playerState !== 'running') return;
-            
-            // Анимация кнопки
-            const btn = document.getElementById('jumpBtn');
-            btn.classList.add('active');
-            setTimeout(() => btn.classList.remove('active'), 150);
-            
-            playerState = 'jumping';
-            player.position.y = 2;
-            
-            setTimeout(() => {
-                player.position.y = 1;
-                playerState = 'running';
-            }, 600);
-        }
-        
-        // Приседание
-        function slide() {
-            if(playerState !== 'running') return;
-            
-            // Анимация кнопки
-            const btn = document.getElementById('slideBtn');
-            btn.classList.add('active');
-            setTimeout(() => btn.classList.remove('active'), 150);
-            
-            playerState = 'sliding';
-            player.scale.y = 0.5;
-            player.position.y = 0.5;
-            
-            setTimeout(() => {
-                player.scale.y = 1;
-                player.position.y = 1;
-                playerState = 'running';
-            }, 800);
-        }
-        
-        // Завершение игры
-        function endGame() {
-            gameActive = false;
-            document.getElementById('finalScore').textContent = `Ваш счет: ${Math.floor(score/10)}`;
-            document.getElementById('gameOverScreen').style.display = 'flex';
-            document.getElementById('obstacleLabel').style.display = 'none';
-        }
-        
-        // Начало игры
-        function startGame() {
-            // Сброс состояния
-            gameActive = true;
-            score = 0;
-            speed = 0.1;
-            obstacleFrequency = 120;
-            frameCount = 0;
-            playerState = 'running';
-            
-            // Удаляем старые препятствия
-            for(let obstacle of obstacles) {
-                scene.remove(obstacle);
-            }
-            obstacles = [];
-            
-            // Сбрасываем позицию игрока
-            player.position.y = 1;
-            player.scale.y = 1;
-            
-            // Скрываем экран старта и завершения игры
-            document.getElementById('gameTitle').style.display = 'none';
-            document.getElementById('startButton').style.display = 'none';
-            document.getElementById('gameOverScreen').style.display = 'none';
-            document.getElementById('obstacleLabel').style.display = 'none';
-        }
-        
-        // Настройка обработчиков событий
-        function setupEventListeners() {
-            document.getElementById('startButton').addEventListener('click', startGame);
-            document.getElementById('restartButton').addEventListener('click', startGame);
-            
-            document.getElementById('jumpBtn').addEventListener('click', jump);
-            document.getElementById('slideBtn').addEventListener('click', slide);
-            
-            // Обработка касаний для мобильных устройств
-            document.addEventListener('touchstart', (e) => {
-                if(!gameActive) return;
-                
-                if(e.touches[0].clientY < window.innerHeight / 2) {
-                    jump();
-                } else {
-                    slide();
-                }
-            });
-            
-            // Обработка клавиатуры для ПК
-            document.addEventListener('keydown', (e) => {
-                if(!gameActive) return;
-                
-                if(e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') {
-                    jump();
-                } else if(e.key === 'ArrowDown' || e.key === 's') {
-                    slide();
-                }
-            });
-            
-            // Обработка изменения размера окна
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
-        
-        // Игровой цикл
-        function animate() {
-            requestAnimationFrame(animate);
-            updateGame();
-            renderer.render(scene, camera);
-        }
-        
-        // Запуск игры при загрузке
-        window.onload = init;
-    </script>
-</body>
-</html>
+          }
+          break;
+          
+        case 'leave':
+          if(players[data.playerId]) {
+            scene.remove(players[data.playerId]);
+            delete players[data.playerId];
+            updatePlayerCount();
+          }
+          break;
+      }
+    };
+
+    function spawnPlayer(id, position) {
+      const geometry = new THREE.CapsuleGeometry(0.4, 1, 4, 8);
+      const material = new THREE.MeshPhongMaterial({ 
+        color: id === myPlayerId ? 0x1abc9c : 0xe74c3c 
+      });
+      
+      const capsule = new THREE.Mesh(geometry, material);
+      capsule.position.set(position.x, position.y + 0.5, position.z);
+      scene.add(capsule);
+      
+      players[id] = capsule;
+      if(id === myPlayerId) myCube = capsule
