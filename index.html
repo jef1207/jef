@@ -167,6 +167,27 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             pointer-events: auto;
             border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.1s;
+        }
+        
+        .control-btn.active {
+            transform: scale(0.9);
+            background: rgba(0, 200, 255, 0.4);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .obstacle-label {
+            position: absolute;
+            background: rgba(255, 50, 50, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 15;
+            display: none;
         }
         
         @media (max-width: 768px) {
@@ -198,7 +219,7 @@
             <button id="startButton">СТАРТ</button>
             
             <div class="instructions">
-                Нажми на экран или используй кнопки для прыжков и уклонений
+                ↑ ПРЫЖОК (над препятствиями) | ↓ ПРИСЕДАНИЕ (под препятствиями)
             </div>
             
             <div class="controls">
@@ -212,6 +233,8 @@
             <div id="finalScore">Ваш счет: 0</div>
             <button id="restartButton">Играть снова</button>
         </div>
+        
+        <div class="obstacle-label" id="obstacleLabel">ПРЕПЯТСТВИЕ!</div>
     </div>
 
     <script>
@@ -224,6 +247,7 @@
         let obstacleFrequency = 120; // кадры между препятствиями
         let frameCount = 0;
         let playerState = 'running'; // running, jumping, sliding
+        let textures = {};
         
         // Инициализация Three.js
         function init() {
@@ -244,6 +268,10 @@
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            
+            // Загружаем текстуры
+            loadTextures();
             
             // Добавляем освещение
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -270,17 +298,91 @@
             animate();
         }
         
+        // Загрузка текстур
+        function loadTextures() {
+            const textureLoader = new THREE.TextureLoader();
+            
+            // Создаем простые текстуры с помощью Canvas
+            textures.grass = createGrassTexture();
+            textures.asphalt = createAsphaltTexture();
+            textures.wood = createWoodTexture();
+            textures.metal = createMetalTexture();
+        }
+        
+        function createGrassTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            // Основа - зеленый
+            ctx.fillStyle = '#2E8B57';
+            ctx.fillRect(0, 0, 256, 256);
+            
+            // Травинки
+            ctx.strokeStyle = '#3CB371';
+            ctx.lineWidth = 2;
+            for(let i = 0; i < 100; i++) {
+                ctx.beginPath();
+                const x = Math.random() * 256;
+                const y = Math.random() * 256;
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + (Math.random()-0.5)*10, y + 10 + Math.random()*20);
+                ctx.stroke();
+            }
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(20, 2);
+            return texture;
+        }
+        
+        function createAsphaltTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            // Серый фон
+            ctx.fillStyle = '#555555';
+            ctx.fillRect(0, 0, 256, 256);
+            
+            // Камни/зернистость
+            ctx.fillStyle = '#444444';
+            for(let i = 0; i < 500; i++) {
+                const x = Math.random() * 256;
+                const y = Math.random() * 256;
+                const size = 1 + Math.random()*3;
+                ctx.fillRect(x, y, size, size);
+            }
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(10, 1);
+            return texture;
+        }
+        
         // Создание игрока
         function createPlayer() {
             const bodyGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
-            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xff4500 });
+            const bodyMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xff4500,
+                shininess: 30
+            });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
             body.position.y = 0.5;
+            body.castShadow = true;
             
             const headGeometry = new THREE.SphereGeometry(0.3, 16, 16);
-            const headMaterial = new THREE.MeshPhongMaterial({ color: 0xffd700 });
+            const headMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xffd700,
+                shininess: 50
+            });
             const head = new THREE.Mesh(headGeometry, headMaterial);
             head.position.y = 1.2;
+            head.castShadow = true;
             
             player = new THREE.Group();
             player.add(body);
@@ -293,25 +395,41 @@
         
         // Создание земли
         function createGround() {
-            const groundGeometry = new THREE.PlaneGeometry(100, 10);
+            // Основная земля (трава)
+            const groundGeometry = new THREE.PlaneGeometry(100, 20);
             const groundMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x32CD32,
+                map: textures.grass,
                 side: THREE.DoubleSide
             });
             const ground = new THREE.Mesh(groundGeometry, groundMaterial);
             ground.rotation.x = Math.PI / 2;
             ground.position.y = 0;
             ground.position.z = -50;
+            ground.receiveShadow = true;
             
             scene.add(ground);
+            
+            // Дорожка (асфальт)
+            const roadGeometry = new THREE.PlaneGeometry(4, 100);
+            const roadMaterial = new THREE.MeshPhongMaterial({ 
+                map: textures.asphalt,
+                side: THREE.DoubleSide
+            });
+            const road = new THREE.Mesh(roadGeometry, roadMaterial);
+            road.rotation.x = Math.PI / 2;
+            road.position.y = 0.01;
+            road.position.z = -50;
+            road.receiveShadow = true;
+            
+            scene.add(road);
             
             // Добавляем дорожные линии
             for(let i = -10; i < 90; i += 2) {
                 const lineGeometry = new THREE.BoxGeometry(1, 0.05, 0.2);
-                const lineMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+                const lineMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFF00 });
                 const line = new THREE.Mesh(lineGeometry, lineMaterial);
                 line.position.z = i - 50;
-                line.position.y = 0.01;
+                line.position.y = 0.02;
                 scene.add(line);
             }
         }
@@ -323,12 +441,14 @@
                 const treeTrunkGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
                 const treeTrunkMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
                 const treeTrunk = new THREE.Mesh(treeTrunkGeometry, treeTrunkMaterial);
-                treeTrunk.position.set(Math.random() > 0.5 ? -2.5 : 2.5, 0.5, i - 50);
+                treeTrunk.position.set(Math.random() > 0.5 ? -4 : 4, 0.5, i - 50);
+                treeTrunk.castShadow = true;
                 
                 const treeCrownGeometry = new THREE.SphereGeometry(0.5, 8, 8);
                 const treeCrownMaterial = new THREE.MeshPhongMaterial({ color: 0x228B22 });
                 const treeCrown = new THREE.Mesh(treeCrownGeometry, treeCrownMaterial);
                 treeCrown.position.y = 1.5;
+                treeCrown.castShadow = true;
                 
                 const tree = new THREE.Group();
                 tree.add(treeTrunk);
@@ -372,21 +492,38 @@
             if(obstacleType === 0) {
                 // Низкое препятствие (для приседания)
                 const geometry = new THREE.BoxGeometry(1, 0.5, 0.5);
-                const material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: 0xff0000,
+                    emissive: 0x440000,
+                    shininess: 90
+                });
                 obstacle = new THREE.Mesh(geometry, material);
                 obstacle.position.y = 0.25;
+                obstacle.userData.type = 'low';
             } else {
                 // Высокое препятствие (для прыжка)
                 const geometry = new THREE.BoxGeometry(0.8, 1.2, 0.8);
-                const material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: 0x0000ff,
+                    emissive: 0x000044,
+                    shininess: 90
+                });
                 obstacle = new THREE.Mesh(geometry, material);
                 obstacle.position.y = 0.6;
+                obstacle.userData.type = 'high';
             }
             
             obstacle.position.z = -20;
             obstacle.position.x = (Math.random() - 0.5) * 2;
+            obstacle.castShadow = true;
             scene.add(obstacle);
             obstacles.push(obstacle);
+            
+            // Подсветка нового препятствия
+            obstacle.userData.highlight = true;
+            setTimeout(() => {
+                if(obstacle.userData) obstacle.userData.highlight = false;
+            }, 1000);
         }
         
         // Обновление игры
@@ -411,17 +548,32 @@
             
             // Обновляем препятствия
             for(let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].position.z += speed;
+                const obstacle = obstacles[i];
+                obstacle.position.z += speed;
+                
+                // Анимация подсветки
+                if(obstacle.userData.highlight) {
+                    const intensity = 0.5 + 0.5 * Math.sin(Date.now() * 0.01);
+                    obstacle.material.emissive.r = obstacle.userData.type === 'low' ? intensity * 0.4 : 0;
+                    obstacle.material.emissive.g = 0;
+                    obstacle.material.emissive.b = obstacle.userData.type === 'high' ? intensity * 0.4 : 0;
+                }
+                
+                // Показываем подсказку для ближайшего препятствия
+                if(obstacle.position.z > -5 && obstacle.position.z < 0) {
+                    showObstacleHint(obstacle);
+                }
                 
                 // Проверка столкновения
-                if(checkCollision(player, obstacles[i])) {
+                if(checkCollision(player, obstacle)) {
+                    collisionEffect(obstacle);
                     endGame();
                     return;
                 }
                 
                 // Удаляем препятствия, которые прошли мимо
-                if(obstacles[i].position.z > 10) {
-                    scene.remove(obstacles[i]);
+                if(obstacle.position.z > 10) {
+                    scene.remove(obstacle);
                     obstacles.splice(i, 1);
                 }
             }
@@ -429,6 +581,65 @@
             // Анимация бега
             if(playerState === 'running') {
                 player.rotation.z = Math.sin(Date.now() * 0.01) * 0.1;
+            }
+        }
+        
+        // Показать подсказку для препятствия
+        function showObstacleHint(obstacle) {
+            const label = document.getElementById('obstacleLabel');
+            const rect = document.getElementById('gameCanvas').getBoundingClientRect();
+            
+            // Позиция в 2D
+            const vector = new THREE.Vector3(
+                obstacle.position.x,
+                obstacle.position.y + 1,
+                obstacle.position.z
+            );
+            
+            vector.project(camera);
+            
+            const x = (vector.x * 0.5 + 0.5) * rect.width;
+            const y = (-vector.y * 0.5 + 0.5) * rect.height;
+            
+            label.style.display = 'block';
+            label.style.left = (x - label.offsetWidth/2) + 'px';
+            label.style.top = (y - 40) + 'px';
+            
+            if(obstacle.userData.type === 'high') {
+                label.textContent = 'ПРЫГАЙ! ↑';
+                label.style.background = 'rgba(50, 50, 255, 0.8)';
+            } else {
+                label.textContent = 'ПРИСЕДАЙ! ↓';
+                label.style.background = 'rgba(255, 50, 50, 0.8)';
+            }
+        }
+        
+        // Эффект столкновения
+        function collisionEffect(obstacle) {
+            // Визуальный эффект
+            obstacle.material.color.set(0xff0000);
+            obstacle.material.emissive.set(0xff0000);
+            obstacle.scale.set(1.2, 1.2, 1.2);
+            
+            // Звуковой эффект (в реальном приложении)
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(200, context.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, context.currentTime + 0.5);
+                
+                const gainNode = context.createGain();
+                gainNode.gain.setValueAtTime(0.5, context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.5);
+            } catch(e) {
+                console.log("Аудио не поддерживается");
             }
         }
         
@@ -443,6 +654,11 @@
         function jump() {
             if(playerState !== 'running') return;
             
+            // Анимация кнопки
+            const btn = document.getElementById('jumpBtn');
+            btn.classList.add('active');
+            setTimeout(() => btn.classList.remove('active'), 150);
+            
             playerState = 'jumping';
             player.position.y = 2;
             
@@ -455,6 +671,11 @@
         // Приседание
         function slide() {
             if(playerState !== 'running') return;
+            
+            // Анимация кнопки
+            const btn = document.getElementById('slideBtn');
+            btn.classList.add('active');
+            setTimeout(() => btn.classList.remove('active'), 150);
             
             playerState = 'sliding';
             player.scale.y = 0.5;
@@ -472,6 +693,7 @@
             gameActive = false;
             document.getElementById('finalScore').textContent = `Ваш счет: ${Math.floor(score/10)}`;
             document.getElementById('gameOverScreen').style.display = 'flex';
+            document.getElementById('obstacleLabel').style.display = 'none';
         }
         
         // Начало игры
@@ -498,6 +720,7 @@
             document.getElementById('gameTitle').style.display = 'none';
             document.getElementById('startButton').style.display = 'none';
             document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('obstacleLabel').style.display = 'none';
         }
         
         // Настройка обработчиков событий
