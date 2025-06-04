@@ -1,0 +1,2589 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
+ <object class="com.horstmann.violet.ClassDiagramGraph"> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>TEMPLATE_URL
+DEFAULT_DEPARTMENT_INDEX
+DEPARTMENT_ID_PATTERN
+IMAGES_BASE_URL
+manager
+game
+view
+element
+shopItems
+template
+rootNode
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Shop(game, view, config, manager)
+sortShopItems(a, b)
+_build()
+_departmentsTouchHandler(event)
+_departmentsListTouchHandler(event)
+isPopulationMaxed()
+activateShopPreviewMode(entityName)
+activateDepartment(departmentId, skipCan)
+lockActiveDepartment()
+unlockAllDepartments()
+show()
+hide()
+invalidate()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Shop</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3342.0</double> 
+     <double>28.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>ContractState
+clicked</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Ship(game, config)
+_answerGetRequiredItem(message)
+startContract()
+upgrade()
+collectContract()
+getInfoModeString()
+_setUpgradeable(isUpgradable)
+destructor()
+toSerializable()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Ship</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3143.0</double> 
+     <double>769.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>getScale()
+setScale(to)
+reset()
+getClientSize()
+maximize()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Viewport</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>909.0</double> 
+     <double>20.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>view
+rootNode
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>AnimsFactory(view, config)
+initAnimationDefinitions()
+castleUpgradeTransition()
+getFeedbackSettings(type)
+createAnim(config)
+showFeedback(config)
+showItemFeedback(config)
+figureAmount(config)
+foodSupply(entityView)
+supply(entityView, config)
+showXPFeedback(message)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>AnimsFactory
+</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>302.0</double> 
+     <double>456.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>callback
+progressMeter
+progressCounter
+loaded</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>AssetsLoader()
+init()
+visualizeProgress()
+onProgress(ev)
+onUpdateReady()
+onSuccess()
+onFailure()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>AssetsLoader</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>299.0</double> 
+     <double>732.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Castle(game, config)
+getInfoModeString()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Castle</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>601.0</double> 
+     <double>276.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+parentNode</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>CastleUpgradeMode(manager, config)
+build()
+clickHandler(ev)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>CastleUpgradeMode</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>556.0</double> 
+     <double>468.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode0" class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>Events
+actionsMenu
+entity
+wasPrevConstruction
+underConstructionImage
+events</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>CastleView(view, entity)
+initEventHandlers()
+touchHandler(ev)
+isFocusable()
+setUnderConstruction(isUnderConstruction)
+getImageFrame()
+upgrade()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>CastleView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>494.0</double> 
+     <double>667.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode1" class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>game
+eventsBubbleTarget
+id
+x
+y
+key
+definition
+selectable
+draggable
+preview
+boost
+contractValue
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Entity(game, config)
+move(position)
+buy(position)
+isColliding(position)
+is(type)
+findEntityDefinitionByPath(game, searchFor, single)
+updateBoost(amount, type)
+toSerializable()
+getCallableName()
+getProperName()
+getInfoModeString()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Entity</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>829.0</double> 
+     <double>397.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>effectedEntities</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Decoration(game, config)
+getInfluencedEntities(entities, x, y)
+broadcastChangeAfterMove()
+applyBoosts(x, y)
+addBoosts()
+removeBoosts()
+updateBoosts(removeBoost)
+getInfoModeString()
+removeEntity(entity)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Decoration</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>871.0</double> 
+     <double>178.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>DecorationView(view, entity)
+drawInfluence()
+drawDynamic(x, y)
+drawRoundedRect(xMin, xMax, yMin, yMax)
+moveTo(xy)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>DecorationView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>849.0</double> 
+     <double>959.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+parentNode
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>DestroyMode(manager, config)
+build()
+handle(actionMessage, actionsMenu)
+confirm()
+cancel()
+goldGain(target)
+foodGain(target)
+activate(config)
+deactivate()
+position()
+show()
+hide()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>DestroyMode</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1155.0</double> 
+     <double>21.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>_instances</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>DooberTooltip(view, node, name)
+get(key)
+attach()
+add(amount)
+hide()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>DooberTooltip</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1158.0</double> 
+     <double>297.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>message
+config
+item
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Drop(config)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Drop</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1204.0</double> 
+     <double>452.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>game
+view
+config
+rootNode
+drydock
+line
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>DrydockGoals(game, view, config)
+build(template)
+show()
+hide()
+getDrydock()
+invalidateShipState()
+saveLine(lineID, goalID)
+getLineGoalID(lineID)
+finishLine()
+imageSrcFor()
+prepareL10n(l10n)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>DrydockGoals</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1166.0</double> 
+     <double>571.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>Events
+State
+events
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>DrydockGoal(data, manager)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>DrydockGoal</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1163.0</double> 
+     <double>933.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>DrydockGoalLine(manager, config, goalID)
+createGoal(goalData)
+provideGoalsScreen(goal, l10n)
+provideGoalScreenClass()
+advance()
+progressLine()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>DrydockGoalLine</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1133.0</double> 
+     <double>1058.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>hp
+punchesLeftUntilKill</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Enemy(game, config)
+punch()
+collectRewards(rewards)
+remove()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Enemy</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1443.0</double> 
+     <double>19.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>animating
+frameIndex
+enemyDef
+dyingEnemyDef
+dyingEnemyImg
+dyingEnemyWidth
+dyingEnemyHeight
+dyingEnemyOffsetX
+dyingEnemyOffsetY</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>EnemyView(view, entity)
+drawStatic(x, y)
+drawDynamic(x, y)
+getImageFrame()
+animatePunch()
+whackAnimation()
+killAnimation()
+onKillAnimationEnd()
+swapSprites(img, width, height, addOffset)
+remove()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>EnemyView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1392.0</double> 
+     <double>167.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>view
+entity
+actions
+eventsBubbleTarget
+ctx
+bufferCtx
+entity
+x
+y
+flexX
+flexY
+zIndex
+image
+width
+height
+colliding
+dynamic
+showBoostInfo
+iconCircle</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>EntityView(view, entity)
+initDraggability()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>EntityView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1434.0</double> 
+     <double>546.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>ContractState
+contractState
+contractValue
+_timeout</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>FarmField(game, config)
+checkContract()
+activateContract(seedName, silent)
+startContract()
+finishContract()
+collectContract()
+setIdle()
+getContractValue()
+getInfoModeString()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>FarmField</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1403.0</double> 
+     <double>957.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>SpriteMap
+foodIconImage
+foodIconWidth
+foodIconHeight
+foodIconOffsetX
+foodIconOffsetY
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>FarmFieldView(view, entity)
+moved()
+createActionIcon()
+setActionIcon()
+touchHandler()
+collectContract()
+isFocusable()
+cacheImageFrame()
+drawDynamic(x, y)
+destructor()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>FarmFieldView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1711.0</double> 
+     <double>25.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>playerData
+entitiesDefinition
+entities
+decorations
+worldEntity
+mapRel
+
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Game(config)
+instance()
+_updateContracts()
+_updatesAfterPhoneIdle()
+initializeSubscriptions()
+generateGridMaps()
+enemyRespawn()
+init()
+createEntity(entityConfig)
+removeEntit(entity)
+onEntityMove(message)
+onEntityBoughtAndPlaced(message)
+updateBoosts(entity)
+addToGridMap(entity, x, y)
+removeFromGridMap(entity, x, y)
+testCollisions(rect, entity)
+testCollisions2(rect, entity, returnEntities, entities)
+contractStartHandler(message)
+contractCollectHandler(message)
+levelUp()
+buyHandler()
+drain(stat, amount, entityView)
+foodNotificationHandler(stat, amount, foodTreshold)
+hasStat(stat, amount)
+getStat(stat)
+increase(stat, amount, entity)
+getPopulation()
+updateMapData()
+isAreaOnCoast(area)
+
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Game</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1649.0</double> 
+     <double>330.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>game
+view
+hud
+infoMode
+moveMode
+Mode
+shopPreviewMode
+seedMode
+roadsMode
+castleUpgradeMode
+destroyMode</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>GameModesManager(game, view, hud, config) 
+setMode(mode, config)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>GameModesManager</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1640.0</double> 
+     <double>942.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>Events
+Flags
+State
+game
+view
+subgoals
+rewards
+goalID</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Goal(data, manager)
+wireIn(game, view)
+setupSubgoalData(subgoal)
+getSubgoalStat(ID)
+setupSubscribers()
+maybeUpdateSubgoal(message)
+collectSubgoal(subgoal)
+announce()
+maybeUpdateState()
+saveSubgoalStats()
+destroySubscribers()
+destroyLocalData()
+destructor()
+getState()
+advance()
+collectRewards()
+htmlState()
+doHaveThing(subgoal)
+_subgoalWantsTree(subgoal)
+_analyzeTrees(trees, subgoal, shortcut)
+
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Goal</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2010.0</double> 
+     <double>27.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>State</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>GoalLine(manager, line, goalID)
+getNextGoalID()
+imageSrcFor(arg)
+build()
+provideGoalsScreen(goal, l10n)
+provideGoalScreenClass()
+show()
+hide()
+getCurrentGoal()
+createGoal()
+get(goalID)
+advance(advancePressed)
+publishNewGoalOnBuild()
+completeGoal()
+progressLine()
+getGoalIcon()
+finishLine()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>GoalLine</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2030.0</double> 
+     <double>525.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>game
+view
+subscribed
+element
+template
+rootNode</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Goals(game, view, config)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Goals</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2166.0</double> 
+     <double>874.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode2" class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>ContractState
+contract
+constructionStartTime
+contractState
+connected
+wasConnected</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>House(game, config)
+resetConnection()
+disconnect()
+connect()
+startConstruction()
+constructionCountdown()
+finishConstruction()
+acceptConstruction()
+activateContract()
+startContract()
+restoreContract(contract)
+finishContract()
+pauseContract()
+unpauseContract()
+collectContract()
+getContractTimeLeft()
+getConstructionTimeLeft()
+getContractValue()
+getInfoModeString()
+toSerializable()
+beforeDestroy()
+destructor()
+
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>House</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1973.0</double> 
+     <double>882.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>busy
+entity
+iconDefinitions
+icon
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>HouseView(view, entity)
+isFocusable()
+bindToEntity(entity)
+_initIconDefinitions()
+_initIconDefinition(key)
+_setIconOffsets(icon)
+createActionIcon()
+moved()
+setActionIcon()
+startConstruction()
+finishConstruction()
+acceptConstruction()
+useConstructionDefinition()
+updateImage()
+_changeActionIconByDefinition(def)
+drawDynamic(x, y)
+touchHandler()
+collectContract()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>HouseView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2158.0</double> 
+     <double>1047.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>GOALS_ATTENTION_GRABBER_TIMEOUT
+game
+view
+elements
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>HUD(game, view)
+createCheatHUD()
+incTime()
+createHUD()
+playerUpdateHandler()
+addGoalButtonNotif(config)
+getGoalIcon(lineID)
+handleNoGoals(message)
+subgoalCompleteHandler(message)
+subgoalCollectedHandler(message)
+addGoalNotification(elem, string)
+removeGoalNotification(elem)
+addStarNotification(message)
+handleGoalComplete(message)
+handleNewGoal(message)
+initButtons()
+popupHandler(config)
+showPopup(config, response, doReload)
+hide()
+show()
+initGoalsAttentionGrabber()
+shakeGoalIcon()
+getShakerFunction(element)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>HUD</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2282.0</double> 
+     <double>25.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>_instance
+overlay</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Overlay()
+instance()
+get()
+show()
+hide()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Overlay</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2272.0</double> 
+     <double>497.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>overlayUrlBar
+_instance</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>OverlayUrlBar()
+instance()
+get()
+show()
+hide()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>OverlayUrlBar</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2418.0</double> 
+     <double>491.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>blocker</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>UIBlocker()
+show()
+hide()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>UIBlocker</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2320.0</double> 
+     <double>641.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+parentNode
+closeButton
+infoPanel
+menu
+rootNode</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>InfoMode(manager, config)
+build()
+activate(config)
+showProgressBar(millisecondsStart, millisecondsTotal)
+showBoosts(entity)
+deactivate()
+position()
+show()
+hide()
+handle(actionMessage, actionsMenu)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>InfoMode</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2344.0</double> 
+     <double>739.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+heap
+rig
+build
+manager
+config
+mode
+node
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>InPlaceActionsMenu(entityView, config, mode)
+rig()
+build()
+position()
+addActionButtons(node, actions)
+setActionEnabled(action, isEnabled)
+destructor()
+hide()
+show()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>InPlaceActionsMenu</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2386.0</double> 
+     <double>1033.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>rootNode
+infoPanel
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>EntityYesNo(config)
+handle(actionMessage)
+destroy()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>EntityYesNo</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2446.0</double> 
+     <double>1356.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>_instance
+view
+rootNode
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>InPlaceNotification(view)
+instance()
+show(config)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>InPlaceNotification</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2564.0</double> 
+     <double>34.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>domains</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>l10n()
+domain()
+get(key)
+set(key, value, domain)
+translate(key, domain)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>l10n</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2567.0</double> 
+     <double>163.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>data
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>LevelUP()
+build()
+unlockedAt(level)
+collectReward()
+rig(element)
+hide()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>LevelUP</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2562.0</double> 
+     <double>312.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+parentNode
+infoPanel
+closeButton
+targetStartX
+targetStartY
+locked</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>MoveMode(manager, config)
+build()
+handle(actionMessage, actionsMenu)
+worldTouchListener(ev)
+activate(config)
+deactivate()
+onTouch(ev)
+show()
+hide()
+confirm()
+cancel()
+onDragEnd()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>MoveMode</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2698.0</double> 
+     <double>734.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>PathFinder()
+initRoadsGraph()
+generateGraph(gridMap, x, y, previousNode, dirtyFlag)
+calculateDistances(node)
+findPath(graphHead, endNode)
+findHouseConnections(gridMap, graphHead, connectedHouses, dirtyFlag)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>PathFinder</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2546.0</double> 
+     <double>557.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>_game
+entities
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>People(game)
+updateGraph()
+spawn()
+respawn()
+initPopulatio()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>People</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2736.0</double> 
+     <double>1086.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>entity
+zIndex
+_worldView
+width
+height
+image
+spriteRatio
+frameWidth
+frameHeight
+frameIndex
+color
+frameX
+frameY
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>PersonView(person, worldView)
+updatePosition()
+draw(ctx, x, y)
+drawStatic()
+drawDynamic()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>PersonView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3086.0</double> 
+     <double>28.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>_people
+_worldView
+_gameModesManager
+id
+x
+y
+width
+height
+views
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>PeopleView(people, worldView, gameModesManager)
+canDraw()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>PeopleView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2669.0</double> 
+     <double>1247.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>WalkDirection
+DEFINTION_URI
+eventsBubbleTarget
+definition
+x
+y
+speed
+width
+height
+walkDirection
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Person(peopleManager, config)
+start()
+snapToGrid()
+updateWalkDirection(segment, prevSegment)
+walk(path)
+remove()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Person</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2736.0</double> 
+     <double>31.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+parentNode
+infoPanel
+closeButton
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>RoadsMode(manager, config)
+_build()
+pathsFilter(entity)
+housesFilter(entity)
+tracePath(paths, x, y, dirtyFlag, isSectionConnected, firstRun)
+getRoadRootPosition(entity)
+updateConnections(firstRun)
+checkForDisconnected()
+activate(config)
+deactivate()
+show()
+hide()
+touchHandler(event)
+isRootRoad(roadEntity)
+getCastleRootPosition()
+addRoad(position)
+removeRoad(entity, entityView)
+getReducedHits(x, y)
+
+
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>RoadsMode</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2988.0</double> 
+     <double>363.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>roadType</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>RoadView (view, entity)
+setRoadType(roadType)
+updateImage()
+getImageFrame()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>RoadView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2701.0</double> 
+     <double>382.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Rock(game, config)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Rock</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2850.0</double> 
+     <double>331.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>IMAGES_BASE_URL
+manager
+parentNode
+infoPanel
+closeButton
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>SeedMode (manager, config)
+_build()
+touchHandler(event)
+activateContract(farmField)
+activate(config)
+deactivate()
+invalidate()
+show()
+hide()
+
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>SeedMode</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2941.0</double> 
+     <double>776.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>actions
+entity
+busy</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>ShipView(view, entity)
+setActionIcon()
+_initIconDefinitions()
+bindToEntity(entity)
+onContractStartable()
+invalidate()
+isFocusable()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>ShipView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3343.0</double> 
+     <double>484.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+parentNode
+infoPanel
+closeButton
+rootNode</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>ShopPreviewMode(manager, config)
+_build()
+activate(config)
+deactivate()
+confirm()
+cancel()
+onDragEnd()
+
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>ShopPreviewMode</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3383.0</double> 
+     <double>675.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>game
+view
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Spawner(game, view)
+spawnStartup()
+getAllowedEnemies(expected)
+spawnRandomEnemies(howMany)
+spawn(key)
+spawnAtLocation(config)
+handleSpawnAtLocationPublish(message)
+getRandomTreeKey()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Spawner</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>2932.0</double> 
+     <double>1051.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>draggable
+contractPauseTime
+isHidden</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>SpecialBuilding(game, config)
+getProperName
+disconnect(firstRun)
+connect(firstRun)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>SpecialBuilding</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3010.0</double> 
+     <double>1247.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>actions
+entity
+hiddenImageDef
+hiddenImage
+hiddenImageWidth
+hiddenImageHeight
+unlockedImageDef
+unlockedImage
+unlockedImageWidth
+unlockedImageHeight
+defaultImageFrame
+image
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>SpecialBuildingView(view, entity)
+changeStateImages(isConnectedToRoad)
+notifyDiscover()
+updateImageFrame(width, height)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>SpecialBuildingView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3211.0</double> 
+     <double>992.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Tree(game, config)
+reward(rewardKey)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Tree</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3470.0</double> 
+     <double>918.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode3" class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>_instance
+config
+game
+currentStep
+screen
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Tutorial(game, config)
+instance()
+show()
+hide()
+step()
+next()
+back()
+canvas()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Tutorial</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3466.0</double> 
+     <double>1118.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode4" class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>listeners
+manager
+config</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Tutorial.Screen(manager, config)
+build()
+setupScrolling()
+makeArrow(config)
+makeHilite(config)
+makeDialog(config)
+makeText(string)
+onViewCentered(view)
+setupCanAnswer(config)
+addShowListener(eventString)
+addProgressor(eventString)
+addRegressor(eventString)
+validate(key, message)
+listen(event, fn)
+_listen(string, fn)
+setupDOMListeners()
+removeDOMListeners()
+_unlisten()
+destructor()
+show()
+hide()
+next()
+back()
+position()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Tutorial.Screen</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3220.0</double> 
+     <double>1383.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode5" class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+config
+arrow</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Tutorial.Arrow(manager, config)
+build()
+queryToCoords()
+position()
+remove()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Tutorial.Arrow</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3438.0</double> 
+     <double>1385.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode6" class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>manager
+config
+hilite
+subroutines</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Tutorial.Hilite(manager, config)
+build()
+queryToCoords()
+position()
+remove()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Tutorial.Hilite</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3639.0</double> 
+     <double>1390.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object id="ClassNode7" class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>UnfoodedHouse(game, config)
+activateContract()
+collectContract(managingView)
+unpauseContract()
+getCallableName()
+toSerializable()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>UnfoodedHouse</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>1734.0</double> 
+     <double>1208.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>x
+y
+trees
+contract
+contractStartTime
+contractState
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>UnlockableArea(game, config)
+spawnTrees(excludeArea)
+unlock()
+startContract()
+finishContract()
+countdown()
+toSerializable()
+
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>UnlockableArea</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3620.0</double> 
+     <double>26.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>UnlockableAreaKeyHandler(game)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>UnlockableAreaKeyHandler</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3621.0</double> 
+     <double>289.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>entity
+nth
+wasScrolledOn</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>UnlockableAreaView(view, entity)
+draw(ctx, x, y)
+countdown()
+finishContract()
+setupDomNode(domNode)
+setupDomNodeTitle(domNode)
+setupDomNodePopulationForUnlock(domNode)
+onUnlock()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>UnlockableAreaView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3618.0</double> 
+     <double>367.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>View()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>View</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3624.0</double> 
+     <double>594.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Viewport()
+getScale()
+setSclae()
+reset()
+getClientSize()
+maximize()</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Viewport</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3745.0</double> 
+     <double>589.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>whacks
+game
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>Whackable(game, config)
+whack()
+reward(rewardKey)
+lumberjacks(whackable)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>Whackable</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3631.0</double> 
+     <double>740.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>parent
+busy
+view
+entity
+frame</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>WhackableView(view, entity)
+touchHandler(ev)
+getWhackActionName()
+getImageFrame(touchableFrame)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>WhackableView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3620.0</double> 
+     <double>872.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>game
+selectable</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>WorldEntity(game)</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>WorldEntity</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3484.0</double> 
+     <double>1019.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>isDragAllowed
+focusedEntityView
+isScrolled
+offsetWidth
+offsetHeight 
+canvas
+entity
+rootNode
+gridUnit
+mapWidth
+mapHeight
+mapWidthPx
+mapHeightPx
+scrollLeft
+scrollTop
+rendering
+mode
+entitiesViews
+visibleEntitiesViews
+bufferCanvasChanges
+moveEntityView</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>WorldView (game, config)
+updateOrientation()
+scrollLocker()
+isFocusedEntityViewDefault(entityView)
+createCanvas()
+createBufferCanvas()
+createGridCanvas()
+createInfoCanvas()
+initWorldInteractions()
+initScrollability()
+initRenderingLoop()
+createCanvas()
+createBufferCanvas()
+setGridVisible(isVisible)
+createGridCanvas()
+createInfoCanvas()
+onGameInit(message)
+createEntityView(entity, _skipRendering)
+removeEntityView(entityView)
+filterVisibleViews()
+isEntityOnScreen(entityView)
+getPanningMargins()
+ensureEntityIsVisible(entityView)
+stopRendering()
+enableRendering()
+stopAnimating()
+enableAnimating()
+initRenderingLoop()
+drawWorldGrid(ctx)
+drawInfoGrid(ctx)
+pushIfUniqueEntityView(entityView)
+updateBufferCanvas()
+getCollidingEntitiesViews(rect)
+addToHitmap(entityView)
+removeFromHitmap(entityView)
+redrawBufferCanvas()
+staticClearRect(x, y, width, height)
+initWorldInteractions()
+handleEvent()
+clientXYtoWorldXY(position)
+getCenterCoordinates()
+setMoveEntityView(message)
+removeMoveEntityView(message)
+findEntityViewByClientXY()
+isFocusable()
+allowDrag(isDragAllowed)
+forceGrid()
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>WorldView</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3832.0</double> 
+     <double>747.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="addNode"> 
+   <object class="com.horstmann.violet.ClassNode"> 
+    <void property="attributes"> 
+     <void property="text"> 
+      <string>isScrolling
+</string> 
+     </void> 
+    </void> 
+    <void property="methods"> 
+     <void property="text"> 
+      <string>.WorldViewScrollabilityMixin()
+initScrollability()
+center()
+centerToTile(x, y)
+scrollTo(scrollLeft, scrollTop)
+setScrollLeft(scrollLeft)
+setScrollTop(scrollTop)
+</string> 
+     </void> 
+    </void> 
+    <void property="name"> 
+     <void property="text"> 
+      <string>.WorldViewScrollabilityMixin</string> 
+     </void> 
+    </void> 
+   </object> 
+   <object class="java.awt.geom.Point2D$Double"> 
+    <void method="setLocation"> 
+     <double>3546.0</double> 
+     <double>1645.0</double> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="connect"> 
+   <object class="com.horstmann.violet.ClassRelationshipEdge"> 
+    <void property="bentStyle"> 
+     <object class="com.horstmann.violet.BentStyle" field="VHV"/> 
+    </void> 
+    <void property="endArrowHead"> 
+     <object class="com.horstmann.violet.ArrowHead" field="TRIANGLE"/> 
+    </void> 
+   </object> 
+   <object idref="ClassNode0"/> 
+   <object idref="ClassNode1"/> 
+  </void> 
+  <void method="connect"> 
+   <object class="com.horstmann.violet.ClassRelationshipEdge"> 
+    <void property="bentStyle"> 
+     <object class="com.horstmann.violet.BentStyle" field="VHV"/> 
+    </void> 
+    <void property="endArrowHead"> 
+     <object class="com.horstmann.violet.ArrowHead" field="TRIANGLE"/> 
+    </void> 
+   </object> 
+   <object idref="ClassNode2"/> 
+   <object idref="ClassNode1"/> 
+  </void> 
+  <void method="connect"> 
+   <object class="com.horstmann.violet.ClassRelationshipEdge"> 
+    <void property="bentStyle"> 
+     <object class="com.horstmann.violet.BentStyle" field="HVH"/> 
+    </void> 
+    <void property="startArrowHead"> 
+     <object class="com.horstmann.violet.ArrowHead" field="DIAMOND"/> 
+    </void> 
+   </object> 
+   <object idref="ClassNode3"/> 
+   <object idref="ClassNode5"/> 
+  </void> 
+  <void method="connect"> 
+   <object class="com.horstmann.violet.ClassRelationshipEdge"> 
+    <void property="bentStyle"> 
+     <object class="com.horstmann.violet.BentStyle" field="HVH"/> 
+    </void> 
+    <void property="startArrowHead"> 
+     <object class="com.horstmann.violet.ArrowHead" field="DIAMOND"/> 
+    </void> 
+   </object> 
+   <object idref="ClassNode3"/> 
+   <object idref="ClassNode4"/> 
+  </void> 
+  <void method="connect"> 
+   <object class="com.horstmann.violet.ClassRelationshipEdge"> 
+    <void property="bentStyle"> 
+     <object class="com.horstmann.violet.BentStyle" field="HVH"/> 
+    </void> 
+    <void property="startArrowHead"> 
+     <object class="com.horstmann.violet.ArrowHead" field="DIAMOND"/> 
+    </void> 
+   </object> 
+   <object idref="ClassNode3"/> 
+   <object idref="ClassNode6"/> 
+  </void> 
+  <void method="connect"> 
+   <object class="com.horstmann.violet.ClassRelationshipEdge"> 
+    <void property="bentStyle"> 
+     <object class="com.horstmann.violet.BentStyle" field="VHV"/> 
+    </void> 
+    <void property="endArrowHead"> 
+     <object class="com.horstmann.violet.ArrowHead" field="TRIANGLE"/> 
+    </void> 
+   </object> 
+   <object idref="ClassNode7"/> 
+   <object idref="ClassNode2"/> 
+  </void> 
+ </object> 
+</java> 
