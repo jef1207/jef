@@ -9,22 +9,18 @@
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+        -webkit-tap-highlight-color: transparent;
       }
       
       body {
-        font-family: 'Droid Sans', Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background: #000;
         color: #fff;
         overflow: hidden;
         width: 100vw;
         height: 100vh;
         position: fixed;
-      }
-      
-      canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
+        touch-action: none;
       }
       
       #progress-container {
@@ -44,25 +40,26 @@
       }
       
       #loading-text {
-        font-size: 20px;
+        font-size: 18px;
         margin-bottom: 20px;
-        color: #00b0ff;
+        color: #4fc3f7;
+        padding: 0 20px;
       }
       
       #progressbar {
-        height: 8px;
+        height: 6px;
         width: 80%;
         max-width: 300px;
         background: #333;
-        border-radius: 4px;
+        border-radius: 3px;
         overflow: hidden;
       }
       
       #progress-fill {
         height: 100%;
         width: 0%;
-        background: #00b0ff;
-        border-radius: 4px;
+        background: #4fc3f7;
+        border-radius: 3px;
         transition: width 0.3s ease;
       }
       
@@ -82,7 +79,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.85);
+        background: rgba(0,0,0,0.9);
         z-index: 2000;
         flex-direction: column;
         justify-content: center;
@@ -92,31 +89,47 @@
       }
       
       #gameover-text {
-        font-size: 28px;
+        font-size: 24px;
         margin-bottom: 20px;
-        color: #ffcc00;
+        color: #ffeb3b;
       }
       
       #time {
-        font-size: 24px;
+        font-size: 20px;
         margin-bottom: 30px;
+        color: #e0e0e0;
       }
       
       #restart-btn {
-        background: #00b0ff;
+        background: #4fc3f7;
         color: white;
         border: none;
-        padding: 12px 30px;
+        padding: 14px 35px;
         font-size: 18px;
         border-radius: 30px;
         cursor: pointer;
         font-weight: bold;
-        transition: transform 0.2s, background 0.2s;
+        transition: all 0.2s;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       }
       
       #restart-btn:active {
-        transform: scale(0.95);
-        background: #0095d9;
+        transform: scale(0.96);
+        background: #29b6f6;
+      }
+      
+      #main {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
       }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -124,7 +137,7 @@
 
   <body>
     <div id="progress-container">
-      <div id="loading-text">Loading HexGL...</div>
+      <div id="loading-text">Initializing game...</div>
       <div id="progressbar">
         <div id="progress-fill"></div>
       </div>
@@ -136,12 +149,12 @@
     </div>
 
     <div id="step-5">
-      <div id="time"></div>
+      <div id="time">Time: 0:00</div>
       <div id="gameover-text">Race Completed!</div>
       <button id="restart-btn">PLAY AGAIN</button>
     </div>
 
-    <!-- Упрощенный набор скриптов -->
+    <!-- Минимальный набор скриптов -->
     <script src="libs/Three.js"></script>
     <script src="libs/Detector.js"></script>
     
@@ -160,13 +173,5 @@
     <script src="bkcore/hexgl/HexGL.js"></script>
     
     <script src="launch.js"></script>
-
-    <script>
-      // Telegram WebApp инициализация
-      if (typeof Telegram !== 'undefined') {
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
-      }
-    </script>
   </body>
 </html>
