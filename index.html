@@ -28,6 +28,24 @@
         left: 0;
         width: 100%;
       }
+      /* Стили для кнопки "Назад" */
+      .back-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10000;
+        color: white;
+        cursor: pointer;
+        background: rgba(0,0,0,0.5);
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-family: 'Arial', sans-serif;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+      .back-button:hover {
+        background: rgba(0,0,0,0.8);
+      }
     </style>
     <script type="text/javascript">
     //analytics
@@ -59,20 +77,25 @@
       </div>
     </div>
     <div id="step-2" style="display: none">
+      <div class="back-button" onclick="goBack()">Назад</div>
       <div id="ctrl-help">Click/Touch to continue.</div>
     </div>
     <div id="step-3" style="display: none">
+      <div class="back-button" onclick="goBack()">Назад</div>
       <div id="progressbar"></div>
     </div>
     <div id="step-4" style="display: none">
+      <div class="back-button" onclick="goBack()">Назад</div>
       <div id="overlay"></div>
       <div id="main"></div>
     </div>
     <div id="step-5" style="display: none">
+      <div class="back-button" onclick="goBack()">Назад</div>
       <div id="time"></div>
       <div id="ctrl-help">Click/Touch to continue.</div>
     </div>
     <div id="credits" style="display: none">
+      <div class="back-button" onclick="goBack()">Назад</div>
       <h3>Code</h3>
       <p><b>Concept and Development</b><br>Thibaut Despoulain (BKcore)</p>
       <p><b>Contributors</b><br>townxelliot<br>mahesh.kk</p>
@@ -124,6 +147,26 @@
     <script src="bkcore/hexgl/HexGL.js"></script>
 
     <script src="launch.js"></script>
+    
+    <!-- Добавленная функция для кнопки "Назад" -->
+    <script>
+      function goBack() {
+        // Показать главное меню
+        document.getElementById('step-1').style.display = 'block';
+        
+        // Скрыть все остальные экраны
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('step-3').style.display = 'none';
+        document.getElementById('step-4').style.display = 'none';
+        document.getElementById('step-5').style.display = 'none';
+        document.getElementById('credits').style.display = 'none';
+        
+        // Остановить игру, если она запущена
+        if (typeof game !== 'undefined' && game.running) {
+          game.stop();
+        }
+      }
+    </script>
 
   </body>
 </html>
