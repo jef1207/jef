@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>HexGL Racing</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+        font-family: 'Droid Sans', Arial, sans-serif;
+      }
+      canvas { 
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #overlay {
+        position: absolute;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      #progress-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 10000;
+      }
+      #progressbar {
+        height: 5px;
+        width: 80%;
+        background: #333;
+        border-radius: 3px;
+        margin-top: 20px;
+      }
+      #progressbar:after {
+        content: '';
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: #00b0ff;
+        border-radius: 3px;
+        transition: width 0.3s;
+      }
+      #loading-text {
+        color: #fff;
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      #step-5 {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        color: white;
+        z-index: 20000;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+      #restart-btn {
+        background: #00b0ff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 20px;
+        margin-top: 20px;
+        cursor: pointer;
+      }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+
+  <body>
+    <div id="progress-container">
+      <div id="loading-text">Loading HexGL...</div>
+      <div id="progressbar"></div>
+    </div>
+
+    <div id="step-4">
+      <div id="overlay"></div>
+      <div id="main"></div>
+    </div>
+
+    <div id="step-5">
+      <div id="time"></div>
+      <div id="gameover-text">Race Completed!</div>
+      <button id="restart-btn">Play Again</button>
+    </div>
+
+    <script src="libs/Three.js"></script>
+    <script src="libs/ShaderExtras.js"></script>
+    <script src="libs/postprocessing/EffectComposer.js"></script>
+    <script src="libs/postprocessing/RenderPass.js"></script>
+    <script src="libs/postprocessing/BloomPass.js"></script>
+    <script src="libs/Detector.js"></script>
+    <script src="libs/Stats.js"></script>
+
+    <script src="bkcore.coffee/controllers/TouchController.js"></script>
+    <script src="bkcore.coffee/Timer.js"></script>
+    <script src="bkcore.coffee/Utils.js"></script>
+
+    <script src="bkcore/threejs/RenderManager.js"></script>
+    <script src="bkcore/threejs/Shaders.js"></script>
+    <script src="bkcore/threejs/Particles.js"></script>
+    <script src="bkcore/threejs/Loader.js"></script>
+
+    <script src="bkcore/Audio.js"></script>
+
+    <script src="bkcore/hexgl/HUD.js"></script>
+    <script src="bkcore/hexgl/RaceData.js"></script>
+    <script src="bkcore/hexgl/ShipControls.js"></script>
+    <script src="bkcore/hexgl/ShipEffects.js"></script>
+    <script src="bkcore/hexgl/CameraChase.js"></script>
+    <script src="bkcore/hexgl/Gameplay.js"></script>
+
+    <script src="bkcore/hexgl/tracks/Cityscape.js"></script>
+
+    <script src="bkcore/hexgl/HexGL.js"></script>
+
+    <script src="launch.js"></script>
+
+    <script>
+      // Адаптация для Telegram WebApp
+      if (typeof Telegram !== 'undefined') {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        Telegram.WebApp.MainButton.hide();
+        
+        // Обработка изменения размера экрана
+        Telegram.WebApp.onEvent('viewportChanged', function() {
+          if (window.hexGL) {
+            window.hexGL.resize(
+              Telegram.WebApp.viewportWidth,
+              Telegram.WebApp.viewportHeight
+            );
+          }
+        });
+      }
+      
+      // Обработчик рестарта
+      document.getElementById('restart-btn').addEventListener('click', function() {
+        window.location.reload();
+      });
+    </script>
+  </body>
+</html>
