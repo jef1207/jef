@@ -1346,7 +1346,7 @@
             background: #e6b800;
         }
         
-        /* Modal */
+        /* Login Modal */
         .modal {
             position: fixed;
             top: 0;
@@ -1471,6 +1471,278 @@
         
         .dark-theme .modal-footer {
             border-color: #4a5568;
+        }
+        
+        /* Модальное окно исполнителей */
+        .executors-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        
+        .executors-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .executors-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(30px);
+            transition: transform 0.4s ease;
+            position: relative;
+        }
+        
+        .dark-theme .executors-modal-content {
+            background: var(--dark-card);
+        }
+        
+        .executors-modal.active .executors-modal-content {
+            transform: translateY(0);
+        }
+        
+        .executors-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+        
+        .dark-theme .executors-modal-header {
+            background: var(--dark-card);
+            border-color: #4a5568;
+        }
+        
+        .executors-modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .dark-theme .executors-modal-title {
+            color: var(--secondary);
+        }
+        
+        .close-executors-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--light-text);
+            transition: color 0.3s;
+        }
+        
+        .close-executors-modal:hover {
+            color: var(--primary);
+        }
+        
+        .dark-theme .close-executors-modal:hover {
+            color: var(--secondary);
+        }
+        
+        .executors-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .executor-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dark-theme .executor-card {
+            background: #2d3748;
+            border-color: #4a5568;
+        }
+        
+        .executor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .executor-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .executor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--light-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 24px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .dark-theme .executor-avatar {
+            background: #374151;
+            color: var(--secondary);
+        }
+        
+        .executor-info {
+            flex-grow: 1;
+        }
+        
+        .executor-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .executor-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .executor-rating .stars {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .executor-rating .stars i {
+            color: #ffcc00;
+            font-size: 14px;
+        }
+        
+        .executor-rating span {
+            font-size: 14px;
+            color: var(--light-text);
+        }
+        
+        .executor-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .dark-theme .executor-price {
+            color: var(--secondary);
+        }
+        
+        .executor-description {
+            color: var(--light-text);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .executor-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            padding: 10px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .dark-theme .executor-stats {
+            border-color: #4a5568;
+        }
+        
+        .executor-stat-item {
+            text-align: center;
+        }
+        
+        .executor-stat-value {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .executor-stat-label {
+            font-size: 13px;
+            color: var(--light-text);
+        }
+        
+        .executor-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .executor-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--light-text);
+            font-size: 14px;
+        }
+        
+        .executor-actions button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .dark-theme .executor-actions button {
+            background: var(--secondary);
+            color: #333;
+        }
+        
+        .executor-actions button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .dark-theme .executor-actions button:hover {
+            background: #e6b800;
+        }
+        
+        /* Адаптивность для модального окна */
+        @media (max-width: 768px) {
+            .executors-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .executors-modal-content {
+                width: 95%;
+            }
         }
         
         /* Responsive Design Improvements */
@@ -2314,6 +2586,21 @@
         </div>
     </div>
 
+    <!-- Модальное окно исполнителей -->
+    <div class="executors-modal" id="executors-modal">
+        <div class="executors-modal-content">
+            <div class="executors-modal-header">
+                <h3 class="executors-modal-title" id="modal-category-title">Исполнители</h3>
+                <button class="close-executors-modal" id="close-executors-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="executors-list" id="executors-list">
+                <!-- Список исполнителей будет генерироваться динамически -->
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Theme Toggle
@@ -2526,6 +2813,551 @@
                 e.preventDefault();
                 alert('Переход к регистрации исполнителя...');
             });
+            
+            // Данные исполнителей по категориям
+            const executorsData = {
+                "Ремонт и строительство": [
+                    { 
+                        name: "Иван Петров", 
+                        avatar: "ИП", 
+                        rating: 4.8, 
+                        reviews: 124, 
+                        price: "от 25 000 ₽", 
+                        description: "Опытный мастер с 10-летним стажем. Специализируюсь на комплексном ремонте квартир и офисов. Гарантия качества и соблюдение сроков.",
+                        location: "Москва",
+                        orders: 245,
+                        experience: "10 лет"
+                    },
+                    { 
+                        name: "Строительная Компания РемонтПрофи", 
+                        avatar: "РП", 
+                        rating: 4.9, 
+                        reviews: 89, 
+                        price: "от 2 000 ₽/м²", 
+                        description: "Профессиональный ремонт под ключ. Работаем с любыми видами отделочных материалов. Составляем смету бесплатно.",
+                        location: "Санкт-Петербург",
+                        orders: 412,
+                        experience: "8 лет"
+                    },
+                    { 
+                        name: "Алексей Семенов", 
+                        avatar: "АС", 
+                        rating: 4.7, 
+                        reviews: 67, 
+                        price: "от 1 500 ₽/м²", 
+                        description: "Качественный ремонт квартир и офисов. Укладка плитки, монтаж потолков, электромонтажные работы. Индивидуальный подход к каждому клиенту.",
+                        location: "Екатеринбург",
+                        orders: 156,
+                        experience: "6 лет"
+                    },
+                    { 
+                        name: "Мастер Отделки", 
+                        avatar: "МО", 
+                        rating: 4.8, 
+                        reviews: 92, 
+                        price: "от 1 800 ₽/м²", 
+                        description: "Штукатурные работы, выравнивание стен и потолков, покраска, поклейка обоев. Современные материалы и технологии.",
+                        location: "Казань",
+                        orders: 187,
+                        experience: "7 лет"
+                    }
+                ],
+                "Уборка": [
+                    { 
+                        name: "Клининговая служба Чистый Дом", 
+                        avatar: "ЧД", 
+                        rating: 4.9, 
+                        reviews: 142, 
+                        price: "от 2 500 ₽", 
+                        description: "Профессиональная уборка квартир, офисов и коттеджей. Используем экологичные средства и современное оборудование.",
+                        location: "Москва",
+                        orders: 324,
+                        experience: "5 лет"
+                    },
+                    { 
+                        name: "Марина Иванова", 
+                        avatar: "МИ", 
+                        rating: 4.8, 
+                        reviews: 89, 
+                        price: "от 1 800 ₽", 
+                        description: "Генеральная и поддерживающая уборка. Химчистка ковров и мягкой мебели. Отмываю даже самые сложные загрязнения.",
+                        location: "Казань",
+                        orders: 187,
+                        experience: "4 года"
+                    },
+                    { 
+                        name: "ЭкоУборка", 
+                        avatar: "ЭУ", 
+                        rating: 4.9, 
+                        reviews: 76, 
+                        price: "от 2 000 ₽", 
+                        description: "Уборка с использованием экологически чистых средств. Безопасно для детей и животных. Послеремонтная уборка.",
+                        location: "Новосибирск",
+                        orders: 231,
+                        experience: "3 года"
+                    }
+                ],
+                "Грузоперевозки": [
+                    { 
+                        name: "Грузоперевозки 24/7", 
+                        avatar: "ГП", 
+                        rating: 4.7, 
+                        reviews: 76, 
+                        price: "от 1 500 ₽/час", 
+                        description: "Переезды квартир и офисов. Грузчики с опытом, упаковка вещей. Газели 3,5 и 5 тонн. Работаем круглосуточно.",
+                        location: "Москва",
+                        orders: 289,
+                        experience: "7 лет"
+                    },
+                    { 
+                        name: "Александр Водитель", 
+                        avatar: "АВ", 
+                        rating: 4.9, 
+                        reviews: 54, 
+                        price: "от 1 200 ₽/час", 
+                        description: "Аккуратные и бережные переезды. Помощь с упаковкой и разборкой мебели. Фиксированные цены без скрытых платежей.",
+                        location: "Новосибирск",
+                        orders: 132,
+                        experience: "5 лет"
+                    }
+                ],
+                "Компьютерная помощь": [
+                    { 
+                        name: "IT Мастер", 
+                        avatar: "ИТ", 
+                        rating: 4.8, 
+                        reviews: 102, 
+                        price: "от 1 500 ₽", 
+                        description: "Ремонт компьютеров и ноутбуков, установка ПО, удаление вирусов, настройка сети. Выезд в день обращения.",
+                        location: "Москва",
+                        orders: 312,
+                        experience: "9 лет"
+                    },
+                    { 
+                        name: "Компьютерный Доктор", 
+                        avatar: "КД", 
+                        rating: 4.9, 
+                        reviews: 87, 
+                        price: "от 1 200 ₽", 
+                        description: "Диагностика и ремонт компьютерной техники. Настройка программного обеспечения. Восстановление данных.",
+                        location: "Санкт-Петербург",
+                        orders: 198,
+                        experience: "6 лет"
+                    }
+                ],
+                "Сантехника": [
+                    { 
+                        name: "СантехМастер", 
+                        avatar: "СМ", 
+                        rating: 4.8, 
+                        reviews: 93, 
+                        price: "от 5 000 ₽", 
+                        description: "Профессиональная установка сантехнического оборудования: смесителей, раковин, унитазов, ванн и душевых кабин. Гарантия на работы.",
+                        location: "Новосибирск",
+                        orders: 287,
+                        experience: "8 лет"
+                    },
+                    { 
+                        name: "Аварийная Сантехника", 
+                        avatar: "АС", 
+                        rating: 4.7, 
+                        reviews: 64, 
+                        price: "от 3 000 ₽", 
+                        description: "Устранение протечек, засоров, аварийные вызовы. Замена труб, установка сантехники. Работаем 24/7.",
+                        location: "Екатеринбург",
+                        orders: 176,
+                        experience: "5 лет"
+                    }
+                ],
+                "Электрика": [
+                    { 
+                        name: "Электрик Сервис", 
+                        avatar: "ЭС", 
+                        rating: 4.9, 
+                        reviews: 78, 
+                        price: "от 2 500 ₽", 
+                        description: "Электромонтажные работы любой сложности. Установка розеток, выключателей, автоматов. Прокладка проводки.",
+                        location: "Москва",
+                        orders: 245,
+                        experience: "10 лет"
+                    },
+                    { 
+                        name: "ПрофЭлектрик", 
+                        avatar: "ПЭ", 
+                        rating: 4.8, 
+                        reviews: 56, 
+                        price: "от 2 000 ₽", 
+                        description: "Услуги электрика: замена проводки, установка люстр, подключение бытовой техники. Гарантия безопасности.",
+                        location: "Казань",
+                        orders: 143,
+                        experience: "7 лет"
+                    }
+                ],
+                "Отделочные работы": [
+                    { 
+                        name: "Мастер Отделки", 
+                        avatar: "МО", 
+                        rating: 4.8, 
+                        reviews: 92, 
+                        price: "от 1 800 ₽/м²", 
+                        description: "Штукатурные работы, выравнивание стен и потолков, покраска, поклейка обоев. Современные материалы и технологии.",
+                        location: "Казань",
+                        orders: 187,
+                        experience: "7 лет"
+                    },
+                    { 
+                        name: "Студия Ремонта", 
+                        avatar: "СР", 
+                        rating: 4.9, 
+                        reviews: 67, 
+                        price: "от 2 200 ₽/м²", 
+                        description: "Комплексные отделочные работы под ключ. Дизайн-проект, подбор материалов, авторский надзор.",
+                        location: "Москва",
+                        orders: 231,
+                        experience: "5 лет"
+                    }
+                ],
+                "Ландшафтный дизайн": [
+                    { 
+                        name: "Сады и Парки", 
+                        avatar: "СП", 
+                        rating: 4.8, 
+                        reviews: 45, 
+                        price: "от 50 000 ₽", 
+                        description: "Проектирование и создание ландшафтных композиций. Озеленение, устройство газонов, садовых дорожек, водоемов.",
+                        location: "Москва",
+                        orders: 89,
+                        experience: "6 лет"
+                    },
+                    { 
+                        name: "Природный Стиль", 
+                        avatar: "ПС", 
+                        rating: 4.7, 
+                        reviews: 38, 
+                        price: "от 40 000 ₽", 
+                        description: "Ландшафтный дизайн в природном стиле. Подбор растений, уход за садом, создание альпийских горок.",
+                        location: "Санкт-Петербург",
+                        orders: 76,
+                        experience: "4 года"
+                    }
+                ],
+                "Курьерские услуги": [
+                    { 
+                        name: "Экспресс Доставка", 
+                        avatar: "ЭД", 
+                        rating: 4.8, 
+                        reviews: 123, 
+                        price: "от 300 ₽", 
+                        description: "Срочная доставка документов и посылок по городу. Надежно, быстро, недорого. Работаем 24/7.",
+                        location: "Москва",
+                        orders: 456,
+                        experience: "3 года"
+                    },
+                    { 
+                        name: "Курьер Профи", 
+                        avatar: "КП", 
+                        rating: 4.9, 
+                        reviews: 87, 
+                        price: "от 250 ₽", 
+                        description: "Доставка любых грузов по городу и области. Аккуратное обращение с посылками. Отслеживание доставки.",
+                        location: "Екатеринбург",
+                        orders: 321,
+                        experience: "2 года"
+                    }
+                ],
+                "Фото и видео съемка": [
+                    { 
+                        name: "Профессиональный Фотограф", 
+                        avatar: "ПФ", 
+                        rating: 4.9, 
+                        reviews: 67, 
+                        price: "от 5 000 ₽/час", 
+                        description: "Фотосъемка мероприятий, портретная съемка, предметная съемка. Обработка фото, печать альбомов.",
+                        location: "Москва",
+                        orders: 143,
+                        experience: "8 лет"
+                    },
+                    { 
+                        name: "Видео Студия", 
+                        avatar: "ВС", 
+                        rating: 4.8, 
+                        reviews: 54, 
+                        price: "от 10 000 ₽", 
+                        description: "Профессиональная видеосъемка мероприятий, рекламных роликов. Монтаж, цветокоррекция, спецэффекты.",
+                        location: "Санкт-Петербург",
+                        orders: 98,
+                        experience: "5 лет"
+                    }
+                ],
+                "Ремонт техники": [
+                    { 
+                        name: "Техно Сервис", 
+                        avatar: "ТС", 
+                        rating: 4.7, 
+                        reviews: 89, 
+                        price: "от 1 000 ₽", 
+                        description: "Ремонт бытовой техники: холодильников, стиральных машин, плит. Гарантия на работы и запчасти.",
+                        location: "Новосибирск",
+                        orders: 234,
+                        experience: "7 лет"
+                    },
+                    { 
+                        name: "Ремонт Гаджетов", 
+                        avatar: "РГ", 
+                        rating: 4.8, 
+                        reviews: 76, 
+                        price: "от 1 500 ₽", 
+                        description: "Ремонт смартфонов, планшетов, ноутбуков. Замена экранов, батарей, ремонт после воды. Быстро и качественно.",
+                        location: "Казань",
+                        orders: 187,
+                        experience: "4 года"
+                    }
+                ],
+                "Услуги красоты": [
+                    { 
+                        name: "Салон Красоты Премиум", 
+                        avatar: "СК", 
+                        rating: 4.9, 
+                        reviews: 132, 
+                        price: "от 2 000 ₽", 
+                        description: "Парикмахерские услуги, маникюр, педикюр, визаж, косметология. Индивидуальный подход к каждому клиенту.",
+                        location: "Москва",
+                        orders: 432,
+                        experience: "5 лет"
+                    },
+                    { 
+                        name: "Мастер Ногтевого Сервиса", 
+                        avatar: "МН", 
+                        rating: 4.9, 
+                        reviews: 98, 
+                        price: "от 1 500 ₽", 
+                        description: "Гелевое наращивание ногтей, дизайн, коррекция. Использование качественных материалов. Выезд на дом.",
+                        location: "Санкт-Петербург",
+                        orders: 265,
+                        experience: "3 года"
+                    }
+                ],
+                "Ремонт автомобилей": [
+                    { 
+                        name: "Авто Сервис Профи", 
+                        avatar: "АС", 
+                        rating: 4.8, 
+                        reviews: 112, 
+                        price: "от 3 000 ₽", 
+                        description: "Комплексный ремонт автомобилей. Диагностика, ТО, кузовной ремонт, покраска. Гарантия на все виды работ.",
+                        location: "Москва",
+                        orders: 387,
+                        experience: "10 лет"
+                    },
+                    { 
+                        name: "Двигатель Мастер", 
+                        avatar: "ДМ", 
+                        rating: 4.9, 
+                        reviews: 87, 
+                        price: "от 5 000 ₽", 
+                        description: "Ремонт двигателей, коробок передач, ходовой части. Компьютерная диагностика. Гарантия качества.",
+                        location: "Екатеринбург",
+                        orders: 243,
+                        experience: "8 лет"
+                    }
+                ],
+                "Репетиторство": [
+                    { 
+                        name: "Репетитор по Математике", 
+                        avatar: "РМ", 
+                        rating: 4.9, 
+                        reviews: 76, 
+                        price: "от 1 000 ₽/час", 
+                        description: "Подготовка к ЕГЭ, ОГЭ, помощь в освоении школьной программы. Индивидуальный подход к каждому ученику.",
+                        location: "Москва",
+                        orders: 143,
+                        experience: "12 лет"
+                    },
+                    { 
+                        name: "Преподаватель Английского", 
+                        avatar: "ПА", 
+                        rating: 4.8, 
+                        reviews: 65, 
+                        price: "от 1 200 ₽/час", 
+                        description: "Общий английский, бизнес-английский, подготовка к экзаменам. Индивидуальные и групповые занятия.",
+                        location: "Санкт-Петербург",
+                        orders: 98,
+                        experience: "7 лет"
+                    }
+                ],
+                "Юридические услуги": [
+                    { 
+                        name: "Юридическая Компания Право", 
+                        avatar: "ЮК", 
+                        rating: 4.8, 
+                        reviews: 54, 
+                        price: "от 5 000 ₽", 
+                        description: "Юридическое сопровождение бизнеса, составление договоров, защита интересов в суде. Консультации.",
+                        location: "Москва",
+                        orders: 87,
+                        experience: "9 лет"
+                    },
+                    { 
+                        name: "Семейный Юрист", 
+                        avatar: "СЮ", 
+                        rating: 4.9, 
+                        reviews: 43, 
+                        price: "от 3 000 ₽", 
+                        description: "Расторжение брака, раздел имущества, алименты, опека над детьми. Защита ваших интересов в суде.",
+                        location: "Новосибирск",
+                        orders: 65,
+                        experience: "6 лет"
+                    }
+                ],
+                "Медицинские услуги": [
+                    { 
+                        name: "Врач на Дом", 
+                        avatar: "ВД", 
+                        rating: 4.9, 
+                        reviews: 76, 
+                        price: "от 3 000 ₽", 
+                        description: "Консультации терапевта на дому, забор анализов, назначение лечения. Экстренная помощь.",
+                        location: "Москва",
+                        orders: 143,
+                        experience: "15 лет"
+                    },
+                    { 
+                        name: "Медсестра Процедурная", 
+                        avatar: "МП", 
+                        rating: 4.8, 
+                        reviews: 54, 
+                        price: "от 1 500 ₽", 
+                        description: "Выполнение медицинских процедур на дому: инъекции, капельницы, перевязки. Профессионально и аккуратно.",
+                        location: "Санкт-Петербург",
+                        orders: 98,
+                        experience: "8 лет"
+                    }
+                ]
+            };
+
+            // Открытие модального окна с исполнителями при клике на категорию
+            const categoryCards = document.querySelectorAll('.category-card');
+            const executorsModal = document.getElementById('executors-modal');
+            const modalCategoryTitle = document.getElementById('modal-category-title');
+            const executorsList = document.getElementById('executors-list');
+            const closeExecutorsModal = document.getElementById('close-executors-modal');
+            
+            categoryCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const categoryName = this.querySelector('.category-name').textContent;
+                    const categoryCount = this.querySelector('.category-count').textContent;
+                    
+                    // Устанавливаем заголовок
+                    modalCategoryTitle.textContent = `${categoryName} (${categoryCount})`;
+                    
+                    // Генерируем список исполнителей
+                    generateExecutorsList(categoryName);
+                    
+                    // Показываем модальное окно
+                    executorsModal.classList.add('active');
+                });
+            });
+            
+            // Закрытие модального окна
+            closeExecutorsModal.addEventListener('click', function() {
+                executorsModal.classList.remove('active');
+            });
+            
+            // Закрытие при клике вне окна
+            executorsModal.addEventListener('click', function(e) {
+                if (e.target === executorsModal) {
+                    executorsModal.classList.remove('active');
+                }
+            });
+            
+            // Функция генерации списка исполнителей
+            function generateExecutorsList(category) {
+                executorsList.innerHTML = '';
+                
+                // Получаем исполнителей для выбранной категории
+                const executors = executorsData[category] || [];
+                
+                if (executors.length === 0) {
+                    executorsList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--light-text);">
+                            <i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 20px;"></i>
+                            <h3>Исполнители не найдены</h3>
+                            <p>Попробуйте выбрать другую категорию или зайти позже</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Генерируем карточки исполнителей
+                executors.forEach(executor => {
+                    const executorCard = document.createElement('div');
+                    executorCard.className = 'executor-card';
+                    executorCard.innerHTML = `
+                        <div class="executor-header">
+                            <div class="executor-avatar">${executor.avatar}</div>
+                            <div class="executor-info">
+                                <div class="executor-name">${executor.name}</div>
+                                <div class="executor-rating">
+                                    <div class="stars">
+                                        ${generateStars(executor.rating)}
+                                    </div>
+                                    <span>${executor.rating} (${executor.reviews} отзывов)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="executor-price">${executor.price}</div>
+                        
+                        <div class="executor-stats">
+                            <div class="executor-stat-item">
+                                <div class="executor-stat-value">${executor.orders}+</div>
+                                <div class="executor-stat-label">заказов</div>
+                            </div>
+                            <div class="executor-stat-item">
+                                <div class="executor-stat-value">${executor.experience}</div>
+                                <div class="executor-stat-label">опыта</div>
+                            </div>
+                        </div>
+                        
+                        <p class="executor-description">${executor.description}</p>
+                        
+                        <div class="executor-footer">
+                            <div class="executor-location">
+                                <i class="fas fa-map-marker-alt"></i> ${executor.location}
+                            </div>
+                            <div class="executor-actions">
+                                <button><i class="fas fa-shopping-cart"></i> Заказать</button>
+                            </div>
+                        </div>
+                    `;
+                    executorsList.appendChild(executorCard);
+                });
+            }
+            
+            // Функция генерации звезд рейтинга
+            function generateStars(rating) {
+                let starsHTML = '';
+                const fullStars = Math.floor(rating);
+                const halfStar = rating % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+                
+                // Полные звезды
+                for (let i = 0; i < fullStars; i++) {
+                    starsHTML += '<i class="fas fa-star"></i>';
+                }
+                
+                // Половина звезды
+                if (halfStar) {
+                    starsHTML += '<i class="fas fa-star-half-alt"></i>';
+                }
+                
+                // Пустые звезды
+                for (let i = 0; i < emptyStars; i++) {
+                    starsHTML += '<i class="far fa-star"></i>';
+                }
+                
+                return starsHTML;
+            }
         });
     </script>
 </body>
