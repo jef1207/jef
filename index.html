@@ -4,121 +4,171 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Киоск печати</title>
+<!-- Подключение шрифтов Google для современного вида -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  /* Общие стили */
   body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f4f8;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #ece9e6, #ffffff);
     margin: 0;
     padding: 20px;
+    color: #333;
   }
+
+  /* Заголовок */
   header {
-    background-color: #007bff;
+    background-color: #4a90e2;
     color: white;
-    padding: 15px;
-    text-align: center;
-    font-size: 24px;
-  }
-  .section {
-    background-color: white;
-    border-radius: 8px;
     padding: 20px;
-    margin-top: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
   }
+
+  /* Общий контейнер для секций */
+  .section {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  /* Заголовки секций */
   h2 {
     margin-top: 0;
+    font-size: 22px;
+    color: #333;
+    margin-bottom:15px;
   }
-  .usb-area {
-    border: 2px dashed #ccc;
-    padding: 40px;
-    text-align: center;
-    font-size: 18px;
-    color: #555;
-  }
+
+  /* Стиль кнопок */
   button {
-    background-color: #007bff;
+    background-color: #4a90e2;
     color: white;
-    border: none;
-    padding: 12px 24px;
-    margin-top: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-  input[type="number"], select {
-    width: calc(100% - 20px);
-    padding: 8px;
+    border:none;
+    padding:14px 24px;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+    transition:.3s all ease;
     margin-top:10px;
-    margin-bottom:20px;
-    border-radius:4px;
-    border:1px solid #ccc;
 }
-.file-info {
-  margin-top:10px; 
+
+button:hover {
+   background-color:#357ABD; 
+   transform: translateY(-2px);
 }
-.hidden {
- display:none; 
+
+button[disabled] {
+   background-color:#a0c4e8; 
+   cursor:not-allowed; 
+   opacity:.6; 
 }
+
+/* Стиль input и select */
+input[type="number"], select {
+   width:100%;
+   padding:12px; 
+   border-radius:8px; 
+   border:none; 
+   box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+   font-size:16px; 
+   margin-top:10px; 
+   margin-bottom:20px; 
+}
+
+/* Область для перетаскивания файла */
+.usb-area {
+   border:dashed #ccc; 
+   padding:40px; 
+   text-align:center; 
+   border-radius:12px; 
+   background-color:#f9f9f9; 
+   cursor:pointer; 
+   transition:.3s all ease; 
+}
+.usb-area:hover {
+   background-color:#f1f1f1; 
+}
+
+/* Скрытые элементы */
+.hidden { display:none; }
+
+/* Сообщения */
 .message {
  margin-top:20px; 
  font-size:18px; 
  color:#28a745; 
  font-weight:bold; 
+ text-align:center; 
 }
+
+/* Предварительный просмотр миниатюры */
+.preview-thumbnail {
+ border-radius:8px; 
+ width:auto; height:auto; max-height:150px; max-width:auto; margin-top:-10px;}
 </style>
 </head>
 <body>
 
 <header>Киоск печати</header>
 
+<!-- Вставка флешки -->
 <div class="section" id="usb-section">
 <h2>Вставьте USB-накопитель для выбора файла</h2>
 <div class="usb-area" id="usb-area">
-   <p>Перетащите файл сюда или нажмите "Обзор файлов"</p>
+   <p style="margin-bottom:15px;">Перетащите файл сюда или нажмите "Обзор файлов"</p>
    <button id="browseBtn">Обзор файлов на флешке</button>
    <input type="file" id="fileInput" style="display:none" />
 </div>
-<div id="fileSelected" class="file-info hidden">
+<div id="fileSelected" class="file-info hidden" style="margin-top:-10px;">
    <strong>Выбран файл:</strong> <span id="fileName"></span><br/>
    <button id="nextBtn" disabled>Далее</button>
 </div>
 </div>
 
+<!-- Настройки печати -->
 <div class="section hidden" id="settings-section">
 <h2>Настройки печати</h2>
-<label>Количество копий:</label><br/>
-<input type="number" id="copies" min="1" max="100" value="1"/><br/>
+<label for="copies">Количество копий:</label>
+<input type="number" id="copies" min="1" max="100" value="1"/>
 
-<label>Тип бумаги:</label><br/>
+<label for="paperType">Тип бумаги:</label>
 <select id="paperType">
 <option value="матовая">Матовая</option>
 <option value="глянцевая">Глянцевая</option>
-</select><br/>
+</select>
 
-<label>Размер:</label><br/>
+<label for="size">Размер:</label>
 <select id="size">
 <option value="A4">A4</option>
 <option value="A3">A3</option>
-</select><br/>
+</select>
 
 <button id="previewBtn">Предварительный просмотр</button>
 </div>
 
-<div class="section hidden" id="preview-section">
+<!-- Предварительный просмотр -->
+<div class="section hidden" id='preview-section'>
 <h2>Предварительный просмотр документа</h2>
-<p><strong>Файл:</strong> <span id="previewFileName"></span></p>
-<!-- Можно вставить миниатюру или изображение -->
-<div style="border:1px solid #ccc; height:150px; display:flex; align-items:center; justify-content:center;">
-<p>Миниатюра документа (заглушка)</p>
+<p><strong>Файл:</strong> <span id='previewFileName'></span></p>
+
+<!-- Заглушка миниатюры -->
+<div style='border-radius:8px;background:#eee;text-align:center;padding-top:-10px;margin-top:-10px'>
+<img src='https://via.placeholder.com/300x150?text=Миниатюра' class='preview-thumbnail' alt='миниатюра'/>
 </div>
 
 <button id='payBtn'>Оплатить и напечатать</button>
 <button id='backToSettings'>Назад к настройкам</button>
 
 <div class='message hidden' id='printMessage'>Пожалуйста, заберите ваш документ на выходе. Спасибо!</div>
-
 </div>
 
 <script>
@@ -139,60 +189,60 @@ const backToSettingsBtn = document.getElementById('backToSettings');
 
 const printMessage = document.getElementById('printMessage');
 
-// Шаги
 let selectedFileName = '';
 
-browseBtn.onclick = () => {
+/* Обработка выбора файла */
+browseBtn.onclick=()=>{
    fileInput.click();
 };
+fileInput.onchange=()=>{
+ if (fileInput.files.length >0) {
+     selectedFileName = fileInput.files[0].name;
+     fileNameSpan.textContent=selectedFileName;
+     fileSelectedDiv.classList.remove('hidden');
+     nextBtn.disabled=false;
 
-fileInput.onchange = () => {
-   if (fileInput.files.length >0) {
-       selectedFileName = fileInput.files[0].name;
-       fileNameSpan.textContent = selectedFileName;
-       fileSelectedDiv.classList.remove('hidden');
-       nextBtn.disabled=false;
-
-       // Можно добавить обработку файла или миниатюры
-   }
+     // Можно добавить предварительный просмотр файла или миниатюру
+ }
 };
 
+/* Переход к настройкам */
 nextBtn.onclick=()=>{
-   // Переход к настройкам
-   document.getElementById('usb-section').classList.add('hidden');
-   settingsSection.classList.remove('hidden');
+ // скрываем раздел вставки флешки
+ document.getElementById('usb-section').classList.add('hidden');
+ // показываем настройки
+ settingsSection.classList.remove('hidden');
 
-   // Передача имени файла в предварительный просмотр
-   previewFileNameSpan.textContent=selectedFileName;
+ // Передача имени файла в предпросмотр
+ previewFileNameSpan.textContent=selectedFileName;
 
-   // Сброс настроек
-   document.getElementById('copies').value=1;
-   document.getElementById('paperType').value='матовая';
-   document.getElementById('size').value='A4';
+ // сброс настроек
+document.getElementById('copies').value=1;
+document.getElementById('paperType').value='матовая';
+document.getElementById('size').value='A4';
 
 };
 
+/* Предварительный просмотр */
 document.getElementById('previewBtn').onclick=()=>{
-   // Переход к предпросмотру
-   settingsSection.classList.add('hidden');
-   previewSection.classList.remove('hidden');
+ settingsSection.classList.add('hidden');
+ previewSection.classList.remove('hidden');
 };
 
+/* Назад к настройкам */
 backToSettings.onclick=()=>{
-   // Назад к настройкам
-   previewSection.classList.add('hidden');
-   settingsSection.classList.remove('hidden');
+ previewSection.classList.add('hidden');
+ settingsSection.classList.remove('hidden');
 };
 
+/* Оплата и завершение */
 payBtn.onclick=()=>{
-   // Имитация оплаты и завершения
-   previewSection.innerHTML=`
+ // имитация оплаты
+ previewSection.innerHTML=`
      <h2>Оплата прошла успешно!</h2>
      <p>Пожалуйста, заберите ваш документ на выходе.</p>`;
-   
-   // Показываем сообщение о готовности
-   printMessage.classList.remove('hidden');
-
+ // сообщение о готовности
+ printMessage.classList.remove('hidden');
 };
 </script>
 
