@@ -528,7 +528,7 @@
                                 <button onclick="changeCopies(1)">+</button>
                             </div>
                         </div>
-                        <button class="action-button print-button" id="printButton" disabled>
+                        <button class="action-button print-button" id="printButton" disabled onclick="printSelectedFile()">
                             <i class="fas fa-print"></i> Напечатать
                         </button>
                     `;
@@ -735,6 +735,49 @@
             copies = Math.max(1, copies + amount);
             document.getElementById('copiesCount').textContent = 
                 copies + (copies === 1 ? ' копия' : copies < 5 ? ' копии' : ' копий');
+        }
+        
+        // Функция для отправки файла на печать
+        async function printSelectedFile() {
+            if (!selectedFile) return;
+            
+            const isColor = document.getElementById('colorPrint').checked;
+            
+            // Создаем FormData для отправки файла
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('copies', copies);
+            formData.append('color', isColor);
+            
+            try {
+                // Показываем индикатор загрузки
+                const printButton = document.getElementById('printButton');
+                const originalText = printButton.innerHTML;
+                printButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка на печать...';
+                printButton.disabled = true;
+                
+                // Отправляем файл на сервер печати
+                const response = await fetch('http://localhost:3000/print', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Документ "${selectedFile.name}" успешно отправлен на печать. Копий: ${copies}`);
+                } else {
+                    alert('Ошибка печати: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Ошибка при печати:', error);
+                alert('Ошибка соединения с сервером печати. Проверьте, запущен ли сервер печати.');
+            } finally {
+                // Восстанавливаем кнопку
+                const printButton = document.getElementById('printButton');
+                printButton.innerHTML = originalText;
+                printButton.disabled = false;
+            }
         }
         
         // ===== Функции для сканирования =====
