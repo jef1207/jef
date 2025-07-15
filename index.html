@@ -295,4 +295,190 @@ function resetAll() {
 	document.querySelector('#previewImage').src='';
 	document.querySelector('#sendToPrinter').disabled=true;
 
-	document
+	// Продолжение функции resetAll
+document.querySelector('#sendToPrinter').disabled=true;
+document.querySelector('#sendToScan').disabled=true;
+document.querySelector('#finalMessage').innerHTML='';
+
+// Обработчики кнопок выбора услуги
+serviceBtns.printDoc.onclick= ()=>{ startService('print'); };
+serviceBtns.scanDoc.onclick= ()=>{ startService('scan'); };
+serviceBtns.flashDrive.onclick= ()=>{ startService('flash'); };
+
+// Обработчики оплаты
+payQRBtn.onclick= ()=>{ initiatePayment('qr'); };
+payCashBtn.onclick= ()=>{ initiatePayment('cash'); };
+simulatePaymentBtn.onclick= ()=>{ completePayment(); };
+
+// Обработчик кнопки "Далее" после оплаты
+proceedBtn.onclick= ()=>{
+  document.getElementById('afterPayment').style.display='none';
+  if(currentService==='print' || currentService==='scan') {
+    document.getElementById('fileSection').style.display='block';
+  } else if(currentService==='flash') {
+    document.getElementById('flashDriveSection').style.display='block';
+  }
+};
+
+// Обработчик выбора файла
+fileInput.onchange= ()=> {
+  if(fileInput.files && fileInput.files[0]) {
+    selectedFile = fileInput.files[0];
+    noFileMsg.style.display='none';
+
+    // Предварительный просмотр изображения или PDF
+    const fileType = selectedFile.type;
+    const reader = new FileReader();
+
+    reader.onload= (e)=> {
+      if(fileType.startsWith('image/')) {
+        previewImage.src=e.target.result;
+        previewImage.style.display='block';
+        document.querySelector('#previewImage').style.display='block';
+        document.querySelector('#previewImage').src=e.target.result;
+        document.querySelector('#previewImage').type='image';
+      } else if(fileType==='application/pdf') {
+        // Для PDF можно использовать embed или iframe
+        const embed = document.createElement('embed');
+        embed.src=e.target.result;
+        embed.type='application/pdf';
+        embed.width='100%';
+        embed.height='400px';
+
+        const previewContainer = document.getElementById('previewCard');
+        previewContainer.innerHTML='';
+        previewContainer.appendChild(embed);
+        embed.style.display='block';
+
+      } else {
+        // Для других типов можно показывать сообщение или иконку
+        document.getElementById('noPreviewMsg').style.display='block';
+      }
+    };
+
+    if(fileType.startsWith('image/')) {
+      reader.readAsDataURL(selectedFile);
+    } else if(fileType==='application/pdf') {
+      reader.readAsDataURL(selectedFile);
+    } else {
+      // Не поддерживаемый тип файла
+      noFileMsg.innerText='Формат файла не поддерживается для предварительного просмотра.';
+      noFileMsg.style.display='block';
+      filePreview.style.display='none';
+    }
+
+    // Включить кнопки отправки
+    sendToPrinterBtn.disabled=false;
+    sendToScanBtn.disabled=false;
+  }
+};
+
+// Обработчик кнопки "Очистить выбор"
+resetFileBtn.onclick= ()=>{
+  selectedFile=null;
+  fileInput.value='';
+  noFileMsg.style.display='block';
+  filePreview.src='';
+  filePreview.style.display='none';
+
+  document.querySelector('#previewImage').style.display='none';
+  document.querySelector('#sendToPrinter').disabled=true;
+  document.querySelector('#sendToScan').disabled=true;
+};
+
+// Обработчики отправки на печать или сканирование
+document.getElementById('sendToPrinter').onclick= ()=>{
+  if(selectedFile) {
+    finalMessageDiv.innerHTML=`Файл "${selectedFile.name}" отправлен на печать.`;
+  }
+};
+document.getElementById('sendToScan').onclick= ()=>{
+  if(selectedFile) {
+    finalMessageDiv.innerHTML=`Файл "${selectedFile.name}" отправлен в сканирование на флешку.`;
+  }
+};
+
+// Обработка работы с флешкой (загрузка файлов)
+const flashFolderInput = document.getElementById('flashFolderInput');
+const flashFileList = document.getElementById('flashFileList');
+
+document.getElementById('readFlash').onclick= ()=>{
+  // Здесь можно реализовать чтение содержимого флешки.
+  // Для демонстрации добавим фиктивные файлы.
+  flashFileList.innerHTML='';
+  const dummyFiles=['Документ1.pdf','Фото1.jpg','Отчёт.docx'];
+  dummyFiles.forEach(name => {
+    const li=document.createElement('li');
+    li.innerText=name;
+    flashFileList.appendChild(li);
+  });
+};
+
+// Загрузка файлов на флешку (выгрузка)
+document.getElementById('saveFilesToFlash').onclick= ()=>{
+  alert('Файлы успешно выгружены на флешку.');
+};
+
+// Загрузка новых файлов на флешку
+document.getElementById('uploadFiles').onchange= ()=>{
+  const files = document.getElementById('uploadFiles').files;
+  uploadFileList.innerHTML='';
+  for(let i=0; i<files.length; i++) {
+    const li=document.createElement('li');
+    li.innerText=files[i].name;
+    uploadFileList.appendChild(li);
+  }
+};
+
+// Кнопка "Вернуться в меню"
+document.getElementById('backToMenu').onclick= ()=>{
+  resetAll();
+  // Вернуться к выбору услуги
+}
+
+// Кнопка "Отменить выбор файла"
+cancelFile.onclick= ()=>{
+  selectedFile=null;
+  fileInput.value='';
+  noFileMsg.style.display='block';
+  filePreview.src='';
+  filePreview.style.display='none';
+
+  document.querySelector('#previewImage').style.display='none';
+  document.querySelector('#sendToPrinter').disabled=true;
+  document.querySelector('#sendToScan').disabled=true;
+}
+
+// Функции оплаты и имитации платежа
+function initiatePayment(method) {
+	// Показываем QR-код или сообщение о платеже наличными
+	if(method==='qr') {
+		qrcodeContainer.style.display='block';
+		paymentStatusDiv.innerHTML='';
+		// Генерируем QR-код (например, со случайным содержимым)
+		QRCode.toCanvas(document.createElement('canvas'), 'https://payment.example.com/pay?id=12345', { width:200 }, function (error, canvas) {
+			if(error) console.error(error);
+			const qrCodeDiv=document.getElementById('qrcode');
+			qrCodeDiv.innerHTML='';
+			qrCodeDiv.appendChild(canvas);
+		});
+	} else if(method==='cash') {
+		paymentStatusDiv.innerHTML='<p>Пожалуйста, оплатите наличными у оператора.</p>';
+	}
+}
+
+// Имитация завершения платежа
+function completePayment() {
+	paymentConfirmed=true;
+	document.getElementById('paymentStatus').innerHTML='<p>Оплата подтверждена.</p>';
+	document.getElementById('qrcodeContainer').style.display='none';
+	document.querySelector('#afterPayment').style.display='block';
+}
+
+// Инициализация начального состояния
+resetAll();
+
+</script>
+</div>
+</body>
+</html>
