@@ -2,82 +2,297 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Имитация печати</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Киоск печати документов</title>
+<!-- Подключение шрифтов и стилей -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
 <style>
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
+    background: #f0f4f8;
+    margin: 0;
     padding: 20px;
   }
-  #printArea {
-    width: 100%;
-    height: 300px;
-    border: 1px solid #ccc;
-    padding: 10px;
+  header {
+    text-align: center;
     margin-bottom: 20px;
   }
-  #printButton {
-    padding: 10px 20px;
-    font-size: 16px;
+  h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #333;
   }
-  #printAnimation {
-    display: none;
-    margin-top: 20px;
-    font-weight: bold;
-    color: green;
+  .container {
+    max-width: 1000px;
+    margin: auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
+  /* Разделы */
+  .section {
+    margin-bottom: 30px;
+  }
+  h2 {
+    font-size: 1.5em;
+    color: #555;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+  }
+
+  /* Стиль кнопок */
+  button {
+    background-color: #007bff;
+    color: white;
+    border:none;
+    padding:12px 24px;
+    border-radius:8px;
+    font-size:1em;
+    cursor:pointer;
+    transition:.3s all ease;
+}
+button:hover {
+   background-color:#0056b3; 
+}
+button.disabled {
+   background-color:#ccc; 
+   cursor:not-allowed; 
+}
+
+ /* Стиль карточек */
+.card {
+   border-radius:8px; 
+   box-shadow:0 2px 8px rgba(0,0,0,0.1);
+   padding:15px; 
+   margin-top:10px; 
+   background:#fafafa; 
+}
+#filePreview {
+   max-width:100%; 
+   max-height:300px; 
+   display:block; 
+   margin-top:10px; 
+   border-radius:4px; 
+}
+
+/* QR-код */
+#qrcodeContainer {
+   text-align:center; 
+   margin-top:15px; 
+}
+#qrcode {
+   display:inline-block; 
+}
+
+/* Общие стили */
+.flex-row {
+   display:flex; 
+   gap:15px; 
+   flex-wrap:auto; 
+}
 </style>
 </head>
 <body>
 
-<h1>Заказ на печать</h1>
+<header>
+<h1>Киоск печати документов</h1>
+</header>
 
-<div id="printArea">
-  <!-- Здесь будет содержимое для печати -->
-  <p>Это пример документа для печати.</p>
+<div class="container">
+
+<!-- Раздел выбора услуги -->
+<div class="section" id="serviceSection">
+<h2>Выберите услугу</h2>
+<div class="flex-row">
+<button id="btnPrintDoc">Печать документа</button>
+<button id="btnScanDoc">Сканирование документа</button>
+<button id="btnFlashDrive">Работа с флешкой</button>
+</div>
 </div>
 
-<button id="printButton">Печать</button>
+<!-- Раздел оплаты -->
+<div class="section" id="paymentSection" style="display:none;">
+<h2>Оплата</h2>
+<p>Пожалуйста, оплатите услугу:</p>
+<div class="flex-row">
+<button id="payQR">Оплатить по QR-коду</button>
+<button id="payCash">Оплатить наличными</button>
+</div>
 
-<div id="printAnimation">Печать...</div>
-<div id="readyMessage" style="display:none;">Документ готов к получению.</div>
+<div id="paymentStatus" style="margin-top:15px;"></div>
+
+<!-- Имитация QR-кода -->
+<div id="qrcodeContainer" style="display:none;">
+<p>Отсканируйте QR-код для оплаты:</p>
+<div id="qrcode"></div>
+<button id="simulatePayment" style="margin-top:10px;">Я оплатил (имитация)</button>
+</div>
+
+<!-- После оплаты -->
+<div id="afterPayment" style="display:none;">
+<h3>Оплата прошла успешно!</h3>
+<button id="proceedBtn">Далее</button>
+</div>
+
+</div>
+
+<!-- Раздел выбора файла для печати -->
+<div class="section" id="fileSection" style="display:none;">
+<h2>Выберите файл для печати или сканирования</h2>
+
+<!-- Выбор файла -->
+<input type='file' id='fileInput' accept='.pdf,.doc,.docx,.png,.jpg,.jpeg' />
+<div id='filePreviewContainer' style='margin-top:10px;'>
+<img id='filePreview' src='' alt='Предварительный просмотр файла' style='display:none;' />
+<p id='noFileMsg'>Файл не выбран.</p>
+</div>
+
+<!-- Кнопки для действий -->
+<div style='margin-top:15px;' class='flex-row'>
+<button id='printBtn' disabled>Печать документa (A4)</button>
+<button id='scanBtn'>Отправить скан в флешку</button>
+<button id='resetFile'>Очистить выбор</button>
+</div>
+
+<!-- Предварительный просмотр выбранного файла -->
+<h3 style='margin-top:20px;'>Предварительный просмотр:</h3>
+<div class='card' id='previewCard'>
+<img src='' alt='Preview' id='previewImage' style='max-width:100%; display:none;' />
+<embed src='' type='' width='100%' height='400' style='display:none;' />
+<p id='noPreviewMsg'>Нет предварительного просмотра.</p>
+</div>
+
+<!-- Отправка на печать или в сканирование -->
+<div style='margin-top:20px;'>
+<button id='sendToPrinter' disabled>Отправить на печать (A4)</button>
+<button id='sendToScan' disabled>Отправить в флешку (сканировать)</button>
+<button id='cancelFile'>Отменить выбор файла</button>
+</div>
+
+<!-- Итоговая информация -->
+<div id='finalMessage' style='margin-top:20px; font-weight:bold;'></div>
+
+</div>
+
+<!-- Раздел работы с флешкой -->
+<div class="section" id="flashDriveSection" style="display:none;">
+<h2>Работа с флешкой</h2>
+<p>Подключите флешку и выберите действие:</p>
+
+<button id='readFlash'>Считать файлы с флешки</button><br/><br/>
+<input type='file' webkitdirectory directory multiple hidden id='flashFolderInput'/>
+<label for='flashFolderInput'><button>Обзор папки на флешке (для загрузки)</button></label><br/><br/>
+
+<h3>Загруженные файлы:</h3>
+<ul id='flashFileList'></ul>
+
+<!-- Для выгрузки файлов на флешку можно реализовать отдельно -->
+
+<button id='backToMenu'>Вернуться в меню</button>
+
+<div style='margin-top:15px;'id='flashActionButtons'>
+<button id='saveFilesToFlash'>Сохранить файлы на флешку (выгрузка)</button><br/><br/>
+<input type='file' accept='.pdf,.doc,.docx,.png,.jpg,.jpeg' multiple hidden id='uploadFiles'/>
+<label for='uploadFiles'><button>Загрузить файлы на флешку (выгрузка)</button></label><br/><br/>
+<ul id='uploadFileList'></ul></div>
+
+
+<!-- Можно добавить отображение содержимого флешки -->
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
 
 <script>
-const printButton = document.getElementById('printButton');
-const printAnimation = document.getElementById('printAnimation');
-const readyMessage = document.getElementById('readyMessage');
+// Глобальные переменные
+let selectedFile = null;
+let paymentConfirmed = false;
 
-printButton.addEventListener('click', () => {
-  // Показываем анимацию
-  printAnimation.style.display = 'block';
-  
-  // Имитация процесса печати через задержку
-  setTimeout(() => {
-    // Скрываем анимацию
-    printAnimation.style.display = 'none';
-    
-    // Показываем сообщение о готовности
-    readyMessage.style.display = 'block';
+// Элементы
+const serviceBtns = {
+  printDoc : document.getElementById('btnPrintDoc'),
+  scanDoc : document.getElementById('btnScanDoc'),
+  flashDrive : document.getElementById('btnFlashDrive')
+};
+const paymentSection = document.getElementById('paymentSection');
+const fileSection = document.getElementById('fileSection');
+const flashDriveSection = document.getElementById('flashDriveSection');
 
-    // Можно добавить кнопку для нового заказа или сброса
-    // Например:
-    // createResetButton();
+const payQRBtn = document.getElementById('payQR');
+const payCashBtn = document.getElementById('payCash');
+const paymentStatusDiv = document.getElementById('paymentStatus');
+const qrcodeContainer = document.getElementById('qrcodeContainer');
+const qrcodeDiv = document.getElementById('qrcode');
+const simulatePaymentBtn = document.getElementById('simulatePayment');
+const afterPaymentDiv = document.getElementById('afterPayment');
 
-  }, 3000); // задержка в миллисекундах (3 секунды)
-});
+const proceedBtn = document.getElementById('proceedBtn');
 
-// Функция для сброса или начала нового заказа (по желанию)
-function createResetButton() {
-  const resetBtn = document.createElement('button');
-  resetBtn.textContent = 'Начать заново';
-  resetBtn.onclick = () => {
-    readyMessage.style.display = 'none';
-    resetBtn.remove();
-  };
-  
-  document.body.appendChild(resetBtn);
+const fileInput = document.getElementById('fileInput');
+const noFileMsg = document.getElementById('noFileMsg');
+const filePreview = document.getElementById('filePreview');
+const previewImage = document.getElementById('previewImage');
+
+const printBtn = document.getElementById('printBtn');
+const scanBtn = document.getElementById('scanBtn');
+const resetFileBtn = document.getElementById('resetFile');
+
+const sendToPrinterBtn = document.getElementById('sendToPrinter');
+const sendToScanBtn = document.getElementById('sendToScan');
+const cancelFileBtn = document.getElementById('cancelFile');
+
+const finalMessageDiv = document.getElementById('finalMessage');
+
+let currentService = null;
+
+// Обработчики выбора услуги
+serviceBtns.printDoc.onclick= ()=>{ startService('print'); };
+serviceBtns.scanDoc.onclick= ()=>{ startService('scan'); };
+serviceBtns.flashDrive.onclick= ()=>{ startService('flash'); };
+
+function startService(serviceType) {
+	// Сброс состояния
+	resetAll();
+	currentService=serviceType;
+
+	if(serviceType==='print') {
+		paymentSection.style.display='';
+		fileSection.style.display ='none';
+		flashDriveSection.style.display ='none';
+	} else if(serviceType==='scan') {
+		paymentSection.style.display='';
+		fileSection.style.display ='none';
+		flashDriveSection.style.display ='none';
+	} else if(serviceType==='flash') {
+		paymentSection.style.display ='none';
+		fileSection.style.display ='none';
+		flashDriveSection.style.display ='block';
+	}
 }
-</script>
 
-</body>
-</html>
+// Функция сброса всех разделов
+function resetAll() {
+	paymentStatusDiv.innerHTML='';
+	qrcodeContainer.style.display ='none';
+	document.querySelector('#afterPayment').style.display ='none';
+	finalMessageDiv.innerHTML='';
+	selectedFile=null;
+
+	fileInput.value='';
+	noFileMsg.style.display='';
+	filePreview.src='';
+	filePreview.style.display ='none';
+
+	printBtn.disabled=true;
+	sendToPrinterBtn.disabled=true;
+
+	scanBtn.disabled=false;
+
+	document.querySelector('#previewImage').style.display ='none';
+	document.querySelector('#previewImage').src='';
+	document.querySelector('#sendToPrinter').disabled=true;
+
+	document
