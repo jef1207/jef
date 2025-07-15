@@ -1,136 +1,905 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Главное окно</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f0f4f8;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-
-  /* Верхняя панель */
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  /* Логотип и слоган */
-  .logo-slogan {
-    display: flex;
-    align-items: center;
-  }
-
-  /* Логотип - изображение */
-  .logo-img {
-    width: 80px; /* Можно изменить размер по необходимости */
-    height: auto;
-    border-radius: 10px; /* Скругление углов */
-    object-fit: cover; /* чтобы изображение не искажалось */
-    margin-right: 15px;
-  }
-
-  /* Слоган */
-  .slogan {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-  }
-
-  /* Кнопка помощи */
-  .help-button {
-    padding: 10px 20px;
-    background-color: #2196F3; /* голубой цвет */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-
-  .help-button:hover {
-    background-color: #1976D2; /* темнее при наведении */
-  }
-
-  /* Основной контент (может быть пустым или с текстом) */
-  main {
-    flex-grow:1; 
-   display:flex; 
-   align-items:center; 
-   justify-content:center; 
-   padding-top:50px; 
-   font-size:36px; 
-   color:#777; 
-   text-align:center; 
-}
-
-  
-/* Нижняя панель с кнопками */
-footer {
-  padding:20px;
-  background-color:#ffffff; 
- box-shadow:-0 -2px 4px rgba(0,0,0,0.1);
- display:flex; 
- justify-content:center; 
- gap:20px; /* Расстояние между кнопками */
- flex-wrap:true
-}
-
-/* Стиль для кнопок снизу */
-.bottom-btn {
- padding :15px 25px ; 
- font-size :16px ; 
- border:none ; 
- border-radius :10px ; 
- cursor:pointer ; 
- transition :background-color .3s ;
- min-width :150px ;
- text-align:center ;
- font-weight:bold ;
-}
-
-.print-btn { background-color:#4CAF50 ; color:white ; }
-.copy-btn { background-color:#FFC107 ; color:white ; }
-.scan-btn { background-color:#00BCD4 ; color:white ; }
-.ad-btn { background-color:#E91E63 ; color:white ; }
-
-.bottom-btn:hover { opacity:.9; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickPrint Киоск</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Общие стили */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            height: 100vh;
+            overflow: hidden;
+            color: #333;
+        }
+        
+        /* Главный экран */
+        .main-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            transition: all 0.5s ease;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Контейнер листьев в виде плотного квадрата */
+        .leaf-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            width: 90%;
+            max-width: 700px;
+            height: 70vh;
+            max-height: 700px;
+            perspective: 1000px;
+            place-items: center;
+            margin: 0 auto;
+        }
+        
+        .leaf {
+            width: 100%;
+            height: 100%;
+            min-height: 200px;
+            border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            color: white;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.3);
+            transform: rotate(45deg);
+        }
+        
+        .leaf i {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transform: rotate(-45deg);
+        }
+        
+        .leaf span {
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 0 15px;
+            font-weight: 500;
+            transform: rotate(-45deg);
+        }
+        
+        .leaf::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255,255,255,0.3),
+                rgba(255,255,255,0)
+            );
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+        
+        .leaf:hover::before {
+            transform: translateX(100%) rotate(30deg);
+        }
+        
+        .leaf:hover {
+            transform: translateY(-5px) scale(1.02) rotate(45deg);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .print { background: linear-gradient(135deg, #4caf50, #2e7d32); }
+        .scan { background: linear-gradient(135deg, #2196f3, #0d47a1); }
+        .copy { background: linear-gradient(135deg, #ffc107, #ff9800); color: #333; }
+        .advertise { background: linear-gradient(135deg, #9c27b0, #673ab7); }
+        
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #666;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 10px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .language-switcher span {
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+        
+        .language-switcher span.active {
+            color: #2e7d32;
+            font-weight: bold;
+            background: rgba(46, 125, 50, 0.1);
+        }
+        
+        .help-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #2e7d32;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            font-size: 1.3rem;
+            z-index: 10;
+        }
+        
+        .help-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        /* Экран услуги */
+        .service-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 100;
+            overflow-y: auto;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #2e7d32;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+        
+        .back-button:hover {
+            background: rgba(46, 125, 50, 0.1);
+        }
+        
+        .service-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        .service-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #2e7d32;
+            text-align: center;
+        }
+        
+        /* Общие элементы форм */
+        .action-button {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .action-button i {
+            font-size: 1.3rem;
+        }
+        
+        .settings {
+            width: 100%;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .settings label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .settings input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #2e7d32;
+        }
+        
+        .copies {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .copies button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .copies button:hover {
+            background: #f0f0f0;
+        }
+        
+        .copies span {
+            font-size: 1.1rem;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        /* Специфичные стили для разных услуг */
+        .file-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f1f8e9;
+            border-radius: 8px;
+            width: 100%;
+            display: none;
+            font-size: 1.1rem;
+        }
+        
+        /* Сканирование */
+        .scan-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .scan-preview {
+            width: 100%;
+            height: 200px;
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .scan-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        /* Ксерокопия */
+        .copy-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        /* Размещение рекламы */
+        .advertise-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .advertise-preview {
+            width: 100%;
+            height: 200px;
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .advertise-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .service-screen.active {
+            display: flex;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        .file-info.show {
+            display: block;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .leaf-container {
+                gap: 15px;
+                height: 60vh;
+            }
+            
+            .leaf i {
+                font-size: 2.5rem;
+            }
+            
+            .leaf span {
+                font-size: 1.2rem;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .leaf-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                height: 70vh;
+                max-height: none;
+            }
+            
+            .leaf {
+                min-height: 120px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<!-- Верхняя часть -->
-<header>
-<div class="logo-slogan">
-<!-- Используем ваше изображение как логотип -->
-<img src="https://avatars.mds.yandex.net/get-altay/992583/2a00000186cb44e5b7aaa2781d7cb59e908c/L_height" alt="Логотип" class="logo-img" />
-<div class="slogan">Лучшее решение для ваших задач</div>
-</div>
-<button class="help-button" onclick="alert('Помощь в разработке!')">Помощь</button>
-</header>
-
-<!-- Основной контент -->
-<main>
-Добро пожаловать! Выберите действие ниже.
-</main>
-
-<!-- Нижняя панель с кнопками -->
-<footer>
-<button class="bottom-btn print-btn" onclick="alert('Распечатать')">Распечатать</button>
-<button class="bottom-btn copy-btn" onclick="alert('Копировать')">Копировать</button>
-<button class="bottom-btn scan-btn" onclick="alert('Сканировать')">Сканировать</button>
-<button class="bottom-btn ad-btn" onclick="alert('Разместить рекламу')">Разместить рекламу</button>
-</footer>
-
+    <div class="main-screen">
+        <div class="logo">QuickPrint</div>
+        
+        <!-- Контейнер с 4 листьями в квадрате -->
+        <div class="leaf-container">
+            <!-- Верхний ряд -->
+            <div class="leaf print" onclick="openService('print')">
+                <i class="fas fa-usb"></i>
+                <span>Печать с флешки</span>
+            </div>
+            
+            <div class="leaf scan" onclick="openService('scan')">
+                <i class="fas fa-scanner"></i>
+                <span>Сканирование</span>
+            </div>
+            
+            <!-- Нижний ряд -->
+            <div class="leaf copy" onclick="openService('copy')">
+                <i class="fas fa-copy"></i>
+                <span>Ксерокопия</span>
+            </div>
+            
+            <div class="leaf advertise" onclick="openService('advertise')">
+                <i class="fas fa-ad"></i>
+                <span>Разместить рекламу</span>
+            </div>
+        </div>
+        
+        <!-- Кнопка языка -->
+        <div class="language-switcher">
+            <span class="active">RU</span> | <span onclick="changeLanguage('en')">EN</span>
+        </div>
+        
+        <!-- Кнопка помощи -->
+        <div class="help-button" onclick="showHelp()">
+            <i class="fas fa-question"></i>
+        </div>
+    </div>
+    
+    <!-- Экран услуги (скрыт по умолчанию) -->
+    <div class="service-screen" id="serviceScreen">
+        <button class="back-button" onclick="closeService()">
+            <i class="fas fa-arrow-left"></i> Назад
+        </button>
+        <div class="service-content" id="serviceContent">
+            <!-- Контент подгружается динамически -->
+        </div>
+    </div>
+    
+    <!-- Скрытый input для выбора файла -->
+    <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(this)">
+    
+    <script>
+        // Текущий язык
+        let currentLanguage = 'ru';
+        
+        // Открытие экрана услуги
+        function openService(service) {
+            const screen = document.getElementById('serviceScreen');
+            const content = document.getElementById('serviceContent');
+            
+            // Заголовок и контент в зависимости от услуги
+            let html = '';
+            let title = '';
+            
+            switch (service) {
+                case 'print':
+                    title = 'Печать с флешки';
+                    html = `
+                        <h2 class="service-title">${title}</h2>
+                        <button class="action-button" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-usb"></i> Выбрать файл
+                        </button>
+                        <div class="file-info" id="fileInfo">
+                            <p><strong>Выбран файл:</strong> <span id="fileName"></span></p>
+                            <p><strong>Размер:</strong> <span id="fileSize"></span></p>
+                            <p><strong>Тип:</strong> <span id="fileType"></span></p>
+                        </div>
+                        <div class="settings">
+                            <label>
+                                <input type="checkbox" id="colorPrint" checked>
+                                Цветная печать
+                            </label>
+                            <div class="copies">
+                                <button onclick="changeCopies(-1)">-</button>
+                                <span id="copiesCount">1 копия</span>
+                                <button onclick="changeCopies(1)">+</button>
+                            </div>
+                        </div>
+                        <button class="action-button print-button" id="printButton" disabled onclick="printSelectedFile()">
+                            <i class="fas fa-print"></i> Напечатать
+                        </button>
+                    `;
+                    break;
+                    
+                case 'scan':
+                    title = 'Сканирование документа';
+                    html = `
+                        <h2 class="service-title">${title}</h2>
+                        <div class="scan-preview" id="scanPreview">
+                            <i class="fas fa-scanner" style="font-size: 3rem; color: #ccc;"></i>
+                            <img id="scannedImage" alt="Предпросмотр скана">
+                        </div>
+                        <div class="scan-options">
+                            <label>
+                                <strong>Формат:</strong>
+                                <select id="scanFormat" class="form-control">
+                                    <option value="A4">A4 (210 × 297 мм)</option>
+                                    <option value="A5">A5 (148 × 210 мм)</option>
+                                    <option value="Letter">Letter (216 × 279 мм)</option>
+                                </select>
+                            </label>
+                            <label>
+                                <strong>Качество:</strong>
+                                <select id="scanQuality" class="form-control">
+                                    <option value="300">300 dpi (стандартное)</option>
+                                    <option value="600">600 dpi (высокое)</option>
+                                    <option value="1200">1200 dpi (премиум)</option>
+                                </select>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="duplexScan">
+                                Двустороннее сканирование
+                            </label>
+                        </div>
+                        <button class="action-button" onclick="startScanning()">
+                            <i class="fas fa-scanner"></i> Начать сканирование
+                        </button>
+                        <div class="settings" style="margin-top: 20px;">
+                            <h3>Отправить на:</h3>
+                            <button class="action-button" style="background: #2196f3;" onclick="sendToEmail()">
+                                <i class="fas fa-envelope"></i> Email
+                            </button>
+                            <button class="action-button" style="background: #ff9800;" onclick="saveToUSB()">
+                                <i class="fas fa-usb"></i> Флешку
+                            </button>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'copy':
+                    title = 'Ксерокопия документа';
+                    html = `
+                        <h2 class="service-title">${title}</h2>
+                        <div class="copy-options">
+                            <div>
+                                <h3>Оригинал</h3>
+                                <label>
+                                    <input type="radio" name="originalType" value="single" checked>
+                                    Односторонний
+                                </label>
+                                <label>
+                                    <input type="radio" name="originalType" value="double">
+                                    Двусторонний
+                                </label>
+                            </div>
+                            <div>
+                                <h3>Копия</h3>
+                                <label>
+                                    <input type="radio" name="copyType" value="single" checked>
+                                    Односторонняя
+                                </label>
+                                <label>
+                                    <input type="radio" name="copyType" value="double">
+                                    Двусторонняя
+                                </label>
+                            </div>
+                        </div>
+                        <div class="settings">
+                            <div class="copies">
+                                <button onclick="changeCopyCount(-1)">-</button>
+                                <span id="copyCount">1 копия</span>
+                                <button onclick="changeCopyCount(1)">+</button>
+                            </div>
+                            <label>
+                                <strong>Масштаб:</strong>
+                                <select id="copyScale">
+                                    <option value="100">100%</option>
+                                    <option value="75">75%</option>
+                                    <option value="50">50%</option>
+                                    <option value="fit">Подогнать под страницу</option>
+                                </select>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="autoContrast">
+                                Автоконтраст
+                            </label>
+                        </div>
+                        <button class="action-button" onclick="startCopying()" style="background: #ff9800;">
+                            <i class="fas fa-copy"></i> Начать копирование
+                        </button>
+                    `;
+                    break;
+                    
+                case 'advertise':
+                    title = 'Размещение рекламы';
+                    html = `
+                        <h2 class="service-title">${title}</h2>
+                        <div class="advertise-preview" id="advertisePreview">
+                            <i class="fas fa-ad" style="font-size: 3rem; color: #ccc;"></i>
+                            <img id="advertiseImage" alt="Предпросмотр рекламы">
+                        </div>
+                        <button class="action-button" onclick="document.getElementById('fileInput').click()" style="background: #9c27b0;">
+                            <i class="fas fa-upload"></i> Загрузить рекламный макет
+                        </button>
+                        <div class="file-info" id="advertiseFileInfo">
+                            <p><strong>Выбран файл:</strong> <span id="advertiseFileName"></span></p>
+                            <p><strong>Размер:</strong> <span id="advertiseFileSize"></span></p>
+                            <p><strong>Тип:</strong> <span id="advertiseFileType"></span></p>
+                        </div>
+                        <div class="settings">
+                            <label>
+                                <strong>Формат рекламы:</strong>
+                                <select id="advertiseFormat">
+                                    <option value="A4">A4 (210 × 297 мм)</option>
+                                    <option value="A5">A5 (148 × 210 мм)</option>
+                                    <option value="A3">A3 (297 × 420 мм)</option>
+                                    <option value="custom">Произвольный размер</option>
+                                </select>
+                            </label>
+                            <label>
+                                <strong>Количество копий:</strong>
+                                <input type="number" id="advertiseCopies" min="1" value="1" style="width: 80px; padding: 5px;">
+                            </label>
+                            <label>
+                                <input type="checkbox" id="colorAdvertise" checked>
+                                Цветная печать
+                            </label>
+                        </div>
+                        <div class="settings">
+                            <h3>Контактные данные</h3>
+                            <label>
+                                <strong>Ваше имя:</strong>
+                                <input type="text" id="advertiseName" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </label>
+                            <label>
+                                <strong>Телефон:</strong>
+                                <input type="tel" id="advertisePhone" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </label>
+                            <label>
+                                <strong>Email:</strong>
+                                <input type="email" id="advertiseEmail" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </label>
+                        </div>
+                        <button class="action-button" id="placeAdvertiseButton" disabled onclick="placeAdvertise()" style="background: #673ab7;">
+                            <i class="fas fa-ad"></i> Разместить рекламу
+                        </button>
+                    `;
+                    break;
+            }
+            
+            content.innerHTML = html;
+            screen.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Закрытие экрана услуги
+        function closeService() {
+            const screen = document.getElementById('serviceScreen');
+            screen.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Сброс выбранного файла при закрытии
+            document.getElementById('fileInput').value = '';
+            selectedFile = null;
+        }
+        
+        // Смена языка
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelector('.language-switcher span.active').classList.remove('active');
+            document.querySelectorAll('.language-switcher span')[lang === 'ru' ? 0 : 1].classList.add('active');
+            // Здесь можно добавить смену текстов на выбранный язык
+            alert(`Язык изменён на ${lang === 'ru' ? 'Русский' : 'Английский'}`);
+        }
+        
+        // Показать помощь
+        function showHelp() {
+            alert('Помощь:\n\n1. Выберите нужную услугу, нажав на один из крупных листов\n2. Следуйте инструкциям на экране\n3. Для возврата нажмите кнопку "Назад"');
+        }
+        
+        // ===== Функции для печати =====
+        let selectedFile = null;
+        let copies = 1;
+        
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                selectedFile = file;
+                
+                // Определяем, для какой услуги выбран файл
+                const serviceScreen = document.getElementById('serviceScreen');
+                if (serviceScreen.classList.contains('active')) {
+                    const serviceTitle = document.querySelector('.service-title').textContent;
+                    
+                    if (serviceTitle.includes('Печать')) {
+                        document.getElementById('fileName').textContent = file.name;
+                        document.getElementById('fileSize').textContent = formatFileSize(file.size);
+                        document.getElementById('fileType').textContent = file.type || 'Неизвестный тип';
+                        document.getElementById('fileInfo').classList.add('show');
+                        document.getElementById('printButton').disabled = false;
+                    } else if (serviceTitle.includes('реклам')) {
+                        document.getElementById('advertiseFileName').textContent = file.name;
+                        document.getElementById('advertiseFileSize').textContent = formatFileSize(file.size);
+                        document.getElementById('advertiseFileType').textContent = file.type || 'Неизвестный тип';
+                        document.getElementById('advertiseFileInfo').classList.add('show');
+                        document.getElementById('placeAdvertiseButton').disabled = false;
+                        
+                        // Показываем превью
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.getElementById('advertiseImage');
+                            img.src = e.target.result;
+                            img.style.display = 'block';
+                            document.getElementById('advertisePreview').innerHTML = '';
+                            document.getElementById('advertisePreview').appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function changeCopies(amount) {
+            copies = Math.max(1, copies + amount);
+            document.getElementById('copiesCount').textContent = 
+                copies + (copies === 1 ? ' копия' : copies < 5 ? ' копии' : ' копий');
+        }
+        
+        // Функция для отправки файла на печать
+        async function printSelectedFile() {
+            if (!selectedFile) return;
+            
+            const isColor = document.getElementById('colorPrint').checked;
+            
+            // Создаем FormData для отправки файла
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('copies', copies);
+            formData.append('color', isColor);
+            
+            try {
+                // Показываем индикатор загрузки
+                const printButton = document.getElementById('printButton');
+                const originalText = printButton.innerHTML;
+                printButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка на печать...';
+                printButton.disabled = true;
+                
+                // Отправляем файл на сервер печати
+                const response = await fetch('http://localhost:3000/print', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Документ "${selectedFile.name}" успешно отправлен на печать. Копий: ${copies}`);
+                } else {
+                    alert('Ошибка печати: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Ошибка при печати:', error);
+                alert('Ошибка соединения с сервером печати. Проверьте, запущен ли сервер печати.');
+            } finally {
+                // Восстанавливаем кнопку
+                const printButton = document.getElementById('printButton');
+                printButton.innerHTML = originalText;
+                printButton.disabled = false;
+            }
+        }
+        
+        // ===== Функции для сканирования =====
+        function startScanning() {
+            const preview = document.getElementById('scanPreview');
+            const img = document.getElementById('scannedImage');
+            
+            preview.innerHTML = '<div style="text-align: center;"><i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #2e7d32;"></i><p>Идёт сканирование...</p></div>';
+            
+            // Имитация сканирования
+            setTimeout(() => {
+                // В реальном приложении здесь будет полученное изображение со сканера
+                img.src = 'https://via.placeholder.com/800x1132/ffffff/2196f3?text=Скан+документа';
+                img.style.display = 'block';
+                preview.innerHTML = '';
+                preview.appendChild(img);
+                
+                // Показываем кнопки отправки
+                const sendButtons = document.querySelectorAll('.settings button');
+                sendButtons.forEach(btn => btn.disabled = false);
+            }, 2000);
+        }
+        
+        function sendToEmail() {
+            const email = prompt('Введите email для отправки скана:');
+            if (email) {
+                alert(`Скан будет отправлен на адрес ${email}\n(В реальной системе здесь будет отправка)`);
+            }
+        }
+        
+        function saveToUSB() {
+            alert('Пожалуйста, вставьте USB-накопитель для сохранения скана\n(В реальной системе будет обнаружение флешки)');
+        }
+        
+        // ===== Функции для ксерокопии =====
+        let copyCount = 1;
+        
+        function changeCopyCount(amount) {
+            copyCount = Math.max(1, copyCount + amount);
+            document.getElementById('copyCount').textContent = 
+                copyCount + (copyCount === 1 ? ' копия' : copyCount < 5 ? ' копии' : ' копий');
+        }
+        
+        function startCopying() {
+            const originalType = document.querySelector('input[name="originalType"]:checked').value;
+            const copyType = document.querySelector('input[name="copyType"]:checked').value;
+            const scale = document.getElementById('copyScale').value;
+            const contrast = document.getElementById('autoContrast').checked;
+            
+            alert(`Начинаем копирование:\n\n` +
+                  `Копий: ${copyCount}\n` +
+                  `Оригинал: ${originalType === 'single' ? 'односторонний' : 'двусторонний'}\n` +
+                  `Копия: ${copyType === 'single' ? 'односторонняя' : 'двусторонняя'}\n` +
+                  `Масштаб: ${scale}%\n` +
+                  `Автоконтраст: ${contrast ? 'вкл' : 'выкл'}`);
+        }
+        
+        // ===== Функции для размещения рекламы =====
+        function placeAdvertise() {
+            if (!selectedFile) return;
+            
+            const format = document.getElementById('advertiseFormat').value;
+            const copies = document.getElementById('advertiseCopies').value;
+            const isColor = document.getElementById('colorAdvertise').checked;
+            const name = document.getElementById('advertiseName').value;
+            const phone = document.getElementById('advertisePhone').value;
+            const email = document.getElementById('advertiseEmail').value;
+            
+            if (!name || !phone || !email) {
+                alert('Пожалуйста, заполните все контактные данные');
+                return;
+            }
+            
+            alert(`Рекламный макет "${selectedFile.name}" отправлен на печать.\n\n` +
+                  `Формат: ${format}\n` +
+                  `Копий: ${copies}\n` +
+                  `Цветная печать: ${isColor ? 'да' : 'нет'}\n\n` +
+                  `Контактные данные:\n` +
+                  `Имя: ${name}\n` +
+                  `Телефон: ${phone}\n` +
+                  `Email: ${email}\n\n` +
+                  `С вами свяжутся для уточнения деталей.`);
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            // Можно добавить инициализацию здесь
+        });
+    </script>
 </body>
 </html>
