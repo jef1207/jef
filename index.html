@@ -2,323 +2,81 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Киоск печати</title>
-<!-- Подключение шрифтов Google для современного вида -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Имитация печати</title>
 <style>
-  /* Общие стили */
   body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #ece9e6, #ffffff);
-    margin: 0;
+    font-family: Arial, sans-serif;
     padding: 20px;
-    color: #333;
   }
-
-  /* Заголовок */
-  header {
-    background-color: #4a90e2;
-    color: white;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 28px;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
-    transition: all 0.3s ease;
+  #printArea {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
   }
-
-  /* Общий контейнер для секций */
-  .section {
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 30px;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    transition: all 0.3s ease, opacity 0.5s ease, transform 0.5s ease;
-    opacity:1; 
-    transform: translateY(0);
+  #printButton {
+    padding: 10px 20px;
+    font-size: 16px;
   }
-
-  /* Анимация скрытия/появления секций */
-  .hidden {
-    opacity:0; 
-    transform: translateY(20px);
-    pointer-events:none; 
-    height:auto; 
-    overflow:hidden; 
-}
-
-.active {
-   opacity:1; 
-   transform: translateY(0);
-   pointer-events:auto; 
-}
-
-h2 {
-    margin-top: 0;
-    font-size: 22px;
-    color:#333;
-}
-
-button {
-   background-color:#4a90e2; 
-   color:#fff; 
-   border:none; 
-   padding:14px 24px; 
-   border-radius:8px; 
-   font-size:16px; 
-   cursor:pointer; 
-   transition:.3s all ease; 
-}
-button:hover {
-   background-color:#357ABD; 
-   transform: translateY(-2px);
-}
-button[disabled] {
-   background-color:#a0c4e8; 
-   cursor:not-allowed; 
-   opacity:.6; 
-}
-
-/* Input и select стили */
-input[type="number"], select {
-   width:100%;
-   padding:12px; 
-   border-radius:8px; 
-   border:none; 
-   box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-   font-size:16px; 
-   margin-top:-10px;margin-bottom:20px;
-}
-
-/* Область для перетаскивания файла */
-.usb-area {
-   border:dashed #ccc; 
-   padding:40px; 
-   text-align:center; 
-   border-radius:12px; 
-   background-color:#f9f9f9; 
-   cursor:pointer; 
-   position relative
-}
-.usb-area:hover {
-   background-color:#f1f1f1; 
-}
-#fileInput { display:none }
-
-.message {
- margin-top:-10px;margin-bottom:-10px;font-size:18px;font-weight:bold;text-align:center;color:#28a745;}
-/* Анимация загрузки */
-.loader-container {
- display:flex; justify-content:center; align-items:center;padding-top:-10px;padding-bottom:-10px;}
-.loader {
- width :50px;height :50px;border-radius :50%;border :6px solid #ccc;border-top-color :#4a90e2 ;animation :spin .8s linear infinite;}
-@keyframes spin{
- from {transform :rotate(0deg);}
- to {transform :rotate(360deg);}
-}
-
-/* Предварительный просмотр миниатюры */
-.preview-thumbnail {
- border-radius:8px;text-align:center;padding-top:-10px;margin-top:-10px;}
+  #printAnimation {
+    display: none;
+    margin-top: 20px;
+    font-weight: bold;
+    color: green;
+  }
 </style>
 </head>
 <body>
 
-<header>Киоск печати</header>
+<h1>Заказ на печать</h1>
 
-<!-- Вставка флешки -->
-<div class="section" id="usb-section">
-<h2>Вставьте USB-накопитель для выбора файла</h2>
-<div class="usb-area" id="usb-area">
-<p style="margin-bottom:15px;">Перетащите файл сюда или нажмите "Обзор файлов"</p>
-<button id="browseBtn">Обзор файлов на флешке</button>
-<input type="file" id="fileInput" />
-</div>
-<div id="fileSelected" class="file-info hidden" style="margin-top:-10px;">
-<strong>Выбран файл:</strong> <span id="fileName"></span><br/>
-<button id="nextBtn" disabled>Далее</button>
-</div>
-<div class='loader-container hidden' id='loadingUsb'>
-<div class='loader'></div></div>
+<div id="printArea">
+  <!-- Здесь будет содержимое для печати -->
+  <p>Это пример документа для печати.</p>
 </div>
 
-<!-- Настройки печати -->
-<div class="section hidden" id="settings-section">
-<h2>Настройки печати</h2>
-<label for="copies">Количество копий:</label>
-<input type="number" id="copies" min="1" max="100" value="1"/>
+<button id="printButton">Печать</button>
 
-<label for="paperType">Тип бумаги:</label>
-<select id="paperType">
-<option value="матовая">Матовая</option>
-<option value="глянцевая">Глянцевая</option>
-</select>
-
-<label for="size">Размер:</label>
-<select id="size">
-<option value="A4">A4</option>
-<option value="A3">A3</option>
-</select>
-
-<button id="previewBtn">Предварительный просмотр</button>
-<div class='loader-container hidden' id='loadingSettings'>
-<div class='loader'></div></div>
-</div>
-
-<!-- Предварительный просмотр -->
-<div class='section hidden' id='preview-section'>
-<h2>Предварительный просмотр документа</h2>
-<p><strong>Файл:</strong> <span id='previewFileName'></span></p>
-
-<!-- Заглушка миниатюры -->
-<div style='border-radius:8px;background:#eee;text-align:center;padding-top:-10px;margin-top:-10px'>
-<img src='https://via.placeholder.com/300x150?text=Миниатюра' class='preview-thumbnail' alt='миниатюра'/>
-</div>
-
-<button id='payBtn'>Оплатить и напечатать</button>
-<button id='backToSettings'>Назад к настройкам</button>
-
-<div class='message hidden' id='printMessage'>Пожалуйста, заберите ваш документ на выходе. Спасибо!</div>
-
-<!-- Анимация загрузки платежа -->
-<div class='loader-container hidden' id='loadingPayment'>
-<div class='loader'></div></div>
-
-<!-- Имитация завершения печати -->
-<div class='loader-container hidden' id='printing'>
-<h3 style='text-align:center;'>Печать...</h3>
-<div class='loader'></div></div>
-
-</div>
+<div id="printAnimation">Печать...</div>
+<div id="readyMessage" style="display:none;">Документ готов к получению.</div>
 
 <script>
-// Элементы
-const usbArea = document.getElementById('usb-area');
-const fileInput = document.getElementById('fileInput');
-const browseBtn = document.getElementById('browseBtn');
-const fileSelectedDiv = document.getElementById('fileSelected');
-const fileNameSpan = document.getElementById('fileName');
-const nextBtn = document.getElementById('nextBtn');
+const printButton = document.getElementById('printButton');
+const printAnimation = document.getElementById('printAnimation');
+const readyMessage = document.getElementById('readyMessage');
 
-const settingsSection = document.getElementById('settings-section');
-const previewSection = document.getElementById('preview-section');
+printButton.addEventListener('click', () => {
+  // Показываем анимацию
+  printAnimation.style.display = 'block';
+  
+  // Имитация процесса печати через задержку
+  setTimeout(() => {
+    // Скрываем анимацию
+    printAnimation.style.display = 'none';
+    
+    // Показываем сообщение о готовности
+    readyMessage.style.display = 'block';
 
-const previewFileNameSpan = document.getElementById('previewFileName');
-const payBtn = document.getElementById('payBtn');
-const backToSettingsBtn = document.getElementById('backToSettings');
+    // Можно добавить кнопку для нового заказа или сброса
+    // Например:
+    // createResetButton();
 
-const printMessage = document.getElementById('printMessage');
-
-const loadingUsb = document.getElementById('loadingUsb');
-const loadingSettings = document.getElementById('loadingSettings');
-const loadingPayment = document.getElementById('loadingPayment');
-const printingAnim = document.getElementById('printing');
-
-let selectedFileName = '';
-
-/* Обработка выбора файла */
-browseBtn.onclick=()=>{
-   fileInput.click();
-};
-fileInput.onchange=()=>{
- if (fileInput.files.length >0) {
-     selectedFileName = fileInput.files[0].name;
-     fileNameSpan.textContent=selectedFileName;
-     fileSelectedDiv.classList.remove('hidden');
-     nextBtn.disabled=false;
-
-     // Можно добавить предварительный просмотр файла или миниатюру
- }
-};
-
-/* Переход к настройкам с имитацией загрузки */
-nextBtn.onclick=()=>{
- // показываем анимацию загрузки
- loadingUsb.classList.remove('hidden');
- setTimeout(()=>{
-     // скрываем раздел вставки флешки
-     document.getElementById('usb-section').classList.add('hidden');
-     // скрываем анимацию
-     loadingUsb.classList.add('hidden');
-
-     // показываем настройки
-     settingsSection.classList.remove('hidden');
-
-     // Передача имени файла в предпросмотр
-     previewFileNameSpan.textContent=selectedFileName;
-
-     // сброс настроек
-     document.getElementById('copies').value=1;
-     document.getElementById('paperType').value='матовая';
-     document.getElementById('size').value='A4';
-
- },1000); // задержка имитации загрузки
-};
-
-/* Предварительный просмотр с имитацией загрузки */
-document.getElementById('previewBtn').onclick=()=>{
- settingsSection.classList.add('hidden');
-
- // показываем анимацию загрузки перед появлением раздела
- const previewDiv=document.getElementById('preview-section');
- const loader=document.createElement('div');
- loader.className='loader-container';
- loader.innerHTML='<div class=\"loader\"></div>';
-
- previewDiv.classList.add('hidden'); // скрываем сразу чтобы не мешал
-document.body.appendChild(loader);
-
-setTimeout(()=>{
- // убираем анимацию и показываем раздел
- loader.remove();
- previewDiv.classList.remove('hidden');
-},1000); // задержка имитации загрузки
-};
-
-/* Назад к настройкам с анимацией */
-backToSettings.onclick=()=>{
- const previewDiv=document.getElementById('preview-section');
- const loader=document.createElement('div');
- loader.className='loader-container';
- loader.innerHTML='<div class=\"loader\"></div>';
-
- previewDiv.classList.add('hidden'); // скрываем сразу чтобы не мешал
-document.body.appendChild(loader);
-
-setTimeout(()=>{
- loader.remove();
- settingsSection.classList.remove('hidden');
-},1000);
-};
-
-/* Оплата и завершение с имитацией процесса */
-payBtn.onclick=()=>{
-// показываем анимацию платежа
-loadingPayment.classList.remove('hidden');
-
-// имитируем задержку платежа (например, обработка)
-setTimeout(()=>{
-// скрываем анимацию платежа
-loadingPayment.classList.add('hidden');
-
-// показываем процесс печати
-printingAnim.classList.remove('hidden');
-
-// имитируем время печати (например, несколько секунд)
-setTimeout(()=>{
- printingAnim.classList.add('hidden');
-
- // показываем сообщение о готовности
- printMessage.classList.remove('hidden');
-
-},3000); // время "печати"
+  }, 3000); // задержка в миллисекундах (3 секунды)
 });
-};
+
+// Функция для сброса или начала нового заказа (по желанию)
+function createResetButton() {
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = 'Начать заново';
+  resetBtn.onclick = () => {
+    readyMessage.style.display = 'none';
+    resetBtn.remove();
+  };
+  
+  document.body.appendChild(resetBtn);
+}
 </script>
 
 </body>
