@@ -90,6 +90,14 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .product-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
         }
         
         .testimonial-card {
@@ -103,8 +111,13 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--secondary-color);
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
         }
         
         footer {
@@ -120,6 +133,12 @@
         .nav-pills .nav-link {
             color: #333;
         }
+        
+        .logo-placeholder {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -127,7 +146,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="https://i.imgur.com/JzQ8DfN.png" alt="AudioPro Logo" height="40">
+                <span class="logo-placeholder">AudioPro</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -147,7 +166,7 @@
                         <a class="nav-link" href="#testimonials">Отзывы</a>
                     </li>
                 </ul>
-                <a href="https://t.me/AudioPro_support_bot" class="btn btn-outline-light ms-3">
+                <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-light ms-3">
                     <i class="fab fa-telegram"></i> Написать в поддержку
                 </a>
             </div>
@@ -161,12 +180,12 @@
                 <div class="col-lg-6">
                     <h1 class="display-4 fw-bold mb-4">Официальная поддержка AudioPro</h1>
                     <p class="lead mb-4">Мы всегда готовы помочь с вашими наушниками. Наш Telegram-бот ответит на вопросы и поможет решить любые проблемы.</p>
-                    <a href="https://t.me/AudioPro_support_bot" class="telegram-btn">
+                    <a href="https://t.me/AudioproSupportBot" class="telegram-btn">
                         <i class="fab fa-telegram"></i> Перейти в поддержку
                     </a>
                 </div>
-                <div class="col-lg-6">
-                    <img src="https://i.imgur.com/5XJQZ9y.png" alt="Наушники AudioPro" class="img-fluid">
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-headphones" style="font-size: 10rem; color: rgba(255,255,255,0.2);"></i>
                 </div>
             </div>
         </div>
@@ -188,7 +207,7 @@
                         </div>
                         <h4>Активировать гарантию</h4>
                         <p>Активируйте гарантию на ваши наушники, отправив скриншот покупки и серийный номер</p>
-                        <a href="https://t.me/AudioPro_support_bot" class="btn btn-outline-primary">Открыть в боте</a>
+                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
                     </div>
                 </div>
                 
@@ -199,7 +218,7 @@
                         </div>
                         <h4>Проблема с зарядкой</h4>
                         <p>Решения распространенных проблем с зарядкой ваших наушников</p>
-                        <a href="https://t.me/AudioPro_support_bot" class="btn btn-outline-primary">Открыть в боте</a>
+                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
                     </div>
                 </div>
                 
@@ -210,7 +229,7 @@
                         </div>
                         <h4>Не работают наушники</h4>
                         <p>Инструкции по перезагрузке и устранению неисправностей</p>
-                        <a href="https://t.me/AudioPro_support_bot" class="btn btn-outline-primary">Открыть в боте</a>
+                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
                     </div>
                 </div>
             </div>
@@ -223,7 +242,7 @@
                         </div>
                         <h4>Возврат товара</h4>
                         <p>Оформите возврат товара, если он не соответствует вашим ожиданиям</p>
-                        <a href="https://t.me/AudioPro_support_bot" class="btn btn-outline-primary">Открыть в боте</a>
+                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
                     </div>
                 </div>
                 
@@ -234,7 +253,7 @@
                         </div>
                         <h4>Получить кэшбэк</h4>
                         <p>Получите кэшбэк за оставленный отзыв о наших наушниках</p>
-                        <a href="https://t.me/AudioPro_support_bot" class="btn btn-outline-primary">Открыть в боте</a>
+                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
                     </div>
                 </div>
                 
@@ -245,7 +264,7 @@
                         </div>
                         <h4>Связаться с поддержкой</h4>
                         <p>Напишите нам напрямую, если не нашли решения вашей проблемы</p>
-                        <a href="https://t.me/AudioPro_support_bot" class="btn btn-outline-primary">Открыть в боте</a>
+                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
                     </div>
                 </div>
             </div>
@@ -263,46 +282,46 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <div class="product-showcase">
-                        <img src="https://i.imgur.com/8Km9tLL.jpg" alt="AudioPro TWS-100" class="img-fluid">
-                        <div class="p-4">
-                            <h4>AudioPro TWS-100</h4>
-                            <p class="text-muted">Беспроводные наушники с шумоподавлением</p>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success me-2"></i> До 8 часов работы</li>
-                                <li><i class="fas fa-check text-success me-2"></i> Bluetooth 5.0</li>
-                                <li><i class="fas fa-check text-success me-2"></i> Водозащита IPX5</li>
-                            </ul>
+                        <div class="product-icon">
+                            <i class="fas fa-headphones"></i>
                         </div>
+                        <h4>AudioPro TWS-100</h4>
+                        <p class="text-muted">Беспроводные наушники с шумоподавлением</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i> До 8 часов работы</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Bluetooth 5.0</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Водозащита IPX5</li>
+                        </ul>
                     </div>
                 </div>
                 
                 <div class="col-md-4 mb-4">
                     <div class="product-showcase">
-                        <img src="https://i.imgur.com/5XJQZ9y.png" alt="AudioPro BassX" class="img-fluid">
-                        <div class="p-4">
-                            <h4>AudioPro BassX</h4>
-                            <p class="text-muted">Наушники с усиленными басами</p>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success me-2"></i> До 10 часов работы</li>
-                                <li><i class="fas fa-check text-success me-2"></i> Глубокие басы</li>
-                                <li><i class="fas fa-check text-success me-2"></i> Сенсорное управление</li>
-                            </ul>
+                        <div class="product-icon">
+                            <i class="fas fa-volume-up"></i>
                         </div>
+                        <h4>AudioPro BassX</h4>
+                        <p class="text-muted">Наушники с усиленными басами</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i> До 10 часов работы</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Глубокие басы</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Сенсорное управление</li>
+                        </ul>
                     </div>
                 </div>
                 
                 <div class="col-md-4 mb-4">
                     <div class="product-showcase">
-                        <img src="https://i.imgur.com/JqYeZbN.jpg" alt="AudioPro Air" class="img-fluid">
-                        <div class="p-4">
-                            <h4>AudioPro Air</h4>
-                            <p class="text-muted">Ультралегкие беспроводные наушники</p>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success me-2"></i> Всего 4г на каждый наушник</li>
-                                <li><i class="fas fa-check text-success me-2"></i> Зарядка за 15 минут</li>
-                                <li><i class="fas fa-check text-success me-2"></i> 6 микрофонов для четких звонков</li>
-                            </ul>
+                        <div class="product-icon">
+                            <i class="fas fa-headset"></i>
                         </div>
+                        <h4>AudioPro Air</h4>
+                        <p class="text-muted">Ультралегкие беспроводные наушники</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i> Всего 4г на каждый наушник</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Зарядка за 15 минут</li>
+                            <li><i class="fas fa-check text-success me-2"></i> 6 микрофонов для четких звонков</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -321,7 +340,9 @@
                 <div class="col-md-4 mb-4">
                     <div class="testimonial-card">
                         <div class="d-flex align-items-center mb-3">
-                            <img src="https://i.imgur.com/JzQ8DfN.png" alt="User" class="testimonial-img me-3">
+                            <div class="testimonial-img">
+                                <i class="fas fa-user"></i>
+                            </div>
                             <div>
                                 <h5 class="mb-0">Алексей Петров</h5>
                                 <div class="text-warning">
@@ -340,7 +361,9 @@
                 <div class="col-md-4 mb-4">
                     <div class="testimonial-card">
                         <div class="d-flex align-items-center mb-3">
-                            <img src="https://i.imgur.com/JzQ8DfN.png" alt="User" class="testimonial-img me-3">
+                            <div class="testimonial-img">
+                                <i class="fas fa-user"></i>
+                            </div>
                             <div>
                                 <h5 class="mb-0">Мария Иванова</h5>
                                 <div class="text-warning">
@@ -359,7 +382,9 @@
                 <div class="col-md-4 mb-4">
                     <div class="testimonial-card">
                         <div class="d-flex align-items-center mb-3">
-                            <img src="https://i.imgur.com/JzQ8DfN.png" alt="User" class="testimonial-img me-3">
+                            <div class="testimonial-img">
+                                <i class="fas fa-user"></i>
+                            </div>
                             <div>
                                 <h5 class="mb-0">Дмитрий Смирнов</h5>
                                 <div class="text-warning">
@@ -383,7 +408,7 @@
         <div class="container text-center">
             <h2 class="fw-bold mb-4">Нужна помощь с наушниками?</h2>
             <p class="lead mb-4">Наш Telegram-бот поддержки работает 24/7 и готов помочь вам в любой момент</p>
-            <a href="https://t.me/AudioPro_support_bot" class="btn btn-light btn-lg">
+            <a href="https://t.me/AudioproSupportBot" class="btn btn-light btn-lg">
                 <i class="fab fa-telegram"></i> Написать в поддержку
             </a>
         </div>
@@ -414,7 +439,7 @@
                 <div class="col-md-3 mb-4">
                     <h5>Поддержка</h5>
                     <ul class="list-unstyled">
-                        <li><a href="https://t.me/AudioPro_support_bot" class="text-white">Telegram-бот</a></li>
+                        <li><a href="https://t.me/AudioproSupportBot" class="text-white">Telegram-бот</a></li>
                         <li><a href="#" class="text-white">FAQ</a></li>
                         <li><a href="#" class="text-white">Гарантия</a></li>
                         <li><a href="#" class="text-white">Возврат</a></li>
