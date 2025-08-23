@@ -37,7 +37,6 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            position: relative;
         }
         
         .header {
@@ -145,7 +144,6 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            cursor: pointer;
         }
         
         .support-card:hover {
@@ -157,6 +155,9 @@
             width: 100%;
             border-radius: 10px;
             margin-bottom: 20px;
+            height: 130px;
+            object-fit: cover;
+            background-color: #f5f5f7;
         }
         
         .support-card h3 {
@@ -296,6 +297,18 @@
             margin-bottom: 8px;
         }
         
+        .icon-placeholder {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 130px;
+            background: #f5f5f7;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 50px;
+            color: #86868b;
+        }
+        
         @media (max-width: 768px) {
             .header-title {
                 font-size: 40px;
@@ -343,46 +356,46 @@
         </header>
 
         <div class="content">
-            <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-pro-2nd-gen-240x130_2x.png" alt="AirPods" class="hero-image">
+            <div class="icon-placeholder">🎧</div>
 
             <section class="section">
                 <h2 class="section-title">Найдите нужную тему</h2>
                 <div class="support-grid">
                     <div class="support-card" onclick="openModal('setup-modal')">
-                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-setup-240x130_2x.png" alt="Настройка">
+                        <div class="icon-placeholder">⚙️</div>
                         <h3>Настройка</h3>
                         <p>Настройте свои AirPods и подключите их к своим устройствам Apple. Просто откройте футляр рядом с iPhone и следуйте инструкциям на экране.</p>
-                        <a href="javascript:void(0)">Настроить AirPods</a>
+                        <a href="#">Настроить AirPods</a>
                     </div>
                     <div class="support-card" onclick="openModal('charging-modal')">
-                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-battery-240x130_2x.png" alt="Зарядка">
+                        <div class="icon-placeholder">🔋</div>
                         <h3>Зарядка</h3>
                         <p>Узнайте, как заряжать AirPods и футляр для зарядки. Проверьте уровень заряда батареи и оптимизируйте время работы от аккумулятора.</p>
-                        <a href="javascript:void(0)">Информация о зарядке</a>
+                        <a href="#">Информация о зарядке</a>
                     </div>
                     <div class="support-card" onclick="openModal('usage-modal')">
-                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-fit-240x130_2x.png" alt="Использование">
+                        <div class="icon-placeholder">🎵</div>
                         <h3>Использование</h3>
                         <p>Слушайте музыку, отвечайте на звонки и используйте функции Siri. Узнайте о жестах управления и специальных возможностях.</p>
-                        <a href="javascript:void(0)">Использование AirPods</a>
+                        <a href="#">Использование AirPods</a>
                     </div>
                     <div class="support-card" onclick="openModal('cleaning-modal')">
-                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-clean-240x130_2x.png" alt="Очистка">
+                        <div class="icon-placeholder">✨</div>
                         <h3>Очистка и уход</h3>
                         <p>Рекомендации по очистке и уходу за вашими AirPods. Узнайте, как правильно чистить наушники и футляр без повреждений.</p>
-                        <a href="javascript:void(0)">Как очищать AirPods</a>
+                        <a href="#">Как очищать AirPods</a>
                     </div>
                     <div class="support-card" onclick="openModal('repair-modal')">
-                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-service-240x130_2x.png" alt="Ремонт">
+                        <div class="icon-placeholder">🔧</div>
                         <h3>Ремонт и обслуживание</h3>
                         <p>Информация о ремонте и вариантах обслуживания. Проверьте гарантийный статус и найдите авторизованные сервисные центры.</p>
-                        <a href="javascript:void(0)">Варианты обслуживания</a>
+                        <a href="#">Варианты обслуживания</a>
                     </div>
                     <div class="support-card" onclick="openModal('specs-modal')">
-                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-specs-240x130_2x.png" alt="Характеристики">
+                        <div class="icon-placeholder">📊</div>
                         <h3>Характеристики</h3>
                         <p>Технические характеристики и информация о совместимости. Узнайте о функциях и возможностях вашей модели AirPods.</p>
-                        <a href="javascript:void(0)">Технические характеристики</a>
+                        <a href="#">Технические характеристики</a>
                     </div>
                 </div>
             </section>
@@ -393,22 +406,22 @@
                     <div class="support-card" onclick="openModal('connection-issues-modal')">
                         <h3>Если AirPods не подключаются</h3>
                         <p>Узнайте, что делать, если ваши AirPods не подключаются к устройству. Решения для распространенных проблем с подключением.</p>
-                        <a href="javascript:void(0)">Узнать больше</a>
+                        <a href="#">Узнать больше</a>
                     </div>
                     <div class="support-card" onclick="openModal('sound-issues-modal')">
                         <h3>Если звук прерывается</h3>
                         <p>Что делать, если звук в AirPods прерывается или воспроизведение нестабильно. Советы по улучшению качества соединения.</p>
-                        <a href="javascript:void(0)">Узнать больше</a>
+                        <a href="#">Узнать больше</a>
                     </div>
                     <div class="support-card" onclick="openModal('battery-check-modal')">
                         <h3>Проверка заряда батареи</h3>
                         <p>Как проверить уровень заряда батареи ваших AirPods. Узнайте о индикаторах статуса заряда на футляре и на устройствах Apple.</p>
-                        <a href="javascript:void(0)">Узнать больше</a>
+                        <a href="#">Узнать больше</a>
                     </div>
                     <div class="support-card" onclick="openModal('reset-modal')">
                         <h3>Сброс настроек AirPods</h3>
                         <p>Как выполнить сброс настроек AirPods к заводским установкам. Это может помочь решить различные проблемы с работой наушников.</p>
-                        <a href="javascript:void(0)">Узнать больше</a>
+                        <a href="#">Узнать больше</a>
                     </div>
                 </div>
             </section>
@@ -461,22 +474,22 @@
                     <div class="support-card" onclick="openModal('contact-modal')">
                         <h3>Свяжитесь с нами</h3>
                         <p>Получите помощь от службы поддержки Apple. Доступны различные способы связи, включая чат, телефон и электронную почту.</p>
-                        <a href="javascript:void(0)">Обратиться в поддержку</a>
+                        <a href="#">Обратиться в поддержку</a>
                     </div>
                     <div class="support-card" onclick="openModal('manuals-modal')">
                         <h3>Руководства пользователя</h3>
                         <p>Загрузите руководства пользователя для AirPods. Доступны руководства на различных языках в формате PDF.</p>
-                        <a href="javascript:void(0)">Скачать руководства</a>
+                        <a href="#">Скачать руководства</a>
                     </div>
                     <div class="support-card" onclick="openModal('community-modal')">
                         <h3>Сообщества Apple</h3>
                         <p>Получите помощь от других пользователей Apple. Задайте вопрос или поделитесь своим опытом в сообществе Apple.</p>
-                        <a href="javascript:void(0)">Посетить сообщества</a>
+                        <a href="#">Посетить сообщества</a>
                     </div>
                     <div class="support-card" onclick="openModal('coverage-modal')">
                         <h3>Проверка обслуживания и поддержки</h3>
                         <p>Проверьте статус обслуживания и поддержки ваших устройств. Узнайте о возможности гарантийного обслуживания.</p>
-                        <a href="javascript:void(0)">Проверить покрытие</a>
+                        <a href="#">Проверить покрытие</a>
                     </div>
                 </div>
             </section>
@@ -535,8 +548,6 @@
         </div>
     </div>
 
-    <!-- Добавьте остальные модальные окна по аналогии -->
-
     <div id="support-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -557,6 +568,29 @@
                 <h3>Электронная почта</h3>
                 <p>Напишите нам на адрес: support@techno.ru</p>
                 <p>Мы отвечаем в течение 24 часов</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="manual-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Инструкции пользователя</h2>
+                <button class="close-btn" onclick="closeModal('manual-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Доступные руководства</h3>
+                <p>Вы можете скачать следующие руководства пользователя:</p>
+                
+                <ul>
+                    <li><a href="#">AirPods Pro (2-го поколения) - Руководство пользователя (PDF, 5.2 МБ)</a></li>
+                    <li><a href="#">AirPods (3-го поколения) - Руководство пользователя (PDF, 4.8 МБ)</a></li>
+                    <li><a href="#">AirPods Max - Руководство пользователя (PDF, 6.1 МБ)</a></li>
+                    <li><a href="#">AirPods Pro - Руководство пользователя (PDF, 4.5 МБ)</a></li>
+                    <li><a href="#">AirPods (2-го поколения) - Руководство пользователя (PDF, 3.9 МБ)</a></li>
+                </ul>
+                
+                <p>Все руководства доступны на русском языке и содержат подробные инструкции по использованию, настройке и устранению неполадок.</p>
             </div>
         </div>
     </div>
