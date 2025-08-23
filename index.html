@@ -83,6 +83,12 @@
         .content h2 {
             font-size: 28px;
             margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
         }
         
         .content h3 {
@@ -104,16 +110,21 @@
             margin-bottom: 10px;
         }
         
-        .image-placeholder {
-            background-color: #f5f5f7;
-            border-radius: 8px;
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .image-container {
             margin: 20px 0;
+            text-align: center;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-caption {
             color: #86868b;
-            border: 1px dashed #d2d2d7;
+            font-size: 14px;
+            margin-top: 8px;
         }
         
         .button {
@@ -129,6 +140,19 @@
         
         .button:hover {
             background-color: #0077ed;
+        }
+        
+        .important-note {
+            background-color: #fff8e6;
+            border-left: 4px solid #ffcc00;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .important-note h4 {
+            margin-bottom: 10px;
+            color: #1d1d1f;
         }
         
         footer {
@@ -179,6 +203,12 @@
                 <p>Как выполнить сброс AirPods до заводских настроек</p>
                 <a href="#reset">Узнать больше</a>
             </div>
+            
+            <div class="nav-item">
+                <h2>Подключение к Android</h2>
+                <p>Как подключить AirPods к устройствам Android</p>
+                <a href="#android-connection">Узнать больше</a>
+            </div>
         </div>
         
         <div class="content" id="sound-issues">
@@ -192,14 +222,16 @@
             
             <p>Откройте зарядный футляр рядом с iPhone или iPad.</p>
             
-            <div class="image-placeholder">
-                [Изображение texnol1.png]
+            <div class="image-container">
+                <img src="https://raw.githubusercontent.com/jef1207/jef/main/texnol1.png" alt="AirPods рядом с iPhone">
+                <div class="image-caption">Откройте футляр рядом с устройством</div>
             </div>
             
             <p>Проверьте состояние зарядки на iPhone или iPad, чтобы убедиться, что оба наушника AirPods заряжаются.</p>
             
-            <div class="image-placeholder">
-                [Изображение texnol2.png]
+            <div class="image-container">
+                <img src="https://raw.githubusercontent.com/jef1207/jef/main/texnol2.png" alt="Проверка заряда AirPods">
+                <div class="image-caption">Проверка состояния зарядки на iPhone</div>
             </div>
             
             <p>Вставьте неработающий наушник AirPods в соответствующее ухо.</p>
@@ -248,9 +280,6 @@
             <p>Если у вас наушники AirPods или AirPods Pro, откройте крышку футляра, когда они находятся внутри, и поднесите футляр к iPhone или iPad.</p>
             
             <p>Если у вас наушники AirPods Max, выньте их из чехла Smart Case и поднесите AirPods Max к iPhone или iPad. Рядом со значком аккумулятора наушников AirPods должен отобразится значок зарядки.</p>
-            
-            <h3>Сбросьте настройки AirPods</h3>
-            <p>Когда вы сбрасываете настройки AirPods, все пользовательские настройки, которые вы установили для AirPods, также сбрасываются. Вам нужно будет восстановить пользовательские настройки.</p>
         </div>
         
         <div class="content" id="connection-issues">
@@ -281,12 +310,14 @@
             
             <ul>
                 <li>Для наушников AirPods 4 (обеих моделей) дважды коснитесь передней части футляра, пока индикатор состояния не замигает белым.</li>
-                <div class="image-placeholder">
-                    [Изображение для AirPods 4]
+                <div class="image-container">
+                    <img src="https://raw.githubusercontent.com/jef1207/jef/main/texnol3.png" alt="AirPods 4 - двойное касание">
+                    <div class="image-caption">Двойное касание передней части футляра AirPods 4</div>
                 </div>
                 <li>Для всех остальных моделей нажмите и удерживайте кнопку настройки на обратной стороне футляра до тех пор, пока индикатор состояния не замигает белым.</li>
-                <div class="image-placeholder">
-                    [Изображение для других моделей]
+                <div class="image-container">
+                    <img src="https://raw.githubusercontent.com/jef1207/jef/main/texnol4.png" alt="Кнопка настройки AirPods">
+                    <div class="image-caption">Кнопка настройки на задней стороне футляра</div>
                 </div>
             </ul>
             
@@ -316,7 +347,7 @@
             
             <p>Нажмите и в течение 15 секунд удерживайте кнопку настройки на задней стороне футляра.</p>
             
-            <p>Когда индикатор состояния на передной панели футляра замигает оранжевым, а затем белым, выполните действия, указанные на экране устройства, чтобы снова подключить AirPods.</p>
+            <p>Когда индикатор состояния на передней панели футляра замигает оранжевым, а затем белым, выполните действия, указанные на экране устройства, чтобы снова подключить AirPods.</p>
             
             <h3>Сбросьте настройки AirPods 4 (для всех моделей)</h3>
             
@@ -351,6 +382,84 @@
             <p>Для моделей AirPods 4 дважды коснитесь передней части футляра, пока индикатор состояния светится. Когда он замигает белым, дважды коснитесь еще раз. Когда индикатор состояния замигает быстрее, дважды коснитесь в третий раз, пока он не начнет мигать оранжевым, а затем белым.</p>
             
             <p>Чтобы повторно подключить наушники AirPods: поместите наушники AirPods, находящиеся в зарядном футляре с открытой крышкой, близко к устройству, а затем следуйте инструкциям на экране устройства.</p>
+        </div>
+        
+        <div class="content" id="android-connection">
+            <h2>6. Как подключить AirPods и другие аксессуары к устройству Android</h2>
+            
+            <p>Если вы только начинаете пользоваться устройствами Android, то будете рады узнать, что к ним можно подключить ваши любимые аксессуары Apple.</p>
+            
+            <div class="important-note">
+                <h4>Важно!</h4>
+                <p>Однако возможно, что некоторые функции не будут поддерживаться.</p>
+            </div>
+            
+            <h3>Как подключить AirPods к устройству Android</h3>
+            
+            <div class="important-note">
+                <h4>Важно!</h4>
+                <ul>
+                    <li>Убедитесь, что чехол AirPods заряжен.</li>
+                    <li>Перед подключением поместите наушники в чехол.</li>
+                </ul>
+            </div>
+            
+            <ol>
+                <li>На устройстве Android проведите вниз от верхнего края экрана.</li>
+                <li>Нажмите на значок Bluetooth <span style="color: #007aff;">&#x1F4F6;</span> и удерживайте его.</li>
+                <li>На устройствах некоторых производителей в появившемся меню может не оказаться значка Bluetooth. В таком случае попробуйте найти этот параметр в настройках:
+                    <ul>
+                        <li>Откройте приложение "Настройки" на устройстве.</li>
+                        <li>Перейдите в раздел Bluetooth.</li>
+                        <li>Включите Bluetooth.</li>
+                        <li>Нажмите Добавить устройство.</li>
+                    </ul>
+                </li>
+                <li>Откройте крышку чехла AirPods.</li>
+                <li>Нажмите и удерживайте кнопку на задней поверхности чехла, пока не начнет мигать белый индикатор на передней поверхности или под крышкой. После этого наушники AirPods появятся в списке доступных устройств.</li>
+                <li>Если этого не произойдет, нажмите на значок "Ещё" <span style="color: #007aff;">&#x22EE;</span> затем Обновить.</li>
+                <li>Выберите AirPods на устройстве Android и следуйте инструкциям.</li>
+            </ol>
+            
+            <div class="image-container">
+                <img src="https://raw.githubusercontent.com/jef1207/jef/main/texnol5.png" alt="Подключение AirPods к Android">
+                <div class="image-caption">Интерфейс подключения Bluetooth на Android</div>
+            </div>
+            
+            <h3>Как подключить AirPods Max™ к устройству Android</h3>
+            
+            <ol>
+                <li>На устройстве Android проведите вниз от верхнего края экрана.</li>
+                <li>Нажмите на значок Bluetooth <span style="color: #007aff;">&#x1F4F6;</span> и удерживайте его.</li>
+                <li>На устройствах некоторых производителей параметр Bluetooth нужно искать в настройках:
+                    <ul>
+                        <li>Откройте приложение "Настройки" на устройстве.</li>
+                        <li>Перейдите в раздел Bluetooth.</li>
+                        <li>Нажмите Добавить устройство.</li>
+                    </ul>
+                </li>
+                <li>Нажмите и удерживайте кнопку шумоподавления на AirPods Max, пока на корпусе наушников не начнет мигать белый индикатор. После этого наушники появятся в списке доступных устройств.</li>
+                <li>Если этого не произойдет, нажмите на значок "Ещё" <span style="color: #007aff;">&#x22EE;</span> затем Обновить.</li>
+                <li>Выберите AirPods Max на устройстве Android и следуйте инструкциям.</li>
+            </ol>
+            
+            <h3>Как подключить другие аксессуары Bluetooth к устройству Android</h3>
+            
+            <p>Вы можете подключить к устройству Android другие аксессуары с функцией Bluetooth.</p>
+            
+            <ol>
+                <li>На устройстве Android проведите вниз от верхнего края экрана.</li>
+                <li>Нажмите на значок Bluetooth <span style="color: #007aff;">&#x1F4F6;</span> и удерживайте его.</li>
+                <li>Нажмите Добавить устройство.</li>
+                <li>Чтобы аксессуар появился в списке доступных устройств, нажмите и удерживайте на нем кнопку подключения.</li>
+                <li>С подробными инструкциями по подключению можно ознакомиться в руководстве к аксессуару.</li>
+                <li>Выберите аксессуар на устройстве Android и следуйте инструкциям.</li>
+            </ol>
+            
+            <div class="important-note">
+                <h4>Совет</h4>
+                <p>Если аксессуар поддерживает Быстрое подключение, откройте его чехол и коснитесь панели, которая появится на устройстве Android.</p>
+            </div>
         </div>
         
         <footer>
