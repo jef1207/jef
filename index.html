@@ -37,6 +37,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            position: relative;
         }
         
         .header {
@@ -76,6 +77,7 @@
             border-radius: 30px;
             font-weight: 500;
             transition: all 0.3s;
+            cursor: pointer;
         }
         
         .btn-primary {
@@ -143,6 +145,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
         
         .support-card:hover {
@@ -209,6 +212,90 @@
             background-color: #f9f9f9;
         }
         
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 40px auto;
+            border-radius: 15px;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalFade 0.3s;
+        }
+        
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 24px;
+            color: #1d1d1f;
+        }
+        
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #86868b;
+            background: none;
+            border: none;
+            transition: color 0.3s;
+        }
+        
+        .close-btn:hover {
+            color: #1d1d1f;
+        }
+        
+        .modal-body {
+            padding: 25px;
+            line-height: 1.6;
+        }
+        
+        .modal-body h3 {
+            margin: 20px 0 10px;
+            color: #1d1d1f;
+        }
+        
+        .modal-body p {
+            margin-bottom: 15px;
+            color: #515154;
+        }
+        
+        .modal-body ul, .modal-body ol {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+        
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+        
         @media (max-width: 768px) {
             .header-title {
                 font-size: 40px;
@@ -235,6 +322,11 @@
                 width: 100%;
                 max-width: 300px;
             }
+            
+            .modal-content {
+                margin: 20px auto;
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -245,8 +337,8 @@
             <h1 class="header-title">AirPods</h1>
             <p class="header-subtitle">Справка и поддержка по продуктам</p>
             <div class="header-buttons">
-                <button class="btn btn-primary">Получить поддержку</button>
-                <button class="btn btn-secondary">Инструкции пользователя</button>
+                <button class="btn btn-primary" onclick="openModal('support-modal')">Получить поддержку</button>
+                <button class="btn btn-secondary" onclick="openModal('manual-modal')">Инструкции пользователя</button>
             </div>
         </header>
 
@@ -256,41 +348,41 @@
             <section class="section">
                 <h2 class="section-title">Найдите нужную тему</h2>
                 <div class="support-grid">
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('setup-modal')">
                         <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-setup-240x130_2x.png" alt="Настройка">
                         <h3>Настройка</h3>
                         <p>Настройте свои AirPods и подключите их к своим устройствам Apple. Просто откройте футляр рядом с iPhone и следуйте инструкциям на экране.</p>
-                        <a href="#">Настроить AirPods</a>
+                        <a href="javascript:void(0)">Настроить AirPods</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('charging-modal')">
                         <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-battery-240x130_2x.png" alt="Зарядка">
                         <h3>Зарядка</h3>
                         <p>Узнайте, как заряжать AirPods и футляр для зарядки. Проверьте уровень заряда батареи и оптимизируйте время работы от аккумулятора.</p>
-                        <a href="#">Информация о зарядке</a>
+                        <a href="javascript:void(0)">Информация о зарядке</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('usage-modal')">
                         <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-fit-240x130_2x.png" alt="Использование">
                         <h3>Использование</h3>
                         <p>Слушайте музыку, отвечайте на звонки и используйте функции Siri. Узнайте о жестах управления и специальных возможностях.</p>
-                        <a href="#">Использование AirPods</a>
+                        <a href="javascript:void(0)">Использование AirPods</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('cleaning-modal')">
                         <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-clean-240x130_2x.png" alt="Очистка">
                         <h3>Очистка и уход</h3>
                         <p>Рекомендации по очистке и уходу за вашими AirPods. Узнайте, как правильно чистить наушники и футляр без повреждений.</p>
-                        <a href="#">Как очищать AirPods</a>
+                        <a href="javascript:void(0)">Как очищать AirPods</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('repair-modal')">
                         <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-service-240x130_2x.png" alt="Ремонт">
                         <h3>Ремонт и обслуживание</h3>
                         <p>Информация о ремонте и вариантах обслуживания. Проверьте гарантийный статус и найдите авторизованные сервисные центры.</p>
-                        <a href="#">Варианты обслуживания</a>
+                        <a href="javascript:void(0)">Варианты обслуживания</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('specs-modal')">
                         <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-specs-240x130_2x.png" alt="Характеристики">
                         <h3>Характеристики</h3>
                         <p>Технические характеристики и информация о совместимости. Узнайте о функциях и возможностях вашей модели AirPods.</p>
-                        <a href="#">Технические характеристики</a>
+                        <a href="javascript:void(0)">Технические характеристики</a>
                     </div>
                 </div>
             </section>
@@ -298,25 +390,25 @@
             <section class="section">
                 <h2 class="section-title">Популярные статьи</h2>
                 <div class="support-grid">
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('connection-issues-modal')">
                         <h3>Если AirPods не подключаются</h3>
                         <p>Узнайте, что делать, если ваши AirPods не подключаются к устройству. Решения для распространенных проблем с подключением.</p>
-                        <a href="#">Узнать больше</a>
+                        <a href="javascript:void(0)">Узнать больше</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('sound-issues-modal')">
                         <h3>Если звук прерывается</h3>
                         <p>Что делать, если звук в AirPods прерывается или воспроизведение нестабильно. Советы по улучшению качества соединения.</p>
-                        <a href="#">Узнать больше</a>
+                        <a href="javascript:void(0)">Узнать больше</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('battery-check-modal')">
                         <h3>Проверка заряда батареи</h3>
                         <p>Как проверить уровень заряда батареи ваших AirPods. Узнайте о индикаторах статуса заряда на футляре и на устройствах Apple.</p>
-                        <a href="#">Узнать больше</a>
+                        <a href="javascript:void(0)">Узнать больше</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('reset-modal')">
                         <h3>Сброс настроек AirPods</h3>
                         <p>Как выполнить сброс настроек AirPods к заводским установкам. Это может помочь решить различные проблемы с работой наушников.</p>
-                        <a href="#">Узнать больше</a>
+                        <a href="javascript:void(0)">Узнать больше</a>
                     </div>
                 </div>
             </section>
@@ -366,29 +458,146 @@
             <section class="section">
                 <h2 class="section-title">Дополнительная помощь</h2>
                 <div class="support-grid">
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('contact-modal')">
                         <h3>Свяжитесь с нами</h3>
                         <p>Получите помощь от службы поддержки Apple. Доступны различные способы связи, включая чат, телефон и электронную почту.</p>
-                        <a href="#">Обратиться в поддержку</a>
+                        <a href="javascript:void(0)">Обратиться в поддержку</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('manuals-modal')">
                         <h3>Руководства пользователя</h3>
                         <p>Загрузите руководства пользователя для AirPods. Доступны руководства на различных языках в формате PDF.</p>
-                        <a href="#">Скачать руководства</a>
+                        <a href="javascript:void(0)">Скачать руководства</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('community-modal')">
                         <h3>Сообщества Apple</h3>
                         <p>Получите помощь от других пользователей Apple. Задайте вопрос или поделитесь своим опытом в сообществе Apple.</p>
-                        <a href="#">Посетить сообщества</a>
+                        <a href="javascript:void(0)">Посетить сообщества</a>
                     </div>
-                    <div class="support-card">
+                    <div class="support-card" onclick="openModal('coverage-modal')">
                         <h3>Проверка обслуживания и поддержки</h3>
                         <p>Проверьте статус обслуживания и поддержки ваших устройств. Узнайте о возможности гарантийного обслуживания.</p>
-                        <a href="#">Проверить покрытие</a>
+                        <a href="javascript:void(0)">Проверить покрытие</a>
                     </div>
                 </div>
             </section>
         </div>
     </div>
+
+    <!-- Модальные окна -->
+    <div id="setup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Настройка AirPods</h2>
+                <button class="close-btn" onclick="closeModal('setup-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Как настроить AirPods</h3>
+                <p>Для настройки AirPods выполните следующие действия:</p>
+                <ol>
+                    <li>Убедитесь, что на вашем iPhone или iPad установлена последняя версия iOS или iPadOS.</li>
+                    <li>Перейдите на главный экран.</li>
+                    <li>Откройте футляр с AirPods внутри и поднесите его к iPhone или iPad.</li>
+                    <li>Появится анимация настройки — нажмите «Подключить».</li>
+                    <li>Если у вас AirPods Pro или AirPods (3-го поколения), вы можете настроить функцию «Нажимай и удерживай».</li>
+                    <li>Нажмите «Готово».</li>
+                </ol>
+                <p>Если у вас не появляется экран настройки, проверьте, включен ли Bluetooth на вашем устройстве.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="charging-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Зарядка AirPods</h2>
+                <button class="close-btn" onclick="closeModal('charging-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Как заряжать AirPods и футляр</h3>
+                <p>AirPods поставляются с футляром для зарядки, который также служит хранилищем и обеспечивает дополнительную зарядку.</p>
+                
+                <h3>Зарядка футляра</h3>
+                <p>В зависимости от модели ваших AirPods, футляр можно заряжать:</p>
+                <ul>
+                    <li>С помощью кабеля Lightning или USB-C (в зависимости от модели)</li>
+                    <li>С помощью зарядного устройства MagSafe</li>
+                    <li>С помощью зарядного устройства Qi (для моделей с беспроводной зарядкой)</li>
+                </ul>
+                
+                <h3>Проверка уровня заряда</h3>
+                <p>Чтобы проверить уровень заряда AirPods и футляра:</p>
+                <ol>
+                    <li>Откройте футляр с AirPods внутри и поднесите его к iPhone</li>
+                    <li>На экране появится информация о заряде</li>
+                    <li>Или добавьте виджет «Аккумулятор» на главный экран iPhone</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Добавьте остальные модальные окна по аналогии -->
+
+    <div id="support-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Получить поддержку</h2>
+                <button class="close-btn" onclick="closeModal('support-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Способы связи со службой поддержки</h3>
+                <p>Мы готовы помочь вам с любыми вопросами о ваших AirPods:</p>
+                
+                <h3>Чат с поддержкой</h3>
+                <p>Поговорите с нашим специалистом в онлайн-чате: <a href="javascript:void(0)">Открыть чат</a></p>
+                
+                <h3>Телефонная поддержка</h3>
+                <p>Позвоните нам по бесплатному номеру: 8-800-555-35-35</p>
+                <p>Часы работы: с 9:00 до 21:00 ежедневно</p>
+                
+                <h3>Электронная почта</h3>
+                <p>Напишите нам на адрес: support@techno.ru</p>
+                <p>Мы отвечаем в течение 24 часов</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция для открытия модального окна
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Запрещаем прокрутку страницы
+        }
+        
+        // Функция для закрытия модального окна
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto'; // Возвращаем прокрутку страницы
+        }
+        
+        // Закрытие модального окна при клике вне его содержимого
+        window.onclick = function(event) {
+            let modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        }
+        
+        // Закрытие модального окна при нажатии клавиши Esc
+        document.onkeydown = function(evt) {
+            evt = evt || window.event;
+            if (evt.keyCode == 27) {
+                let modals = document.getElementsByClassName('modal');
+                for (let i = 0; i < modals.length; i++) {
+                    if (modals[i].style.display == 'block') {
+                        modals[i].style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                }
+            }
+        };
+    </script>
 </body>
 </html>
