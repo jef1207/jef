@@ -3,473 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AudioPro - Официальная поддержка</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Служба поддержки ТЕХНОЛ (RU)</title>
     <style>
-        :root {
-            --primary-color: #6a11cb;
-            --secondary-color: #2575fc;
-            --accent-color: #ff4d4d;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #333;
+            color: #1d1d1f;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            line-height: 1.47059;
+            padding: 20px;
         }
         
-        .hero-section {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 5rem 0;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        a {
+            color: #06c;
+            text-decoration: none;
+            transition: color 0.3s;
         }
         
-        .feature-card {
+        a:hover {
+            color: #01447e;
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            height: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(120deg, #000000 0%, #2c2c2c 100%);
+            color: white;
         }
         
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--secondary-color);
+        .apple-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            font-size: 56px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: white;
+        }
+        
+        .header-subtitle {
+            font-size: 28px;
+            color: #a1a1a6;
+            margin-bottom: 30px;
+        }
+        
+        .header-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s;
         }
         
         .btn-primary {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            background: #0071e3;
+            color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s;
         }
         
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: #0077ed;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 113, 227, 0.3);
         }
         
-        .telegram-btn {
-            background: #0088cc;
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
             color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .hero-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            display: block;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .section {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 40px;
             font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 50px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #d2d2d7;
+            color: #1d1d1f;
+        }
+        
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .support-card {
+            border: 1px solid #e8e8e8;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .support-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        .support-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .support-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #1d1d1f;
+        }
+        
+        .support-card p {
+            color: #515154;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .support-card a {
+            color: #06c;
+            font-weight: 500;
             display: inline-flex;
             align-items: center;
-            transition: all 0.3s;
         }
         
-        .telegram-btn:hover {
-            background: #0077b5;
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        .support-card a::after {
+            content: "›";
+            margin-left: 5px;
+            font-size: 20px;
         }
         
-        .telegram-btn i {
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
-        
-        .product-showcase {
-            background: white;
-            border-radius: 15px;
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center;
-            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
-        .product-icon {
-            font-size: 4rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
+        .specs-table th, .specs-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
         }
         
-        .testimonial-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        .specs-table th {
+            background-color: #f5f5f7;
+            font-weight: 600;
         }
         
-        .testimonial-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            margin-right: 15px;
+        .specs-table tr:last-child td {
+            border-bottom: none;
         }
         
-        footer {
-            background: linear-gradient(to right, #2c3e50, #4ca1af);
-            color: white;
-            padding: 3rem 0;
+        .specs-table tr:hover {
+            background-color: #f9f9f9;
         }
         
-        .nav-pills .nav-link.active {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-        }
-        
-        .nav-pills .nav-link {
-            color: #333;
-        }
-        
-        .logo-placeholder {
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 40px;
+            }
+            
+            .header-subtitle {
+                font-size: 21px;
+            }
+            
+            .section-title {
+                font-size: 32px;
+            }
+            
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Навигация -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <span class="logo-placeholder">AudioPro</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#home">Главная</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#features">Поддержка</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#products">Продукты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#testimonials">Отзывы</a>
-                    </li>
-                </ul>
-                <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-light ms-3">
-                    <i class="fab fa-telegram"></i> Написать в поддержку
-                </a>
+    <div class="container">
+        <header class="header">
+            <div class="apple-logo">􀣺</div>
+            <h1 class="header-title">AirPods</h1>
+            <p class="header-subtitle">Справка и поддержка по продуктам</p>
+            <div class="header-buttons">
+                <button class="btn btn-primary">Получить поддержку</button>
+                <button class="btn btn-secondary">Инструкции пользователя</button>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <!-- Герой секция -->
-    <section class="hero-section" id="home">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">Официальная поддержка AudioPro</h1>
-                    <p class="lead mb-4">Мы всегда готовы помочь с вашими наушниками. Наш Telegram-бот ответит на вопросы и поможет решить любые проблемы.</p>
-                    <a href="https://t.me/AudioproSupportBot" class="telegram-btn">
-                        <i class="fab fa-telegram"></i> Перейти в поддержку
-                    </a>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <i class="fas fa-headphones" style="font-size: 10rem; color: rgba(255,255,255,0.2);"></i>
-                </div>
-            </div>
-        </div>
-    </section>
+        <div class="content">
+            <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-pro-2nd-gen-240x130_2x.png" alt="AirPods" class="hero-image">
 
-    <!-- Основные функции поддержки -->
-    <section class="py-5" id="features">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Как мы можем помочь?</h2>
-                <p class="text-muted">Выберите нужный вариант в нашем боте поддержки</p>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="feature-card text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h4>Активировать гарантию</h4>
-                        <p>Активируйте гарантию на ваши наушники, отправив скриншот покупки и серийный номер</p>
-                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
+            <section class="section">
+                <h2 class="section-title">Найдите нужную тему</h2>
+                <div class="support-grid">
+                    <div class="support-card">
+                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-setup-240x130_2x.png" alt="Настройка">
+                        <h3>Настройка</h3>
+                        <p>Настройте свои AirPods и подключите их к своим устройствам Apple. Просто откройте футляр рядом с iPhone и следуйте инструкциям на экране.</p>
+                        <a href="#">Настроить AirPods</a>
+                    </div>
+                    <div class="support-card">
+                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-battery-240x130_2x.png" alt="Зарядка">
+                        <h3>Зарядка</h3>
+                        <p>Узнайте, как заряжать AirPods и футляр для зарядки. Проверьте уровень заряда батареи и оптимизируйте время работы от аккумулятора.</p>
+                        <a href="#">Информация о зарядке</a>
+                    </div>
+                    <div class="support-card">
+                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-fit-240x130_2x.png" alt="Использование">
+                        <h3>Использование</h3>
+                        <p>Слушайте музыку, отвечайте на звонки и используйте функции Siri. Узнайте о жестах управления и специальных возможностях.</p>
+                        <a href="#">Использование AirPods</a>
+                    </div>
+                    <div class="support-card">
+                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-clean-240x130_2x.png" alt="Очистка">
+                        <h3>Очистка и уход</h3>
+                        <p>Рекомендации по очистке и уходу за вашими AirPods. Узнайте, как правильно чистить наушники и футляр без повреждений.</p>
+                        <a href="#">Как очищать AirPods</a>
+                    </div>
+                    <div class="support-card">
+                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-service-240x130_2x.png" alt="Ремонт">
+                        <h3>Ремонт и обслуживание</h3>
+                        <p>Информация о ремонте и вариантах обслуживания. Проверьте гарантийный статус и найдите авторизованные сервисные центры.</p>
+                        <a href="#">Варианты обслуживания</a>
+                    </div>
+                    <div class="support-card">
+                        <img src="https://support.apple.com/library/APPLE/APPLECARE_ALLGEOS/SP824/airpods-specs-240x130_2x.png" alt="Характеристики">
+                        <h3>Характеристики</h3>
+                        <p>Технические характеристики и информация о совместимости. Узнайте о функциях и возможностях вашей модели AirPods.</p>
+                        <a href="#">Технические характеристики</a>
                     </div>
                 </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h4>Проблема с зарядкой</h4>
-                        <p>Решения распространенных проблем с зарядкой ваших наушников</p>
-                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-headphones"></i>
-                        </div>
-                        <h4>Не работают наушники</h4>
-                        <p>Инструкции по перезагрузке и устранению неисправностей</p>
-                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row mt-4">
-                <div class="col-md-4">
-                    <div class="feature-card text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-undo"></i>
-                        </div>
-                        <h4>Возврат товара</h4>
-                        <p>Оформите возврат товара, если он не соответствует вашим ожиданиям</p>
-                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <h4>Получить кэшбэк</h4>
-                        <p>Получите кэшбэк за оставленный отзыв о наших наушниках</p>
-                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card text-center">
-                        <div class="feature-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <h4>Связаться с поддержкой</h4>
-                        <p>Напишите нам напрямую, если не нашли решения вашей проблемы</p>
-                        <a href="https://t.me/AudioproSupportBot" class="btn btn-outline-primary">Открыть в боте</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            </section>
 
-    <!-- Продукты -->
-    <section class="py-5 bg-light" id="products">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Наши продукты</h2>
-                <p class="text-muted">Высококачественные беспроводные наушники</p>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="product-showcase">
-                        <div class="product-icon">
-                            <i class="fas fa-headphones"></i>
-                        </div>
-                        <h4>AudioPro TWS-100</h4>
-                        <p class="text-muted">Беспроводные наушники с шумоподавлением</p>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-check text-success me-2"></i> До 8 часов работы</li>
-                            <li><i class="fas fa-check text-success me-2"></i> Bluetooth 5.0</li>
-                            <li><i class="fas fa-check text-success me-2"></i> Водозащита IPX5</li>
-                        </ul>
+            <section class="section">
+                <h2 class="section-title">Популярные статьи</h2>
+                <div class="support-grid">
+                    <div class="support-card">
+                        <h3>Если AirPods не подключаются</h3>
+                        <p>Узнайте, что делать, если ваши AirPods не подключаются к устройству. Решения для распространенных проблем с подключением.</p>
+                        <a href="#">Узнать больше</a>
+                    </div>
+                    <div class="support-card">
+                        <h3>Если звук прерывается</h3>
+                        <p>Что делать, если звук в AirPods прерывается или воспроизведение нестабильно. Советы по улучшению качества соединения.</p>
+                        <a href="#">Узнать больше</a>
+                    </div>
+                    <div class="support-card">
+                        <h3>Проверка заряда батареи</h3>
+                        <p>Как проверить уровень заряда батареи ваших AirPods. Узнайте о индикаторах статуса заряда на футляре и на устройствах Apple.</p>
+                        <a href="#">Узнать больше</a>
+                    </div>
+                    <div class="support-card">
+                        <h3>Сброс настроек AirPods</h3>
+                        <p>Как выполнить сброс настроек AirPods к заводским установкам. Это может помочь решить различные проблемы с работой наушников.</p>
+                        <a href="#">Узнать больше</a>
                     </div>
                 </div>
-                
-                <div class="col-md-4 mb-4">
-                    <div class="product-showcase">
-                        <div class="product-icon">
-                            <i class="fas fa-volume-up"></i>
-                        </div>
-                        <h4>AudioPro BassX</h4>
-                        <p class="text-muted">Наушники с усиленными басами</p>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-check text-success me-2"></i> До 10 часов работы</li>
-                            <li><i class="fas fa-check text-success me-2"></i> Глубокие басы</li>
-                            <li><i class="fas fa-check text-success me-2"></i> Сенсорное управление</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="col-md-4 mb-4">
-                    <div class="product-showcase">
-                        <div class="product-icon">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <h4>AudioPro Air</h4>
-                        <p class="text-muted">Ультралегкие беспроводные наушники</p>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-check text-success me-2"></i> Всего 4г на каждый наушник</li>
-                            <li><i class="fas fa-check text-success me-2"></i> Зарядка за 15 минут</li>
-                            <li><i class="fas fa-check text-success me-2"></i> 6 микрофонов для четких звонков</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            </section>
 
-    <!-- Отзывы -->
-    <section class="py-5" id="testimonials">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Отзывы наших клиентов</h2>
-                <p class="text-muted">Что говорят о нас пользователи</p>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="testimonial-img">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <h5 class="mb-0">Алексей Петров</h5>
-                                <div class="text-warning">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <p>"Отличные наушники за свои деньги! Звук чистый, басы приятные. Поддержка помогла быстро активировать гарантию через бота."</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="testimonial-img">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <h5 class="mb-0">Мария Иванова</h5>
-                                <div class="text-warning">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <p>"Купила BassX - басы действительно на уровне! Была проблема с зарядкой, но в боте поддержки нашли решение за 5 минут."</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="testimonial-img">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <h5 class="mb-0">Дмитрий Смирнов</h5>
-                                <div class="text-warning">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <p>"Получил кэшбэк за отзыв, как и обещали. Бот поддержки удобный, все вопросы решаются быстро. Рекомендую!"</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            <section class="section">
+                <h2 class="section-title">Технические характеристики AirPods Pro (2-го поколения)</h2>
+                <table class="specs-table">
+                    <tr>
+                        <th>Характеристика</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>Модель</td>
+                        <td>AirPods Pro (2-го поколения)</td>
+                    </tr>
+                    <tr>
+                        <td>Активное шумоподавление</td>
+                        <td>До 2x больше по сравнению с предыдущим поколением</td>
+                    </tr>
+                    <tr>
+                        <td>Режим прозрачности</td>
+                        <td>Адаптивный режим прозрачности</td>
+                    </tr>
+                    <tr>
+                        <td>Пространственное аудио</td>
+                        <td>Персонализированное пространственное аудио с динамическим отслеживанием головы</td>
+                    </tr>
+                    <tr>
+                        <td>Время работы от аккумулятора</td>
+                        <td>До 6 часов воспроизведения звука (до 30 часов с футляром)</td>
+                    </tr>
+                    <tr>
+                        <td>Защита от пота и воды</td>
+                        <td>Рейтинг IPX4 для AirPods и футляра</td>
+                    </tr>
+                    <tr>
+                        <td>Чип</td>
+                        <td>H2 для улучшенного звука и работы функций</td>
+                    </tr>
+                    <tr>
+                        <td>Датчики</td>
+                        <td>Двойные оптические датчики, датчик силы нажатия, акселерометр, гироскоп, микрофоны с шумоподавлением</td>
+                    </tr>
+                </table>
+            </section>
 
-    <!-- CTA секция -->
-    <section class="py-5 bg-primary text-white">
-        <div class="container text-center">
-            <h2 class="fw-bold mb-4">Нужна помощь с наушниками?</h2>
-            <p class="lead mb-4">Наш Telegram-бот поддержки работает 24/7 и готов помочь вам в любой момент</p>
-            <a href="https://t.me/AudioproSupportBot" class="btn btn-light btn-lg">
-                <i class="fab fa-telegram"></i> Написать в поддержку
-            </a>
-        </div>
-    </section>
-
-    <!-- Футер -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5>AudioPro</h5>
-                    <p>Производитель качественных беспроводных наушников с 2018 года.</p>
-                    <div class="social-icons">
-                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-youtube"></i></a>
+            <section class="section">
+                <h2 class="section-title">Дополнительная помощь</h2>
+                <div class="support-grid">
+                    <div class="support-card">
+                        <h3>Свяжитесь с нами</h3>
+                        <p>Получите помощь от службы поддержки Apple. Доступны различные способы связи, включая чат, телефон и электронную почту.</p>
+                        <a href="#">Обратиться в поддержку</a>
+                    </div>
+                    <div class="support-card">
+                        <h3>Руководства пользователя</h3>
+                        <p>Загрузите руководства пользователя для AirPods. Доступны руководства на различных языках в формате PDF.</p>
+                        <a href="#">Скачать руководства</a>
+                    </div>
+                    <div class="support-card">
+                        <h3>Сообщества Apple</h3>
+                        <p>Получите помощь от других пользователей Apple. Задайте вопрос или поделитесь своим опытом в сообществе Apple.</p>
+                        <a href="#">Посетить сообщества</a>
+                    </div>
+                    <div class="support-card">
+                        <h3>Проверка обслуживания и поддержки</h3>
+                        <p>Проверьте статус обслуживания и поддержки ваших устройств. Узнайте о возможности гарантийного обслуживания.</p>
+                        <a href="#">Проверить покрытие</a>
                     </div>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h5>Меню</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#home" class="text-white">Главная</a></li>
-                        <li><a href="#features" class="text-white">Поддержка</a></li>
-                        <li><a href="#products" class="text-white">Продукты</a></li>
-                        <li><a href="#testimonials" class="text-white">Отзывы</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Поддержка</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://t.me/AudioproSupportBot" class="text-white">Telegram-бот</a></li>
-                        <li><a href="#" class="text-white">FAQ</a></li>
-                        <li><a href="#" class="text-white">Гарантия</a></li>
-                        <li><a href="#" class="text-white">Возврат</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Контакты</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-envelope me-2"></i> @AudioproSupportBot</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-4 bg-light">
-            <div class="text-center">
-                <p class="mb-0">© 2025 AudioPro. Все права защищены.</p>
-            </div>
+            </section>
         </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Плавная прокрутка для якорных ссылок
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
+    </div>
 </body>
 </html>
